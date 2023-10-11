@@ -42,7 +42,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         }
         else if (input.at(i) == '.')
         {
-            afterPoint += 1;
+            afterPoint += 1;        // ? check wether point's location(begin or end should be error)? 
             numberLength += 1;
             recordingNumber = true;
             currentStringValue += ".";
