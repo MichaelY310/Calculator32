@@ -48,6 +48,15 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             currentStringValue += ".";
         }
         else {
+            // ERROR if point not followed by a number
+            if (recordingNumber && currentStringValue.back() == '.')
+            {
+                // if there's error, the last token would be ERROR instead of END
+                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
+                return res;
+            }
+
+
             // the last digit is recorded
             if (recordingNumber) {
                 res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
