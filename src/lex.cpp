@@ -1,7 +1,7 @@
 #include "lib/lex.h"
 
 
-Token::Token(TokenType itype, std::string icontent, int iline, int iindex, float ivalue)
+Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
 {
 
@@ -19,9 +19,9 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 
     // for number
     int numberLength = 0;
-    float currentValue = 0;         
+    double currentValue = 0;         
     std::string currentStringValue = "";
-    float afterPoint = 0;   
+    double afterPoint = 0;   
     bool recordingNumber = false;
 
     for (int i = 0; i < len; i++)
@@ -30,11 +30,11 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         {
             recordingNumber = true;
             if (afterPoint) {
-                currentValue += float(input.at(i) - '0') / std::pow(10.0f, afterPoint);
+                currentValue += double(input.at(i) - '0') / std::pow(10.0f, afterPoint);
                 afterPoint += 1;
             } else {
                 currentValue *= 10;
-                currentValue += float(input.at(i) - '0');   
+                currentValue += double(input.at(i) - '0');   
             }
             std::string s(1, input.at(i));
             currentStringValue += s;
@@ -110,7 +110,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         index++;
     }
 
-    res.emplace_back(TokenType::end, "END", line, 1, -1);
+    res.emplace_back(TokenType::end, "END", line+1, 1, -1);
 
     return res;
 }

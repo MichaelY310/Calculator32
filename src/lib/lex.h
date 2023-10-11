@@ -20,10 +20,10 @@ enum class TokenType {
 class Token {
 
 public:
-    Token(TokenType itype, std::string icontent, int iline, int iindex, float ivalue = -1);
+    Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue = -1);
     ~Token() = default;
 
-    operator float() const {
+    operator double() const {
         return value;
     }
 
@@ -36,6 +36,6 @@ public:
     std::string content;    // value as a string
     int line = -1;
     int index = -1;
-    float value = -1;       // a number has its own value. otherwise -1
+    double value = -1;       // a number has its own value. otherwise -1
 
 };
