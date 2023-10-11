@@ -28,14 +28,14 @@ public:
     }
 
 public:
-    static std::vector<Token> GenTokenVector(const std::string input);
+    static std::vector<Token> GenTokenVector(const std::string input);  // returns a vector of tokens created from a string.
     static void printLexer(const std::string input);
      
 public:
     TokenType type;
-    std::string content;
+    std::string content;    // value as a string
     int line = -1;
     int index = -1;
-    float value = -1;
+    float value = -1;       // a number has its own value. otherwise -1
 
 };
