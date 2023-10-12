@@ -244,5 +244,18 @@ int main() {
         // Concatenate the lines into the input string
         input += line + '\n';
     }
-    Token::printLexer(input);
+
+
+    std::vector<Token> TokenVector = GenTokenVector(input);
+    // Check ERROR
+    Token lastToken = TokenVector.back();
+    if (lastToken.type == TokenType::error)
+    {
+        std::cout << "Syntax error on line " << lastToken.line << " column " << lastToken.index << "." << std::endl;
+        return 1;
+    }
+
+
+    Token::printLexer(TokenVector);
+    return 0;
 }
