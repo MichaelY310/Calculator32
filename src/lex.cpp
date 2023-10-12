@@ -42,6 +42,13 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         }
         else if (input.at(i) == '.')
         {
+            // nothing before a point
+            if (!recordingNumber)
+            {
+                // if there's error, the last token would be ERROR instead of END
+                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
+                return res;
+            }
             afterPoint += 1;
             numberLength += 1;
             recordingNumber = true;
@@ -230,7 +237,7 @@ int main() {
     // return 0;
 
 
-
+    // read input
     std::string input;
     while (true) {
         std::string line;
