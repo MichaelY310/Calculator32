@@ -29,7 +29,7 @@ public:
 
 public:
     static std::vector<Token> GenTokenVector(const std::string input);  // returns a vector of tokens created from a string.
-    static void printLexer(const std::string input);
+    static void printLexer(std::vector<Token> TokenVector);
      
 public:
     TokenType type;

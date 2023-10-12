@@ -116,12 +116,8 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 }
 
 
-void Token::printLexer(const std::string input) 
+void Token::printLexer(std::vector<Token> TokenVector) 
 {
-
-    std::vector<Token> TokenVector = GenTokenVector(input);
-
-
 
 
     // Check ERROR
@@ -167,4 +163,17 @@ void Token::printLexer(const std::string input)
     }
 
     return;
+}
+
+
+
+
+int main() {
+
+    std::string input;
+    std::cin >> input;
+    std::vector<Token> TokenVector = Token::GenTokenVector(input);
+    Token::printLexer(TokenVector);
+
+    return 0;
 }
