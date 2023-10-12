@@ -7,45 +7,47 @@ Parser::Parser(const std::vector<std::string> expression) {
 
 Node * Parser::ParserHelper(const std::vector<std::string> expression, int index, Node * root){
     Node * curr = nullptr;
-    // if (index > maxindex) {
-    //     maxindex = index;    // used to check end
-    // }
-    if (expression.at(index) == ")"){ //7here
-        // return root;
+    if (index >= maxindex) {
+        maxindex = index;    // used to check end
+    }
+    if (expression.at(index) == ")"){  // Base Case
+        return root;            
     }
     
-    else if (expression.at(index) == "("){
+    else if (expression.at(index) == "("){ //When the element is (
 
-        root = ParserHelper(expression, index + 1, root); //1 here /3here
+        root = ParserHelper(expression, index + 1, root);  
+
+        if (maxindex < expression.size()-1){ // Check whether the function reach the end of the vector
+            // std::cout << "running" << std::endl;
+
+            curr = ParserHelper(expression, maxindex+1, root); 
+        }
     
-        // return root;
+        return root;
     }
 
     else if (expression.at(index) == "+" || expression.at(index) == "-" || expression.at(index) == "*" || expression.at(index) == "/"){
         if (root == nullptr){
-            root = new Node(expression.at(index));
-            // std::cout << root->token << std::endl;
-            curr = ParserHelper(expression, index + 1, root); //2 here
-            // std::cout <<"CURR:" << curr->token << std::endl;
-            // root->Children.push_back(curr);
-            // return root;
+            root = new Node(expression.at(index));  // for the first Root
+        
+            curr = ParserHelper(expression, index + 1, root); 
+        
+            return root;
         }
-        else{
-            curr = new Node(expression.at(index));
-            curr = ParserHelper(expression, index + 1, curr); //4here (*)correct /
+        else{   
+            curr = new Node(expression.at(index));  
+            curr = ParserHelper(expression, index + 1, curr);
             root->Children.push_back(curr);
-            // return root;
+            return root;
         }
     }
-    else {
+    else {          // when the element is number 
         curr = new Node(expression.at(index));
-        root->Children.push_back(curr);
-        ParserHelper(expression, index+1, root); //5here 6here 
-        // return root;
+        root->Children.push_back(curr);         
+        ParserHelper(expression, index+1, root); 
+        return root;
     }
 
-
-
-
-    return root;
+  
 }
