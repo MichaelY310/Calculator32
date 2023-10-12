@@ -10,18 +10,22 @@ struct Node {
     std::string token;
     std::vector<Node *> Children;   //vector can store more than 2 children
     float num;
-    int ind;
+    int paraCheck;
+    bool end;
+
 
     Node(std::string inputStr){
         token = inputStr;
         num = -1;  
-        ind = -1;             //when the node is token its num will be -1
+        paraCheck = 0;   
+        end = false;          //when the node is token its num will be -1
     };
 
     Node(float inputNum){
         token = "?";
         num = inputNum;  
-        ind = -1;       // when the node is number it will have no token.
+        paraCheck = 0;       // when the node is number it will have no token.
+        end = false;
     };
 };
 
@@ -30,6 +34,7 @@ class Parser {
         Parser(const std::vector<std::string> );
         Node * ParserHelper(const std::vector<std::string>, int , Node * );
         ~Parser(){};
+        int maxindex = 0;
 
     // private:
         Node * Root;
