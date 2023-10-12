@@ -245,22 +245,40 @@ int main() {
     // return 0;
 
 
+
+
+
+
+    // // read input
+    // std::string input;
+    // std::string line;
+    // while (true) {
+    //     std::getline(std::cin, line);
+
+    //     if (line.empty()) {
+    //         // Stop reading if the line is empty
+    //         break;
+    //     }
+
+    //     // Concatenate the lines into the input string
+    //     input += line + '\n';
+    // }
+
+
+
     // read input
     std::string input;
-    while (true) {
-        std::string line;
-        std::getline(std::cin, line);
-
-        if (line.empty()) {
-            // Stop reading if the line is empty
-            break;
-        }
-
+    std::string line;
+    while (std::cin >> line) {
         // Concatenate the lines into the input string
-        input += line + '\n';
+        input += line;
     }
-
     // input = "(+(-2 4.444 )";
+
+
+
+
+
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR
