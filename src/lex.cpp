@@ -127,7 +127,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         index++;
     }
 
-    res.emplace_back(TokenType::end, "END", line+1, 1, -1);
+    res.emplace_back(TokenType::end, "END", line, 1, -1);
 
     return res;
 }
