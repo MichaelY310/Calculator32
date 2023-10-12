@@ -246,7 +246,7 @@ int main() {
     }
 
 
-    std::vector<Token> TokenVector = GenTokenVector(input);
+    std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR
     Token lastToken = TokenVector.back();
     if (lastToken.type == TokenType::error)
