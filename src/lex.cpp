@@ -26,6 +26,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 
     for (int i = 0; i < len; i++)
     {
+        std::cout << (int)input.at(i) << std::endl;
         if (input.at(i) == '0' || input.at(i) == '1' || input.at(i) == '2' || input.at(i) == '3' || input.at(i) == '4' || input.at(i) == '5' || input.at(i) == '6' || input.at(i) == '7' || input.at(i) == '8' || input.at(i) == '9') 
         {
             recordingNumber = true;
@@ -127,7 +128,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         index++;
     }
 
-    res.emplace_back(TokenType::end, "END", line, 1, -1);
+    res.emplace_back(TokenType::end, "END", line, index, -1);
 
     return res;
 }
@@ -259,6 +260,7 @@ int main() {
         input += line + '\n';
     }
 
+    // input = "(+(-2 4.444 )";
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR
