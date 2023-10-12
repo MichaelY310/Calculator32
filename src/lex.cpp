@@ -175,5 +175,5 @@ int main() {
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     Token::printLexer(TokenVector);
 
-    return 0;
+    return 1;
 }
