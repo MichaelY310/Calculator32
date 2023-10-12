@@ -10,7 +10,7 @@ struct Node {
     std::string token;
     std::vector<Node *> Children;   //vector can store more than 2 children
     float num;
-    int size;
+    int ind;
 
     Node(std::string inputStr){
         token = inputStr;
