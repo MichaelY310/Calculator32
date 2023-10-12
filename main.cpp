@@ -1,5 +1,5 @@
 #include <string>
-#include <iostream>
+#include <iostream
 #include "src/lib/lex.h"
 #include "src/lib/parse.h"
 
@@ -12,5 +12,4 @@ int main() {
     std::cout << parserString << std::endl;
     std::cout << "Result: " << result << std::endl;
     return 0;
-
 }
