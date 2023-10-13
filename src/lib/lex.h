@@ -28,7 +28,7 @@ public:
     }
 
 public:
-      // returns a vector of tokens created from a string.
+    static std::vector<Token> GenTokenVector(const std::string input);  // returns a vector of tokens created from a string.
     static void printLexer(std::vector<Token> TokenVector);
     static void printLexer(const std::string input);
      
@@ -40,6 +40,4 @@ public:
     double value = -1;       // a number has its own value. otherwise -1
 
 };
-
-std::vector<Token> GenTokenVector(const std::string input);
 

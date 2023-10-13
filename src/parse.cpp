@@ -213,20 +213,20 @@ int main() {
         input += line + '\n';
     }
 
-    std::vector<Token> TokenVector = GenTokenVector(input);
-    // Check ERROR
+    // std::vector<Token> TokenVector = Token::GenTokenVector(input);
+    // // Check ERROR
 
-    std::vector<Token> T;
-    for (size_t i = 0; i < TokenVector.size()-1; i++){
-        T.push_back(TokenVector.at(i));
-    }
+    // std::vector<Token> T;
+    // for (size_t i = 0; i < TokenVector.size()-1; i++){
+    //     T.push_back(TokenVector.at(i));
+    // }
 
-    Parser p(T);
-    p.printinfix();
-    double result;
+    // Parser p(T);
+    // p.printinfix();
+    // double result;
 
-    result = p.evaluateExpression();
-    std::cout << result << std::endl;
+    // result = p.evaluateExpression();
+    // std::cout << result << std::endl;
 
 
     return 0;
