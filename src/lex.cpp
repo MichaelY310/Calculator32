@@ -220,7 +220,6 @@ void Token::printLexer(const std::string input)
 
 int main() {
 
-
     // read input
     std::string input;
     std::string line;
@@ -249,40 +248,6 @@ int main() {
     // Token::printLexer("(+(-2 4.444 )");
     // // Token::printLexer("(/49 50.\n12 ($ 7..8 .3))");
     // return 0;
-
-
-
-
-
-
-    // // read input
-    std::string input;
-    std::string line;
-    while (!std::cin.eof()) {
-        std::getline(std::cin, line);
-
-        input += line;
-    }
-
-
-
-    // while (!std::cin.eof()) {
-    //     std::cin >> line;
-    //     input += line;
-
-    //     if (!std::cin.fail()) {
-    //         std::cout << "You entered: " << line << std::endl;
-    //     } else {
-    //         std::cin.clear();
-    //         std::cin.ignore();
-    //         break;
-    //     }
-    // }
->>>>>>> 35848ef3045ef2363341833a99747b33ca02802e
-
-
-
-
 
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
