@@ -4,8 +4,47 @@
 #include <cctype>
 
 Parser::Parser(const std::vector<Token> expression) {
+    std::vector<Token> T;
+
+    if (expression.size()<=1){
+        std::cout <<"Unexpected token at line "<< expression.at(0).line << "column " << expression.at(0).index<< ": " << expression.at(0).content <<std::endl;
+        exit(2);
+    }
+
+    int paraCheck = 0;
+    Token Last; 
+
+    for (size_t i = 0; i < expression.size()-1; i++){
+        
+        // if (i > 0) {            
+        //     Last = expression.at(i-1);
+        //     if ()
+        // }
+
+        if (expression.at(i).content == "("){
+            paraCheck += 1;
+        }
+        if (expression.at(i).content == ")"){
+            paraCheck -= 1;
+        }
+
+        if (paraCheck < 0){          // check para is correct
+            std::cout <<"Unexpected token at line "<< expression.at(i).line << "column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
+            exit(2);
+        }
+        if (paraCheck != 0 && i == expression.size()-2){
+            std::cout <<"Unexpected token at line "<< expression.at(i).line << "column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
+            exit(2);
+        }
+
+        T.push_back(expression.at(i));
+
+    }
+
+    
+
    
-    Root = ParserHelper(expression, 0, nullptr);
+    Root = ParserHelper(T, 0, nullptr);
 }
 
 
@@ -122,7 +161,7 @@ double Parser::applyOp(char op, double b, double a) {
         return a * b;
     case '/':
         if (b == 0) {
-            std::cout << "Runtime Error: Division by zero." << std::endl;
+            std::cout << "Runtime error: division by zero." << std::endl;
             exit(3);
         }
         return a / b;

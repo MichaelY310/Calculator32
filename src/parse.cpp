@@ -20,12 +20,7 @@ int main() {
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR
 
-    std::vector<Token> T;
-    for (size_t i = 0; i < TokenVector.size()-1; i++){
-        T.push_back(TokenVector.at(i));
-    }
-
-    Parser p(T);
+    Parser p(TokenVector);
     p.printinfix();
     double result;
 

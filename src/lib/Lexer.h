@@ -23,6 +23,7 @@ class Token {
 
 public:
     Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue = -1);
+    Token(){};
     ~Token() = default;
 
     operator double() const {
