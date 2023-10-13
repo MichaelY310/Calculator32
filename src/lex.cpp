@@ -223,7 +223,7 @@ int main() {
     // read input
     std::string input;
     std::string line;
-    bool isLastLine = false;
+
 
     while (std::getline(std::cin, line)) {
         
