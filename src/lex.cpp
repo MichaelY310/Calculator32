@@ -238,42 +238,31 @@ void Token::printLexer(const std::string input)
 // }
 
 int main() {
-    // std::cout << "hello world" << std::endl;
-    // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
-    // Token::printLexer("(+(-2 4.444 )");
-    // // Token::printLexer("(/49 50.\n12 ($ 7..8 .3))");
-    // return 0;
-
-
-
-
-
-
-    // // read input
-    // std::string input;
-    // std::string line;
-    // while (true) {
-    //     std::getline(std::cin, line);
-
-    //     if (line.empty()) {
-    //         // Stop reading if the line is empty
-    //         break;
-    //     }
-
-    //     // Concatenate the lines into the input string
-    //     input += line + '\n';
-    // }
-
 
 
     // read input
     std::string input;
     std::string line;
-    while (std::cin >> line) {
-        // Concatenate the lines into the input string
-        input += line;
+    bool isLastLine = false;
+
+    while (true) {
+        std::getline(std::cin, line);
+
+        if (line.empty()) {
+            // Stop reading if the line is empty
+            break;
+        }
+
+        if (!isLastLine) {
+            // If it's not the last line, add '\n'
+            input += line + '\n';
+        }
+        else {
+            input += line; // Don't add '\n' for the last line
+        }
+
+        isLastLine = std::cin.eof(); // Check if we've reached the end of input
     }
-    // input = "(+(-2 4.444 )";
 
 
 
