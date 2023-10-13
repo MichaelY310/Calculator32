@@ -126,7 +126,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         }
         index++;
     }
-
+    if (recordingNumber) {
+                res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
+                
+            }
     res.emplace_back(TokenType::end, "END", line, index, -1);
 
     return res;
