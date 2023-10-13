@@ -26,13 +26,13 @@ struct Node {
 class Parser {
     public:
         Parser(const std::vector<Token> );
-        Node * ParserHelper(const std::vector<Token>, int , Node * );
+        Node * ParserHelper(const std::vector<Token>, size_t , Node * );
         ~Parser(){};
-        int maxindex = 0;
+        size_t maxindex = 0;
 
         void printinfix();
 
-        std::string PrintHelp(Node * , std::string, int);
+        std::string PrintHelp(Node * , std::string, size_t);
         double evaluateExpression();
 
 

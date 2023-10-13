@@ -9,7 +9,7 @@ Parser::Parser(const std::vector<Token> expression) {
 }
 
 
-Node * Parser::ParserHelper(const std::vector<Token> expression, int index, Node * root){
+Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, Node * root){
     // std::cout << "running1" <<std::endl;
     Node * curr = nullptr;
     if (index >= maxindex) {
@@ -61,7 +61,7 @@ void Parser::printinfix(){
     std::cout << FixExp << std::endl;
 }
 
-std::string Parser::PrintHelp(Node * root, std::string ExpStr, int index){
+std::string Parser::PrintHelp(Node * root, std::string ExpStr, size_t index){
     
     
     if (root == nullptr){
@@ -217,7 +217,7 @@ int main() {
     // Check ERROR
 
     std::vector<Token> T2;
-    for (int i = 0; i < TokenVector.size()-1; i++){
+    for (size_t i = 0; i < TokenVector.size()-1; i++){
         T2.push_back(TokenVector.at(i));
     }
 
