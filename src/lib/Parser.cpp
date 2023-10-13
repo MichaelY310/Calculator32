@@ -7,7 +7,7 @@ Parser::Parser(const std::vector<Token> expression) {
     std::vector<Token> T;
 
     if (expression.size()<=1){
-        std::cout <<"Unexpected token at line "<< expression.at(0).line << "column " << expression.at(0).index<< ": " << expression.at(0).content <<std::endl;
+        std::cout <<"Unexpected token at line "<< expression.at(0).line << " column " << expression.at(0).index<< ": " << expression.at(0).content <<std::endl;
         exit(2);
     }
 
@@ -29,11 +29,11 @@ Parser::Parser(const std::vector<Token> expression) {
         }
 
         if (paraCheck < 0){          // check para is correct
-            std::cout <<"Unexpected token at line "<< expression.at(i).line << "column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
+            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
             exit(2);
         }
         if (paraCheck != 0 && i == expression.size()-2){
-            std::cout <<"Unexpected token at line "<< expression.at(i).line << "column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
+            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
             exit(2);
         }
 
