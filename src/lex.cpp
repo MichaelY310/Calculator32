@@ -172,10 +172,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
         std::cout << " " << " ";
 
         // token value
-        std::cout << t.content << std::endl;;
-
-        
-        // std::cout << t.line << " " << t.index << " " << t.value << " " << t.content << std::endl;
+        std::cout << t.content << std::endl;
     }
 
     return;
@@ -215,27 +212,11 @@ void Token::printLexer(const std::string input)
         std::cout << content;
         std::cout << " " << " ";
         // token value
-        std::cout << t.content << std::endl;;
-        
-        // std::cout << t.line << " " << t.index << " " << t.value << " " << t.content << std::endl;
+        std::cout << t.content << std::endl;;        
     }
     return;
 }
 
-
-
-// int main() {
-
-//     std::string input;
-//     std::cin >> input;
-//     std::vector<Token> TokenVector = Token::GenTokenVector(input);
-
-//     std::cout << TokenVector.size() << std::endl;
-
-//     Token::printLexer(TokenVector);
-
-//     return 1;
-// }
 
 int main() {
     // std::cout << "hello world" << std::endl;
@@ -250,30 +231,28 @@ int main() {
 
 
     // // read input
-    // std::string input;
-    // std::string line;
-    // while (true) {
-    //     std::getline(std::cin, line);
-
-    //     if (line.empty()) {
-    //         // Stop reading if the line is empty
-    //         break;
-    //     }
-
-    //     // Concatenate the lines into the input string
-    //     input += line + '\n';
-    // }
-
-
-
-    // read input
     std::string input;
     std::string line;
-    while (std::cin >> line) {
-        // Concatenate the lines into the input string
+    while (!std::cin.eof()) {
+        std::getline(std::cin, line);
+
         input += line;
     }
-    // input = "(+(-2 4.444 )";
+
+
+
+    // while (!std::cin.eof()) {
+    //     std::cin >> line;
+    //     input += line;
+
+    //     if (!std::cin.fail()) {
+    //         std::cout << "You entered: " << line << std::endl;
+    //     } else {
+    //         std::cin.clear();
+    //         std::cin.ignore();
+    //         break;
+    //     }
+    // }
 
 
 
