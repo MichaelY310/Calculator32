@@ -126,9 +126,22 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         }
         index++;
     }
-    if (recordingNumber) {
+    if (recordingNumber && currentStringValue.back() == '.')
+            {
+                // if there's error, the last token would be ERROR instead of END
+                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
+                return res;
+            }
+
+
+            // the last digit is recorded
+            if (recordingNumber) {
                 res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
-                
+                recordingNumber = false;
+                afterPoint = false;
+                currentValue = 0;
+                currentStringValue = "";
+                numberLength = 0;
             }
     res.emplace_back(TokenType::end, "END", line, index, -1);
 
