@@ -26,6 +26,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 
     for (int i = 0; i < len; i++)
     {
+        // std::cout << (int)input.at(i) << std::endl;
         if (input.at(i) == '0' || input.at(i) == '1' || input.at(i) == '2' || input.at(i) == '3' || input.at(i) == '4' || input.at(i) == '5' || input.at(i) == '6' || input.at(i) == '7' || input.at(i) == '8' || input.at(i) == '9') 
         {
             recordingNumber = true;
@@ -42,6 +43,20 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         }
         else if (input.at(i) == '.')
         {
+            // nothing before a point
+            if (!recordingNumber)
+            {
+                // if there's error, the last token would be ERROR instead of END
+                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
+                return res;
+            }
+            // already have a point
+            if (afterPoint)
+            {
+                // if there's error, the last token would be ERROR instead of END
+                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
+                return res;
+            }
             afterPoint += 1;
             numberLength += 1;
             recordingNumber = true;
@@ -73,6 +88,9 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
                 index = 0;
             }
             else if (input.at(i) == ' ')
+            {
+            }
+            else if (input.at(i) == '\t')
             {
             }
             else if (input.at(i) == '+')
@@ -110,18 +128,14 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         index++;
     }
 
-    res.emplace_back(TokenType::end, "END", line+1, 1, -1);
+    res.emplace_back(TokenType::end, "END", line, index, -1);
 
     return res;
 }
 
 
-void Token::printLexer(const std::string input) 
+void Token::printLexer(std::vector<Token> TokenVector) 
 {
-
-    std::vector<Token> TokenVector = GenTokenVector(input);
-
-
 
 
     // Check ERROR
@@ -131,8 +145,6 @@ void Token::printLexer(const std::string input)
         std::cout << "Syntax error on line " << lastToken.line << " column " << lastToken.index << "." << std::endl;
         return;
     }
-
-
 
 
     int spaceNumber;
@@ -167,4 +179,99 @@ void Token::printLexer(const std::string input)
     }
 
     return;
+}
+
+
+
+void Token::printLexer(const std::string input) 
+{
+    std::vector<Token> TokenVector = GenTokenVector(input);
+    // Check ERROR
+    Token lastToken = TokenVector.back();
+    if (lastToken.type == TokenType::error)
+    {
+        std::cout << "Syntax error on line " << lastToken.line << " column " << lastToken.index << "." << std::endl;
+        return;
+    }
+    int spaceNumber;
+    std::string content; // line or index to string
+    for (Token t : TokenVector)
+    {
+        // line
+        content = std::to_string(t.line);
+        spaceNumber = 4 - content.length();
+        for (int i=0; i<spaceNumber; i++)
+        {
+            std::cout << " ";
+        }
+        std::cout << content;
+        // index
+        content = std::to_string(t.index);
+        spaceNumber = 5 - content.length();
+        for (int i=0; i<spaceNumber; i++)
+        {
+            std::cout << " ";
+        }
+        std::cout << content;
+        std::cout << " " << " ";
+        // token value
+        std::cout << t.content << std::endl;;
+        
+        // std::cout << t.line << " " << t.index << " " << t.value << " " << t.content << std::endl;
+    }
+    return;
+}
+
+
+
+// int main() {
+
+//     std::string input;
+//     std::cin >> input;
+//     std::vector<Token> TokenVector = Token::GenTokenVector(input);
+
+//     std::cout << TokenVector.size() << std::endl;
+
+//     Token::printLexer(TokenVector);
+
+//     return 1;
+// }
+
+int main() {
+    // std::cout << "hello world" << std::endl;
+    // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
+    // Token::printLexer("(+(-2 4.444 )");
+    // // Token::printLexer("(/49 50.\n12 ($ 7..8 .3))");
+    // return 0;
+
+
+    // read input
+    std::string input;
+    while (true) {
+        std::string line;
+        std::getline(std::cin, line);
+
+        if (line.empty()) {
+            // Stop reading if the line is empty
+            break;
+        }
+
+        // Concatenate the lines into the input string
+        input += line + '\n';
+    }
+
+    // input = "(+(-2 4.444 )";
+
+    std::vector<Token> TokenVector = Token::GenTokenVector(input);
+    // Check ERROR
+    Token lastToken = TokenVector.back();
+    if (lastToken.type == TokenType::error)
+    {
+        std::cout << "Syntax error on line " << lastToken.line << " column " << lastToken.index << "." << std::endl;
+        return 1;
+    }
+
+
+    Token::printLexer(TokenVector);
+    return 0;
 }
