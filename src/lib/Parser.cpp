@@ -122,7 +122,7 @@ double Parser::applyOp(char op, double b, double a) {
         return a * b;
     case '/':
         if (b == 0) {
-            std::cout << "Runtime Error: Division by zero." << std::endl;
+            std::cout << "Runtime error: division by zero." << std::endl;
             exit(3);
         }
         return a / b;
