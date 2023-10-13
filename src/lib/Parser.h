@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "lex.h"
+#include "Lexer.h"
 
 struct Node {
     std::string token;

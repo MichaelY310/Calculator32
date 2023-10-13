@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LEX_H
-#define LEX_H
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <string>
 #include <vector>
