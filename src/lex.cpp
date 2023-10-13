@@ -227,11 +227,12 @@ int main() {
     while (std::getline(std::cin, line)) {
         
 
-
+            input += "\n";
             input += line; // Don't add '\n' for the last 
 
 
     }
+    input.erase(0, 1);
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
     // Token::printLexer("(+(-2 4.444 )");
