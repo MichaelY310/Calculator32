@@ -1,4 +1,6 @@
 #pragma once
+#ifndef LEXER_H
+#define LEXER_H
 
 #include <string>
 #include <vector>
@@ -29,6 +31,7 @@ public:
 
 public:
     static std::vector<Token> GenTokenVector(const std::string input);  // returns a vector of tokens created from a string.
+    static void printLexer(std::vector<Token> TokenVector);
     static void printLexer(const std::string input);
      
 public:
@@ -39,3 +42,5 @@ public:
     double value = -1;       // a number has its own value. otherwise -1
 
 };
+
+#endif
