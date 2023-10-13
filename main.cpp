@@ -1,5 +1,5 @@
 #include <string>
-#include <iostream
+#include <iostream>
 #include "src/lib/lex.h"
 #include "src/lib/parse.h"
 

@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-// #include "lex.h"
+#include "lex.h"
 #include <iostream>
 #include <string>
 #include <vector>

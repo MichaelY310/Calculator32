@@ -4,6 +4,12 @@
 #include "lex.h"
 #include <string>
 
+class Node {
+public:
+    Token token;
+    std::vector<Node*> children;
+};
+
 class Parser {
 public:
     Parser(const std::vector<Token>& tokens);
