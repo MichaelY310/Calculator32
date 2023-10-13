@@ -1,4 +1,6 @@
 #pragma once
+#ifndef LEX_H
+#define LEX_H
 
 #include <string>
 #include <vector>
@@ -38,5 +40,7 @@ public:
     int line = -1;
     int index = -1;
     double value = -1;       // a number has its own value. otherwise -1
-    // std::vector<std::string>;
+
 };
+
+#endif
