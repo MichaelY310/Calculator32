@@ -1,5 +1,4 @@
 #include "lib/parse.h"
-#include "lib/lex.h"
 #include <stack>
 #include <sstream>
 #include <cctype>
