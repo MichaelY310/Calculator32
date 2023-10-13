@@ -1,110 +1,235 @@
 #include "lib/parse.h"
-#include "lib/lex.h"
-#include <vector>
-#include <iostream>
+#include <stack>
+#include <sstream>
+#include <cctype>
 
-Parser::Parser(const std::vector<Token>& tokens) : tokens_(tokens), current(-1), stringParse("") {
-	if (tokens[0].type != TokenType::leftParenthesis) {
-		std::cout << "Unexpected token at line " + std::to_string(tokens_[0].line) + " colemn " + std::to_string(tokens_[0].index) +": " + tokens_[0].content << std::endl;
-		exit(2);
-	}
+Parser::Parser(const std::vector<Token> expression) {
+   
+    Root = ParserHelper(expression, 0, nullptr);
 }
 
-double Parser::parseExpression() {
-    Token token = getNextToken();
 
-    if (token.type == TokenType::error) {
-        std::cout << "Unexpected token at line " + std::to_string(tokens_[current].line) + " colemn " + std::to_string(tokens_[current].index) +": " + tokens_[current].content << std::endl;
-        exit(2);
+Node * Parser::ParserHelper(const std::vector<Token> expression, int index, Node * root){
+    // std::cout << "running1" <<std::endl;
+    Node * curr = nullptr;
+    if (index >= maxindex) {
+        maxindex = index;    // used to check end
+    }
+    if (expression.at(index).content == ")"){  // Base Case
+        return root;            
+    }
+    
+    else if (expression.at(index).content == "("){ //When the element is (
+
+        root = ParserHelper(expression, index + 1, root);  
+
+        if (maxindex < expression.size()-1){ // Check whether the function reach the end of the vector
+            // std::cout << "running" << std::endl;
+
+            curr = ParserHelper(expression, maxindex+1, root); 
+        }
+    
+        return root;
     }
 
-    if (token.type == TokenType::leftParenthesis) {
-        stringParse = stringParse + "(";
-        std::string op = getNextToken().content;
-        checkSymbol(op);
-        std::vector<double> args;
+    else if (expression.at(index).content == "+" || expression.at(index).content == "-" || expression.at(index).content == "*" || expression.at(index).content == "/"){
+        if (root == nullptr){
+            root = new Node(expression.at(index).content);  // for the first Root
+        
+            curr = ParserHelper(expression, index + 1, root); 
+        
+            return root;
+        }
+        else{   
+            curr = new Node(expression.at(index).content);  
+            curr = ParserHelper(expression, index + 1, curr);
+            root->Children.push_back(curr);
+            return root;
+        }
+    }
+    else {          // when the element is number 
+        curr = new Node(expression.at(index).content);
+        root->Children.push_back(curr);         
+        ParserHelper(expression, index+1, root); 
+        return root;
+    }
+}
 
-        while (true) {
-            if (tokens_[current + 1].type == TokenType::rightParenthesis) {
-                break;
+void Parser::printinfix(){
+    // std::cout << "running" <<std::endl;
+    FixExp = PrintHelp(Root, "", 0);
+    std::cout << FixExp << std::endl;
+}
+
+std::string Parser::PrintHelp(Node * root, std::string ExpStr, int index){
+    
+    
+    if (root == nullptr){
+        std::cout << "Nothing in the root !" << std::endl;
+        return ExpStr;
+    }
+    
+    if (index == root->Children.size()-1) {  // base case 
+        if (root->Children.at(index)->token == "+" || root->Children.at(index)->token == "-" || root->Children.at(index)->token == "*" || root->Children.at(index)->token == "/") {
+            ExpStr += " " + root->token + " " + PrintHelp(root->Children.at(index), "", 0) + ")"; //
+            return ExpStr;
+        }
+        else{
+            ExpStr += " " + root->token + " " + root->Children.at(index)->token + ")";
+            return ExpStr;
+        } 
+    }
+    else if (index == 0){       // start of the string
+        if (root->Children.at(index)->token == "+" || root->Children.at(index)->token == "-" || root->Children.at(index)->token == "*" || root->Children.at(index)->token == "/") {
+            ExpStr += "("  + PrintHelp(root->Children.at(index), "", 0); //1 2 
+
+            if (index < root->Children.size()-1) {
+                ExpStr += PrintHelp(root, "", index + 1);
             }
-            double arg = parseExpression();
-            args.push_back(arg);
+
+            return ExpStr;
         }
-        double result = applyOperator(op, args);
-        stringParse = stringParse + ")";
-        return result;
+        else{
+            ExpStr += "(" + root->Children.at(index)->token + PrintHelp(root, "" , index + 1);  //3
+            return ExpStr;
+        }
+        
     }
-    else if (token.type == TokenType::number) {
-        return token.value;
+    else if (index >= root->Children.size()) {       // if out of range exit
+        std::cout << "WRONG" << std::endl;
+        exit(-1);
     }
-    else {
-        std::cout << "Unexpected token at line " + std::to_string(tokens_[current].line) + " colemn " + std::to_string(tokens_[current].index) +": " + tokens_[current].content << std::endl;
-        exit(2);
+    else {      // other situation when 
+        if (root->Children.at(index)->token == "+" || root->Children.at(index)->token == "-" || root->Children.at(index)->token == "*" || root->Children.at(index)->token == "/") {
+            ExpStr += " " + root->token + " " + PrintHelp(root->Children.at(index), "", 0);
+            return ExpStr;
+        }
+        else{
+            ExpStr += " " + root->token + " " + root->Children.at(index)->token + PrintHelp(root, "", index + 1); //
+            return ExpStr;
+        }
     }
+
 }
 
-std::string Parser::getStringExpression()
-{
-	return stringParse;
-}
-
-void Parser::checkSymbol(const std::string symbol)
-{
-    if (!(symbol == "+" || symbol == "-" || symbol == "*" || symbol == "/")) {
-        std::cout << "Unexpected token at line " + std::to_string(tokens_[current].line) + " colemn " + std::to_string(tokens_[current].index) +": " + tokens_[current].content << std::endl;
-        exit(2);
+double Parser::applyOp(char op, double b, double a) {
+    switch (op) {
+    case '+':
+        return a + b;
+    case '-':
+        return a - b;
+    case '*':
+        return a * b;
+    case '/':
+        if (b == 0) {
+            std::cout << "Runtime Error: Division by zero." << std::endl;
+            exit(3);
+        }
+        return a / b;
     }
+    return 0;
 }
 
-Token Parser::getNextToken()
-{
-	current++;
-	return tokens_[current];
-}
+// Function to evaluate arithmetic expressions
+double Parser::evaluateExpression() {
+    std::istringstream iss(FixExp);
+    std::stack<double> values;
+    std::stack<char> ops;
 
-double Parser::applyOperator(const std::string& op, const std::vector<double>& args) {
-    if (args.empty()) {
-        std::cout << "Unexpected token at line " + std::to_string(tokens_[current+1].line) + " colemn " + std::to_string(tokens_[current+1].index) +": " + tokens_[current + 1].content << std::endl;
-        exit(2);
-    }
-    if (op == "+") {
-        double sum = 0.0;
-        for (size_t i = 0; i < args.size(); ++i) {
-            sum += args[i];
-            if (i != args.size() - 1) {
-                stringParse = stringParse + std::to_string(args[i]) + " + ";
+    char current;
+    while (iss >> current) {
+        if (isdigit(current) || current == '.') {
+            iss.putback(current);
+            double value;
+            iss >> value;
+            values.push(value);
+        }
+        else if (current == '(') {
+            ops.push(current);
+        }
+        else if (current == ')') {
+            while (ops.top() != '(') {
+                double val2 = values.top();
+                values.pop();
+
+                double val1 = values.top();
+                values.pop();
+
+                char op = ops.top();
+                ops.pop();
+
+                values.push(applyOp(op, val2, val1));
             }
-            else {
-                stringParse = stringParse + std::to_string(args[i]);
+            ops.pop();
+        }
+        else if (current == '+' || current == '-' || current == '*' || current == '/') {
+            while (!ops.empty() && ops.top() != '(') {
+                double val2 = values.top();
+                values.pop();
+
+                double val1 = values.top();
+                values.pop();
+
+                char op = ops.top();
+                ops.pop();
+
+                values.push(applyOp(op, val2, val1));
             }
+            ops.push(current);
         }
-        return sum;
     }
-    else if (op == "-") {
-        double result = args[0];
-        for (size_t i = 1; i < args.size(); ++i) {
-            result -= args[i];
-        }
-        return result;
+
+    while (!ops.empty()) {
+        double val2 = values.top();
+        values.pop();
+
+        double val1 = values.top();
+        values.pop();
+
+        char op = ops.top();
+        ops.pop();
+
+        values.push(applyOp(op, val2, val1));
     }
-    else if (op == "*") {
-        double product = 1.0;
-        for (double arg : args) {
-            product *= arg;
-        }
-        return product;
-    }
-    else {
-        double result = args[0];
-        for (size_t i = 1; i < args.size(); ++i) {
-            if (args[i] == 0.0) {
-                std::cerr << "Runtime error: division by zero." << std::endl;
-                exit(3);
-            }
-            result /= args[i];
-        }
-        return result;
-    }
+
+    return values.top();
 }
 
+
+
+int main() {
+
+    std::string input;
+    while (true) {
+        std::string line;
+        std::getline(std::cin, line);
+
+        if (line.empty()) {
+            // Stop reading if the line is empty
+            break;
+        }
+
+        // Concatenate the lines into the input string
+        input += line + '\n';
+    }
+
+    std::vector<Token> TokenVector = Token::GenTokenVector(input);
+    // Check ERROR
+
+    std::vector<Token> T2;
+    for (int i = 0; i < TokenVector.size()-1; i++){
+        T2.push_back(TokenVector.at(i));
+    }
+
+    Parser p(T2);
+    p.printinfix();
+    double result;
+
+    result = p.evaluateExpression();
+    std::cout << result << std::endl;
+
+
+    return 0;
+
+}
+   

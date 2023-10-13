@@ -1,26 +1,49 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "lex.h"
+#include <iostream>
 #include <string>
+#include <vector>
+#include "lex.h"
 
-class Parser {
-public:
-    Parser(const std::vector<Token>& tokens);
-    double parseExpression();
-    std::string getStringExpression();
-private:
+struct Node {
+    std::string token;
+    std::vector<Node *> Children;   //vector can store more than 2 children
+    float num;
 
-    const std::vector<Token>& tokens_;
-    int current;
-    void checkSymbol(const std::string symbol);
-    std::string stringParse;
-    Token getNextToken();
-    double applyOperator(const std::string& op, const std::vector<double>& args);
+
+    Node(std::string inputStr){
+        token = inputStr;
+        num = -1;           //when the node is token its num will be -1
+    };
+
+    Node(float inputNum){
+        token = "?";
+        num = inputNum;     // when the node is number it will have no token.
+    };
 };
 
-#endif
+class Parser {
+    public:
+        Parser(const std::vector<Token> );
+        Node * ParserHelper(const std::vector<Token>, int , Node * );
+        ~Parser(){};
+        int maxindex = 0;
+
+        void printinfix();
+
+        std::string PrintHelp(Node * , std::string, int);
+        double evaluateExpression();
+
+
+    // private:
+        Node * Root;
+        std::string FixExp = "";
+        double applyOp(char op, double b, double a);
+
+};
 
 
 
 
+#endif 
