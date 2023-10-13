@@ -1,9 +1,10 @@
-#pragma once
+#ifndef PARSER_H
+#define PARSER_H
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include "lex.h"
+#include "Lexer.h"
 
 struct Node {
     std::string token;
@@ -41,3 +42,8 @@ class Parser {
         double applyOp(char op, double b, double a);
 
 };
+
+
+
+
+#endif 
