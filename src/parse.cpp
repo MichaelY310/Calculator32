@@ -213,7 +213,7 @@ int main() {
         input += line + '\n';
     }
 
-    std::vector<Token> TokenVector = Token::GenTokenVector(input);
+    std::vector<Token> TokenVector = GenTokenVector(input);
     // Check ERROR
 
     std::vector<Token> T;

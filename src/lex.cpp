@@ -9,7 +9,7 @@ Token::Token(TokenType itype, std::string icontent, int iline, int iindex, doubl
 
 
 
-std::vector<Token> Token::GenTokenVector(const std::string input) {
+std::vector<Token> GenTokenVector(const std::string input) {
     int len = input.length();
 
     std::vector<Token> res;
