@@ -225,23 +225,13 @@ int main() {
     std::string line;
     bool isLastLine = false;
 
-    while (true) {
-        std::getline(std::cin, line);
+    while (std::getline(std::cin, line)) {
+        
 
-        if (line.empty()) {
-            // Stop reading if the line is empty
-            break;
-        }
 
-        if (!isLastLine) {
-            // If it's not the last line, add '\n'
-            input += line + '\n';
-        }
-        else {
-            input += line; // Don't add '\n' for the last line
-        }
+            input += line; // Don't add '\n' for the last 
 
-        isLastLine = std::cin.eof(); // Check if we've reached the end of input
+
     }
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
