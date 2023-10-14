@@ -1,4 +1,5 @@
 #include "lib/lex.h"
+#include <iterator>
 
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
