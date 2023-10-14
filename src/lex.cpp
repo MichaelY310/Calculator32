@@ -244,7 +244,6 @@ int main() {
         input += line;
     }
 
-
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
     // Token::printLexer("(+(-2 4.444 )");
