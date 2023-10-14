@@ -238,22 +238,12 @@ int main() {
     // read input
     std::string input;
     std::string line;
-
-
-    while (std::getline(std::cin, line)) {
-        
-            if (input.size() != 0)
-                input += "\n";
-            input += line; // Don't add '\n' for the last 
-
-
+    
+    while(!std::cin.eof()) {
+      if(std::getline(std::cin, line)) {
+        input += line;
+      }
     }
-
-
-        if(std::cin.eof()) {
-        // Do stuff..
-            input += "\n";
-        }
 
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
