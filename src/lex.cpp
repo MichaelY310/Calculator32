@@ -1,5 +1,4 @@
 #include "lib/lex.h"
-#include <iterator>
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
@@ -237,16 +236,14 @@ int main() {
 
     // read input
     std::string input = "";
-    //std::string line;
-    //while(!std::cin.eof()) {
-    //  if(std::getline(std::cin, line)) {
-    //    input += line;
-    //  }
-    //}
+    std::string line;
     
-    std::istream_iterator<std::string> my_it(std::cin);
-    for (; my_it != std::istream_iterator<std::string>(); my_it++)
-      input += *my_it;
+    while(!std::cin.eof()) {
+        char c = std::cin.get(char);
+        line = string(1, c);
+        input += line;
+    }
+
 
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
