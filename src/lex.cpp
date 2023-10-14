@@ -236,14 +236,17 @@ void Token::printLexer(const std::string input)
 int main() {
 
     // read input
-    std::string input;
-    std::string line;
-    
-    while(!std::cin.eof()) {
-      if(std::getline(std::cin, line)) {
-        input += line;
-      }
-    }
+    std::string input = "";
+    //std::string line;
+    //while(!std::cin.eof()) {
+    //  if(std::getline(std::cin, line)) {
+    //    input += line;
+    //  }
+    //}
+
+    istream_iterator<string> my_it(cin);
+    for (; my_it != istream_iterator<string>(); my_it++)
+      input += (*my_it).c_str());
 
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
