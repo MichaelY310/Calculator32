@@ -243,7 +243,7 @@ int main() {
     //    input += line;
     //  }
     //}
-
+    
     std::istream_iterator<std::string> my_it(cin);
     for (; my_it != std::istream_iterator<std::string>(); my_it++)
       input += (*my_it).c_str());
