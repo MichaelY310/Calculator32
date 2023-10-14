@@ -244,9 +244,9 @@ int main() {
     //  }
     //}
     
-    std::istream_iterator<std::string> my_it(cin);
+    std::istream_iterator<std::string> my_it(std::cin);
     for (; my_it != std::istream_iterator<std::string>(); my_it++)
-      input += (*my_it).c_str());
+      input += (*my_it).c_str();
 
     // std::cout << "hello world" << std::endl;
     // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
