@@ -239,8 +239,9 @@ int main() {
     std::string line;
     
     while(!std::cin.eof()) {
-        char c = std::cin.get(char);
-        line = string(1, c);
+        char c;
+        std::cin.get(c);
+        line = std::string(1, c);
         input += line;
     }
 
