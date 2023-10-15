@@ -10,7 +10,6 @@ Parser::Parser(const std::vector<Token> expression) {
 
 
 Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, Node * root){
-    // std::cout << "running1" <<std::endl;
     Node * curr = nullptr;
     if (index >= maxindex) {
         maxindex = index;    // used to check end
@@ -24,7 +23,6 @@ Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, N
         root = ParserHelper(expression, index + 1, root);  
 
         if (maxindex < expression.size()-1){ // Check whether the function reach the end of the vector
-            // std::cout << "running" << std::endl;
 
             curr = ParserHelper(expression, maxindex+1, root); 
         }

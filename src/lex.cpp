@@ -1,29 +1,16 @@
 #include "lib/Lexer.h"
 
 int main() {
-    // std::cout << "hello world" << std::endl;
-    // // Token::printLexer("(+(-2 4.444 )\n32(* 5 13.45)(");
-    // Token::printLexer("(+(-2 4.444 )");
-    // // Token::printLexer("(/49 50.\n12 ($ 7..8 .3))");
-    // return 0;
+    std::string input = "";
+    std::string line;
 
-
-    // read input
-    std::string input;
-    while (true) {
-        std::string line;
-        std::getline(std::cin, line);
-
-        if (line.empty()) {
-            // Stop reading if the line is empty
-            break;
-        }
-
-        // Concatenate the lines into the input string
-        input += line + '\n';
+    while (!std::cin.eof()) {
+        char c;
+        std::cin.get(c);
+        line = std::string(1, c);
+        input += line;
     }
-
-    // input = "(+(-2 4.444 )";
+    input = input.substr(0, input.size() - 1);
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR

@@ -3,19 +3,16 @@
 
 int main() {
 
-    std::string input;
-    while (true) {
-        std::string line;
-        std::getline(std::cin, line);
+    std::string input = "";
+    std::string line;
 
-        if (line.empty()) {
-            // Stop reading if the line is empty
-            break;
-        }
-
-        // Concatenate the lines into the input string
-        input += line + '\n';
+    while (!std::cin.eof()) {
+        char c;
+        std::cin.get(c);
+        line = std::string(1, c);
+        input += line;
     }
+    input = input.substr(0, input.size() - 1);
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR
