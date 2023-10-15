@@ -1,10 +1,8 @@
 #include "Lexer.h"
 
-
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
 {
-
 }
 
 
@@ -19,23 +17,24 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 
     // for number
     int numberLength = 0;
-    double currentValue = 0;         
+    double currentValue = 0;
     std::string currentStringValue = "";
-    double afterPoint = 0;   
+    double afterPoint = 0;
     bool recordingNumber = false;
 
     for (int i = 0; i < len; i++)
     {
         // std::cout << (int)input.at(i) << std::endl;
-        if (input.at(i) == '0' || input.at(i) == '1' || input.at(i) == '2' || input.at(i) == '3' || input.at(i) == '4' || input.at(i) == '5' || input.at(i) == '6' || input.at(i) == '7' || input.at(i) == '8' || input.at(i) == '9') 
+        if (input.at(i) == '0' || input.at(i) == '1' || input.at(i) == '2' || input.at(i) == '3' || input.at(i) == '4' || input.at(i) == '5' || input.at(i) == '6' || input.at(i) == '7' || input.at(i) == '8' || input.at(i) == '9')
         {
             recordingNumber = true;
             if (afterPoint) {
                 currentValue += double(input.at(i) - '0') / std::pow(10.0f, afterPoint);
                 afterPoint += 1;
-            } else {
+            }
+            else {
                 currentValue *= 10;
-                currentValue += double(input.at(i) - '0');   
+                currentValue += double(input.at(i) - '0');
             }
             std::string s(1, input.at(i));
             currentStringValue += s;
@@ -118,7 +117,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
                 res.emplace_back(TokenType::rightParenthesis, ")", line, index, -1);
             }
             // Error
-            else    
+            else
             {
                 // if there's error, the last token would be ERROR instead of END
                 res.emplace_back(TokenType::error, "ERROR", line, index, -1);
@@ -127,14 +126,30 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         }
         index++;
     }
+    if (recordingNumber && currentStringValue.back() == '.')
+    {
+        // if there's error, the last token would be ERROR instead of END
+        res.emplace_back(TokenType::error, "ERROR", line, index, -1);
+        return res;
+    }
 
+
+    // the last digit is recorded
+    if (recordingNumber) {
+        res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
+        recordingNumber = false;
+        afterPoint = false;
+        currentValue = 0;
+        currentStringValue = "";
+        numberLength = 0;
+    }
     res.emplace_back(TokenType::end, "END", line, index, -1);
 
     return res;
 }
 
 
-void Token::printLexer(std::vector<Token> TokenVector) 
+void Token::printLexer(std::vector<Token> TokenVector)
 {
 
 
@@ -154,7 +169,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
         // line
         content = std::to_string(t.line);
         spaceNumber = 4 - content.length();
-        for (int i=0; i<spaceNumber; i++)
+        for (int i = 0; i < spaceNumber; i++)
         {
             std::cout << " ";
         }
@@ -163,7 +178,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
         // index
         content = std::to_string(t.index);
         spaceNumber = 5 - content.length();
-        for (int i=0; i<spaceNumber; i++)
+        for (int i = 0; i < spaceNumber; i++)
         {
             std::cout << " ";
         }
@@ -172,10 +187,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
         std::cout << " " << " ";
 
         // token value
-        std::cout << t.content << std::endl;;
-
-        
-        // std::cout << t.line << " " << t.index << " " << t.value << " " << t.content << std::endl;
+        std::cout << t.content << std::endl;
     }
 
     return;
@@ -183,7 +195,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
 
 
 
-void Token::printLexer(const std::string input) 
+void Token::printLexer(const std::string input)
 {
     std::vector<Token> TokenVector = GenTokenVector(input);
     // Check ERROR
@@ -200,7 +212,7 @@ void Token::printLexer(const std::string input)
         // line
         content = std::to_string(t.line);
         spaceNumber = 4 - content.length();
-        for (int i=0; i<spaceNumber; i++)
+        for (int i = 0; i < spaceNumber; i++)
         {
             std::cout << " ";
         }
@@ -208,7 +220,7 @@ void Token::printLexer(const std::string input)
         // index
         content = std::to_string(t.index);
         spaceNumber = 5 - content.length();
-        for (int i=0; i<spaceNumber; i++)
+        for (int i = 0; i < spaceNumber; i++)
         {
             std::cout << " ";
         }
@@ -216,8 +228,6 @@ void Token::printLexer(const std::string input)
         std::cout << " " << " ";
         // token value
         std::cout << t.content << std::endl;;
-        
-        // std::cout << t.line << " " << t.index << " " << t.value << " " << t.content << std::endl;
     }
     return;
 }
