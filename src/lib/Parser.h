@@ -11,6 +11,14 @@ struct Node {
     std::vector<Node *> Children;   //vector can store more than 2 children
     float num;
 
+    Node(Node &C){
+        token = C.token;
+        for (auto & ele : C.Children){
+            Children.push_back(ele);
+        }
+        num = C.num;
+    }
+
 
     Node(std::string inputStr){
         token = inputStr;
