@@ -28,7 +28,7 @@ int main() {
         
     }
     bool empty = true;
-    for (int i=0; i<input.size(); i++)
+    for (int i=0; i < (int)input.size(); i++)
     {
         if (input.at(i) != '\t' && input.at(i) != '\n' && input.at(i) != ' ')
         {
