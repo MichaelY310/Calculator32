@@ -97,6 +97,7 @@ int main() {
     }
 
 
+    
     for (int i=0; i < (int)TokenVector.size(); i++)
     {
         if (TokenVector[i].type == TokenType::rightParenthesis)
