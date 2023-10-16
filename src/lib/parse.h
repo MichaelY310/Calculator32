@@ -93,7 +93,7 @@ public:
             }
             return res;
         }
-        // return Node();
+        return Node();
     }
     
     static double calculate(Node root) 
@@ -103,7 +103,7 @@ public:
             return root.value.value;
         } else {
             double res = calculate(root.children[0]);
-            for (int i=1; i < root.children.size(); i++)
+            for (int i=1; i < (int)root.children.size(); i++)
             {
                 if (root.value.type == TokenType::plus) { res += calculate(root.children[i]); }
                 if (root.value.type == TokenType::minus) { res -= calculate(root.children[i]); }
@@ -129,7 +129,7 @@ public:
         } else {
             std::cout << root.value.content << std::endl;
     
-            for (int i=0; i < root.children.size(); i++)
+            for (int i=0; i < (int)root.children.size(); i++)
             {
                 print(root.children[i]);
             }
