@@ -1,6 +1,43 @@
 #include "lib/Parser.h"
 
 
+void errorCheck(std::vector<Token> expression) {
+    if (expression.size() == 1 || expression.at(0).type != TokenType::leftParenthesis) {
+        std::cout << "Unexpected token at line " << expression.at(0).line << " column " << expression.at(0).index << ": " << expression.at(0).content << std::endl;
+        exit(2);
+    }
+
+    int paraCheck = 0;
+    for (size_t i = 1; i < expression.size() - 1; i++) {
+        if (expression.at(i).content == "(") {
+            paraCheck += 1;
+            if (!(expression.at(i+1).type == TokenType::plus || expression.at(i+1).type == TokenType::minus || expression.at(i+1).type == TokenType::multiply || expression.at(i+1).type == TokenType::divide)) {
+                std::cout << "Unexpected token at line " << expression.at(i+1).line << " column " << expression.at(i+1).index << ": " << expression.at(i+1).content << std::endl;
+                exit(2);
+            }
+        }
+        if (expression.at(i).content == ")") {
+            paraCheck -= 1;
+        }
+
+        if (expression.at(i).type == TokenType::plus || expression.at(i).type == TokenType::minus || expression.at(i).type == TokenType::multiply || expression.at(i).type == TokenType::divide) {
+            if (expression.at(i - 1).type != TokenType::leftParenthesis) {
+                std::cout << "Unexpected token at line " << expression.at(i).line << " column " << expression.at(i).index << ": " << expression.at(i).content << std::endl;
+                exit(2);
+            }
+        }
+
+        if (paraCheck < 0) {          // check para is correct
+            std::cout << "Unexpected token at line " << expression.at(i).line << " column " << expression.at(i).index << ": " << expression.at(i).content  << std::endl;
+            exit(2);
+        }
+        if (paraCheck == 0 && i != expression.size() - 2) {
+            std::cout << "Unexpected token at line " << expression.at(i+1).line << " column " << expression.at(i+1).index << ": " << expression.at(i+1).content  << std::endl;
+            exit(2);
+        }
+    }
+}
+
 int main() {
     std::string input = "";
     std::string line;
@@ -30,10 +67,8 @@ int main() {
         return 1;
     }
 
-    if (TokenVector.size() == 1) {
-        std::cout << "Unexpected token at line " << TokenVector[0].line << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
-        return 2;
-    }
+    
+    errorCheck(TokenVector);
 
     Node root = Parser::MakeTree(TokenVector, 0, TokenVector.size() - 2);
     if (Parser::ErrorToken.type != TokenType::none)
