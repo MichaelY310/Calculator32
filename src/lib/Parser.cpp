@@ -1,7 +1,8 @@
 #include "Parser.h"
 
+Token Parser::ErrorToken = Token(TokenType::none, "", -1, -1, -1);
+
 Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBound){
-    // (
     if (expression[leftBound].type == TokenType::leftParenthesis)
     {
         // ( not followed by operation symbol

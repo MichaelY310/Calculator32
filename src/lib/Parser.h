@@ -31,4 +31,4 @@ private:
     static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
 };
 
-Token Parser::ErrorToken = Token(TokenType::none, "", -1, -1, -1);
+
