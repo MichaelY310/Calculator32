@@ -13,7 +13,7 @@ int main() {
     }
     input = input.substr(0, input.size()-1);
 
-    std::cout << input << std::endl;
+    //std::cout << input << std::endl;
     
     //std::string input = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
     //std::string input = "(/ 1 0)";
