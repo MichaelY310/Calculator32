@@ -19,7 +19,12 @@ int main() {
     //std::string input = "(1 * 2 * 3)";
 
     
-    if (input.size() == 0) { return 2; }
+    if (input.size() == 0) 
+    {
+        std::cout << "Unexpected token at line 1 column 1: END" << std::endl;
+        return 2; 
+        
+    }
     if (input.at(0) != '(') 
     {
         std::cout << "Unexpected token at line " << Parser::ErrorToken.line << "  column  " << Parser::ErrorToken.index << ": " << Parser::ErrorToken.content << std::endl;
