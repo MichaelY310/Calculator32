@@ -1,4 +1,4 @@
-#include "lib/lex.h"
+#include "lexer.h"
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
