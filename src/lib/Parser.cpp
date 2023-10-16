@@ -18,13 +18,16 @@ Parser::Parser(const std::vector<Token> expression) {
         
         if (i > 0) {            
             Last = expression.at(i-1);
-            if (Last.type == expression.at(i).type){
-                std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(0).content <<std::endl;
-                exit(2);
+            if (Last.type == expression.at(i).type ){
+                if (expression.at(i).type== TokenType::plus || expression.at(i).type== TokenType::minus || expression.at(i).type== TokenType::multiply || expression.at(i).type== TokenType::divide ){
+                    std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< " 6: " << expression.at(i).content <<std::endl;
+                    exit(2);
+                }
+                // std::cout << "test" << expression.at(i).content <<std::endl;
+                // if (expression.at(i).type == TokenType::number) {
+                //     // std::cout << "Wrong" <<std::endl;
             }
         }
-
-
         if (expression.at(i).content == "("){
             paraCheck += 1;
         }
@@ -40,9 +43,7 @@ Parser::Parser(const std::vector<Token> expression) {
             std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content<< "456" <<std::endl;
             exit(2);
         }
-
         T.push_back(expression.at(i));
-
     }
 
 

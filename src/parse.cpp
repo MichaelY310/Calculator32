@@ -12,6 +12,7 @@ int main() {
         input += line;
     }
     input = input.substr(0, input.size() - 1);
+    // input = "(+ 1 (* * 2 3 4))";
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
 
@@ -21,7 +22,6 @@ int main() {
 
     result = p.evaluateExpression();
     std::cout << result << std::endl;
-
 
     return 0;
 
