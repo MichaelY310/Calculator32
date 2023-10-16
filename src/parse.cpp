@@ -90,23 +90,6 @@ int main() {
     errorCheck(TokenVector);
     
 
-    // Multiple expression
-    int right = findRightParenthesis(TokenVector, 1, (int)TokenVector.size()-2);
-    if (TokenVector[0].type == TokenType::leftParenthesis) {
-        if (right != (int)TokenVector.size()-2) 
-        {  
-            std::cout << "Unexpected token at line " << TokenVector[right+1].line << " column " << TokenVector[right+1].index << ": " << TokenVector[right+1].content << std::endl;
-            return 2;
-        }
-    }
-    else {
-        // multiple numbers
-        if (TokenVector.size() > 2 && TokenVector[0].type == TokenType::number)
-        {  
-            std::cout << "Unexpected token at line " << TokenVector[1].line << " column " << TokenVector[1].index << ": " << TokenVector[1].content << std::endl;
-            return 2;
-        }
-    }
     
 
     
