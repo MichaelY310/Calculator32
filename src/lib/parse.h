@@ -42,9 +42,15 @@ public:
         if (expression[leftBound].type == TokenType::leftParenthesis)
         {
             // ( not followed by operation symbol
-            if (leftBound+1 > rightBound) { ErrorToken = expression[leftBound+1]; return Node(); }
-            if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide)
-            { ErrorToken = expression[leftBound + 1]; return Node(); }
+            if (p+1 > rightBound) 
+            {
+                if (ErrorToken.type == TokenType::none) { ErrorToken = expression[p+1]; return Node();  }
+            }
+            if (expression[p + 1].type != TokenType::plus && expression[p + 1].type != TokenType::minus && expression[p + 1].type != TokenType::multiply && expression[p + 1].type != TokenType::divide)
+            { 
+                if (ErrorToken.type == TokenType::none) 
+                { ErrorToken = expression[p+1]; return Node(); } 
+            }
             
             int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
             if (rightIndex > rightBound) 
