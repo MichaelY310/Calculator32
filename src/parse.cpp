@@ -2,12 +2,18 @@
 
 
 void errorCheck(std::vector<Token> expression) {
-    if (expression.size() == 1 || expression.at(0).type != TokenType::leftParenthesis) {
+    if (expression.size() == 1 || !(expression.at(0).type == TokenType::leftParenthesis || expression.at(0).type == TokenType::number)) {
         std::cout << "Unexpected token at line " << expression.at(0).line << " column " << expression.at(0).index << ": " << expression.at(0).content << std::endl;
         exit(2);
     }
+    if (expression.at(0).type == TokenType::number) {
+        if (expression.size() != 2) {
+            std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
+            exit(2);
+        }
+    }
 
-    int paraCheck = 0;
+    int paraCheck = 1;
     for (size_t i = 1; i < expression.size() - 1; i++) {
         if (expression.at(i).content == "(") {
             paraCheck += 1;
