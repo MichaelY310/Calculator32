@@ -2,10 +2,13 @@
 
 
 void errorCheck(std::vector<Token> expression) {
+    // Check if the vector has only END token, or the first token incorrect.
     if (expression.size() == 1 || !(expression.at(0).type == TokenType::leftParenthesis || expression.at(0).type == TokenType::number)) {
         std::cout << "Unexpected token at line " << expression.at(0).line << " column " << expression.at(0).index << ": " << expression.at(0).content << std::endl;
         exit(2);
     }
+
+    //If the first token is number, then it should be only token.
     if (expression.at(0).type == TokenType::number) {
         if (expression.size() != 2) {
             std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
@@ -16,13 +19,17 @@ void errorCheck(std::vector<Token> expression) {
         }
     }
 
+    //If the first token is left parenthesis, then next one should be a operator.
     if (!(expression.at(1).type == TokenType::plus || expression.at(1).type == TokenType::minus || expression.at(1).type == TokenType::multiply || expression.at(1).type == TokenType::divide)) {
         std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
         exit(2);
     }
 
+    //Diff between left and right parenthesis, should always be over zero in the process of iteration, be zero after iteration.
     int paraCheck = 1;
     for (size_t i = 1; i < expression.size() - 1; i++) {
+
+        //Left paranthesis should always follow with a operator
         if (expression.at(i).content == "(") {
             paraCheck += 1;
             if (!(expression.at(i+1).type == TokenType::plus || expression.at(i+1).type == TokenType::minus || expression.at(i+1).type == TokenType::multiply || expression.at(i+1).type == TokenType::divide)) {
@@ -30,10 +37,13 @@ void errorCheck(std::vector<Token> expression) {
                 exit(2);
             }
         }
+
+        //Right paranthese should reduce the difference by 1.
         if (expression.at(i).content == ")") {
             paraCheck -= 1;
         }
 
+        //Operator should always preceded by paranthese.
         if (expression.at(i).type == TokenType::plus || expression.at(i).type == TokenType::minus || expression.at(i).type == TokenType::multiply || expression.at(i).type == TokenType::divide) {
             if (expression.at(i - 1).type != TokenType::leftParenthesis) {
                 std::cout << "Unexpected token at line " << expression.at(i).line << " column " << expression.at(i).index << ": " << expression.at(i).content << std::endl;
@@ -41,16 +51,21 @@ void errorCheck(std::vector<Token> expression) {
             }
         }
 
+        //Anytime when right parenthesis is more than right is fault.
         if (paraCheck < 0) {          // check para is correct
             std::cout << "Unexpected token at line " << expression.at(i).line << " column " << expression.at(i).index << ": " << expression.at(i).content  << std::endl;
             exit(2);
         }
+
+        //Anytime when right parenthesis is same as left is fault, except it reached the end of vector.
         if (paraCheck == 0 && i != expression.size() - 2) {
             std::cout << "Unexpected token at line " << expression.at(i+1).line << " column " << expression.at(i+1).index << ": " << expression.at(i+1).content  << std::endl;
             exit(2);
         }
     }
-    if (paraCheck != 0) {          // check para is correct
+
+    //If reached the end check left is same as left.
+    if (paraCheck != 0) {          
         std::cout << "Unexpected token at line " << expression.at(expression.size() - 1).line << " column " << expression.at(expression.size() - 1).index << ": " << expression.at(expression.size() - 1).content << std::endl;
         exit(2);
     }
