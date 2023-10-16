@@ -14,7 +14,6 @@ struct Node {
     Node(){
         token = "empty";
         num = -1;
-
     }
 
     Node(Node &C){
