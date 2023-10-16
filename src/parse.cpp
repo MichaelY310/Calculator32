@@ -1,10 +1,5 @@
 #include "lib/parse.h"
 
-
-
-
-
-
 void errorCheck(std::vector<Token> expression) {
     if (expression.size() == 1 || !(expression.at(0).type == TokenType::leftParenthesis || expression.at(0).type == TokenType::number)) {
         std::cout << "Unexpected token at line " << expression.at(0).line << " column " << expression.at(0).index << ": " << expression.at(0).content << std::endl;
