@@ -44,21 +44,25 @@ public:
             // ( not followed by operation symbol
             if (leftBound+1 > rightBound) {
                 if (ErrorToken.type == TokenType::none) {
-                    ErrorToken = expression[leftBound+1]; return Node(); 
+                    ErrorToken = expression[leftBound+1]; 
                 }
+                return Node();
             }
             if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide)
             { 
                 if (ErrorToken.type == TokenType::none) {
-                    ErrorToken = expression[leftBound + 1]; return Node(); 
+                    ErrorToken = expression[leftBound + 1]; 
                 }
+                return Node();
             }
             
             int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
             if (rightIndex > rightBound) 
             { 
                 std::cout << "1" << std::endl;
-                if (ErrorToken.type == TokenType::none) { ErrorToken = expression[rightIndex]; }
+                if (ErrorToken.type == TokenType::none) { 
+                    ErrorToken = expression[rightIndex]; 
+                }
                 return Node();
             }
             return MakeTree(expression, leftBound + 1, rightIndex-1);
@@ -79,8 +83,8 @@ public:
                 if (ErrorToken.type == TokenType::none) 
                 { 
                     ErrorToken = expression[leftBound+1]; 
-                    return Node(); 
                 } 
+                return Node();
             }
 
             
@@ -100,12 +104,19 @@ public:
                     // ( not followed by operation symbol
                     if (p+1 > rightBound) 
                     {
-                        if (ErrorToken.type == TokenType::none) { ErrorToken = expression[p+1]; return Node();  }
+                        if (ErrorToken.type == TokenType::none) 
+                        { 
+                            ErrorToken = expression[p+1];
+                        }
+                        return Node();
                     }
                     if (expression[p + 1].type != TokenType::plus && expression[p + 1].type != TokenType::minus && expression[p + 1].type != TokenType::multiply && expression[p + 1].type != TokenType::divide)
                     { 
                         if (ErrorToken.type == TokenType::none) 
-                        { ErrorToken = expression[p+1]; return Node(); } 
+                        { 
+                            ErrorToken = expression[p+1]; 
+                        } 
+                        return Node();
                     }
                      
                     
@@ -114,7 +125,10 @@ public:
                     { 
                         std::cout << "2" << std::endl;
                         std::cout << expression[p].index << std::endl;
-                        if (ErrorToken.type == TokenType::none) { ErrorToken = expression[rightIndex]; }
+                        if (ErrorToken.type == TokenType::none) 
+                        { 
+                            ErrorToken = expression[rightIndex]; 
+                        }
                         return Node();
                     }
                     res.children.push_back(MakeTree(expression, p, rightIndex));
@@ -124,7 +138,10 @@ public:
                 else
                 {
                     std::cout << "";
-                    if (ErrorToken.type == TokenType::none) { ErrorToken = expression[p]; }
+                    if (ErrorToken.type == TokenType::none) 
+                    { 
+                        ErrorToken = expression[p]; 
+                    }
                     return Node();
                 }
             }
