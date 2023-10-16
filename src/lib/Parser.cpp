@@ -7,7 +7,7 @@ Parser::Parser(const std::vector<Token> expression) {
     std::vector<Token> T;
 
     if (expression.size()<=1){
-        std::cout <<"Unexpected token at line "<< expression.at(0).line << " column " << expression.at(0).index<< ": " << expression.at(0).content <<std::endl;
+        std::cout <<"Unexpected token at line "<< expression.at(0).line << " column " << expression.at(0).index<< ": " << expression.at(0).content << "123"<<std::endl;
         exit(2);
     }
 
@@ -16,10 +16,14 @@ Parser::Parser(const std::vector<Token> expression) {
 
     for (size_t i = 0; i < expression.size()-1; i++){
         
-        // if (i > 0) {            
-        //     Last = expression.at(i-1);
-        //     if ()
-        // }
+        if (i > 0) {            
+            Last = expression.at(i-1);
+            if (Last.type == expression.at(i).type){
+                std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(0).content <<std::endl;
+                exit(2);
+            }
+        }
+
 
         if (expression.at(i).content == "("){
             paraCheck += 1;
@@ -29,11 +33,11 @@ Parser::Parser(const std::vector<Token> expression) {
         }
 
         if (paraCheck < 0){          // check para is correct
-            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
+            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content<< "234" <<std::endl;
             exit(2);
         }
         if (paraCheck != 0 && i == expression.size()-2){
-            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content <<std::endl;
+            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content<< "456" <<std::endl;
             exit(2);
         }
 
@@ -41,9 +45,8 @@ Parser::Parser(const std::vector<Token> expression) {
 
     }
 
-    
 
-   
+
     Root = ParserHelper(T, 0, nullptr);
 }
 
