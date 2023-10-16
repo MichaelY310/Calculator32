@@ -121,7 +121,7 @@ public:
         }
     }
     
-    static void print(Node root) 
+    static void testprint(Node root) 
     {
         if (root.value.type == TokenType::number)
         {
@@ -131,8 +131,25 @@ public:
     
             for (int i=0; i < (int)root.children.size(); i++)
             {
-                print(root.children[i]);
+                testprint(root.children[i]);
             }
+        }
+    }
+
+    static void print(Node root) 
+    {
+        if (root.value.type == TokenType::number)
+        {
+            std::cout << root.value.content;
+        } else {
+            std::cout << "(";
+            for (int i=1; i < (int)root.children.size(); i++)
+            {
+                print(root.children[i]);
+                std::cout << " " << root.value.content << " ";
+            }
+            print(root.children[(int)root.children.size() - 1]);
+            std::cout << ")";
         }
     }
 };
