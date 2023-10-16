@@ -63,6 +63,7 @@ int main() {
         return 2;
     }
     Parser::print(root);
+    std::cout << std::endl;
     
     double result= Parser::calculate(root);
     if (Parser::ErrorToken.type != TokenType::none)
@@ -71,7 +72,6 @@ int main() {
         return 3;
     }
 
-    std::cout << std::endl;
     std::cout << result << std::endl;
     
     
