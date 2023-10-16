@@ -46,7 +46,7 @@ Parser::Parser(const std::vector<Token> expression) {
         T.push_back(expression.at(i));
     }
 
-
+    Root = new Node();
 
     Root = ParserHelper(T, 0, Root);
 }
