@@ -70,7 +70,7 @@ int main() {
 
     // Multiple expression
     int right = findRightParenthesis(TokenVector, 0, TokenVector.size()-2);
-    if (right != TokenVector.size()-2) 
+    if (right != (int)TokenVector.size()-2) 
     {  
         std::cout << "Unexpected token at line " << TokenVector[right].line << " column " << TokenVector[right].index << ": " << TokenVector[right].content << std::endl;
         return 2;
