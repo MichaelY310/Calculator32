@@ -28,16 +28,16 @@ int main() {
         
     }
     bool empty = true;
+    int index = 1;
+    int line = 1;
     for (int i=0; i < (int)input.size(); i++)
     {
-        if (input.at(i) != '\t' && input.at(i) != '\n' && input.at(i) != ' ')
-        {
-            empty = false;
-            break;
-        }
+        if (input.at(i) == '\n') { line += 1; index = 1; }
+        else if (input.at(i) == '\t' || input.at(i) == ' ') { index = +1; }
+        else { empty = false; break; }
     }
     if (empty) {
-        std::cout << "Unexpected token at line 1 column 1: END" << std::endl;
+        std::cout << "Unexpected token at line " << line << " column " << index << ": END" << std::endl;
         return 2; 
     }
     //if (input.at(0) != '(') 
