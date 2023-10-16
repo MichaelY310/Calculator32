@@ -90,11 +90,15 @@ Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, N
             return root;
         }
     }
-    else {          // when the element is number 
+    else if (expression.at(i).type == TokenType::number){          // when the element is number 
         curr = new Node(expression.at(index).content);
         root->Children.push_back(curr);    //?    
         ParserHelper(expression, index+1, root); 
         return root;
+    }
+    else{
+        std::cout << "wrong" <<std::endl;
+        exit(-1);
     }
 }
 
