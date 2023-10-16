@@ -38,7 +38,8 @@ int main() {
         return 3;
     }
 
-    //Token::printLexer(TokenVector);
+    Parser::print(root);
+    std::cout << std::endl;
     std::cout << result << std::endl;
     
     
