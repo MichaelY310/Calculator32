@@ -75,7 +75,7 @@ int main() {
     if (TokenVector[0].type == TokenType::leftParenthesis) {
         if (right != (int)TokenVector.size()-2) 
         {  
-            std::cout << "Unexpected token at line " << TokenVector[right].line << " column " << TokenVector[right].index << ": " << TokenVector[right].content << std::endl;
+            std::cout << "Unexpected token at line " << TokenVector[right+1].line << " column " << TokenVector[right+1].index << ": " << TokenVector[right+1].content << std::endl;
             return 2;
         }
     }
