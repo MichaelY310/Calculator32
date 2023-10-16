@@ -27,6 +27,19 @@ int main() {
         return 2; 
         
     }
+    bool empty = true;
+    for (int i=0; i<input.size(); i++)
+    {
+        if (input.at(i) != '\t' && input.at(i) != '\n' && input.at(i) != ' ')
+        {
+            empty = false;
+            break;
+        }
+    }
+    if (empty) {
+        std::cout << "Unexpected token at line 1 column 1: END" << std::endl;
+        return 2; 
+    }
     //if (input.at(0) != '(') 
     //{
     //    std::cout << "Unexpected token at line " << 1 << "  column  " << 1 << ": " << input.at(0) << std::endl;
