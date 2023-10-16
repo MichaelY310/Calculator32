@@ -1,3 +1,14 @@
 # Calculator32
-In this project, we are going to write a programming language, but writing a programming language is hard, so we construtured a calculator first.
-The calculator will accept a S-expression, and give the result.
+
+there are two main functions
+
+# lex.cpp
+Turn the input string into a token vector and print their attributes
+
+# parse.cpp
+Turn the input string into a tree and then calculate the result of the expression.
+
+
+> William Lin
+> Torry Tong
+> Michael Yang
