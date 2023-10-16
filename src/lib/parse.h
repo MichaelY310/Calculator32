@@ -147,6 +147,7 @@ public:
         }
     }
 
+
     static void print(Node root) 
     {
         if (root.value.type == TokenType::number)
