@@ -152,7 +152,16 @@ public:
     {
         if (root.value.type == TokenType::number)
         {
-            std::cout << root.value.content;
+            int v = floor(root.value.value); 
+            if ((double)v == root.value.value) 
+            { 
+                std::cout << v; 
+            }
+            else 
+            {
+                std::cout << root.value.content;
+            }
+            
         } else {
             std::cout << "(";
             for (int i=0; i < (int)root.children.size(); i++)
