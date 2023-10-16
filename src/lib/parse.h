@@ -55,15 +55,17 @@ public:
     static Node MakeTree(std::vector<Token> expression, int leftBound, int rightBound)
     {
         // (
+        // (+ 1 1 4)
         if (expression[leftBound].type == TokenType::leftParenthesis)
         {
-            // ( not followed by operation symbol
+            // ( only
             if (leftBound+1 > rightBound) {
                 if (ErrorToken.type == TokenType::none) {
                     ErrorToken = expression[leftBound+1]; 
                 }
                 return Node();
             }
+            // ( not followed by operation symbol
             if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide)
             { 
                 if (ErrorToken.type == TokenType::none) {
@@ -71,11 +73,10 @@ public:
                 }
                 return Node();
             }
-            
+            // right parentheses ) not found
             int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
             if (rightIndex > rightBound) 
             { 
-                std::cout << "1" << std::endl;
                 if (ErrorToken.type == TokenType::none) { 
                     ErrorToken = expression[rightIndex]; 
                 }
@@ -83,17 +84,22 @@ public:
             }
             return MakeTree(expression, leftBound + 1, rightIndex-1);
         }
+            
         // number
+        // 810
         else if (expression[leftBound].type == TokenType::number)
         {
             Node res = Node(expression[leftBound]);
             return res;
         }
+            
         // operation
+        // * 9 10 11
         else if (expression[leftBound].type == TokenType::plus || expression[leftBound].type == TokenType::minus || expression[leftBound].type == TokenType::multiply || expression[leftBound].type == TokenType::divide)
         {
 
             // nothing follows the symbol
+            // *
             if (leftBound == rightBound)
             { 
                 if (ErrorToken.type == TokenType::none) 
@@ -103,7 +109,7 @@ public:
                 return Node();
             }
 
-            
+            // iterate through all the elements and add them as children
             Node res = Node(expression[leftBound]);
             int p = leftBound + 1;
             while (p <= rightBound)
@@ -117,7 +123,7 @@ public:
                 // (
                 else if (expression[p].type == TokenType::leftParenthesis) 
                 { 
-                    // ( not followed by operation symbol
+                    // ( only
                     if (p+1 > rightBound) 
                     {
                         if (ErrorToken.type == TokenType::none) 
@@ -126,6 +132,7 @@ public:
                         }
                         return Node();
                     }
+                    // ( not followed by operation symbol
                     if (expression[p + 1].type != TokenType::plus && expression[p + 1].type != TokenType::minus && expression[p + 1].type != TokenType::multiply && expression[p + 1].type != TokenType::divide)
                     { 
                         if (ErrorToken.type == TokenType::none) 
@@ -135,12 +142,10 @@ public:
                         return Node();
                     }
                      
-                    
+                    // ) not found
                     int rightIndex = findRightParenthesis(expression, p + 1, rightBound);
                     if (rightIndex > rightBound) 
                     { 
-                        std::cout << "2" << std::endl;
-                        std::cout << expression[p].index << std::endl;
                         if (ErrorToken.type == TokenType::none) 
                         { 
                             ErrorToken = expression[rightIndex]; 
@@ -150,10 +155,11 @@ public:
                     res.children.push_back(MakeTree(expression, p, rightIndex));
                     p = rightIndex + 1;
                 }
+                    
                 // ErrorToken
+                // $
                 else
                 {
-                    std::cout << "";
                     if (ErrorToken.type == TokenType::none) 
                     { 
                         ErrorToken = expression[p]; 
@@ -190,28 +196,13 @@ public:
             return res;
         }
     }
-    
-    static void testprint(Node root) 
-    {
-        if (root.value.type == TokenType::number)
-        {
-            std::cout << root.value.content << std::endl;
-        } else {
-            std::cout << root.value.content << std::endl;
-    
-            for (int i=0; i < (int)root.children.size(); i++)
-            {
-                testprint(root.children[i]);
-            }
-        }
-    }
-
 
     static void print(Node root) 
     {
         if (root.value.type == TokenType::number)
         {
             int v = floor(root.value.value); 
+            // 1000.000  ->  1000
             if ((double)v == root.value.value) 
             { 
                 std::cout << v; 
@@ -220,7 +211,6 @@ public:
             {
                 std::cout << root.value.content;
             }
-            
         } else {
             std::cout << "(";
             for (int i=0; i < (int)root.children.size(); i++)
