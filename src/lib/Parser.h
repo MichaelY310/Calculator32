@@ -18,6 +18,12 @@ struct Node {
         }
         num = C.num;
     }
+    ~Node(){
+        for (auto & ele : Children){
+            delete ele;
+            ele = nullptr;
+        }
+    }
 
 
     Node(std::string inputStr){
@@ -35,7 +41,9 @@ class Parser {
     public:
         Parser(const std::vector<Token> );
         Node * ParserHelper(const std::vector<Token>, size_t , Node * );
-        ~Parser(){};
+        ~Parser(){
+            
+        };
         size_t maxindex = 0;
 
         void printinfix();
