@@ -42,8 +42,11 @@ class Parser {
         Parser(const std::vector<Token> );
         Node * ParserHelper(const std::vector<Token>, size_t , Node * );
         ~Parser(){
-            
+            deleteHelp(Root);
         };
+
+        void deleteHelp(Node * root);
+
         size_t maxindex = 0;
 
         void printinfix();
