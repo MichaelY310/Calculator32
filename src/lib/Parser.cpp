@@ -7,7 +7,7 @@ Parser::Parser(const std::vector<Token> expression) {
     std::vector<Token> T;
 
     if (expression.size()<=1){
-        std::cout <<"Unexpected token at line "<< expression.at(0).line << " column " << expression.at(0).index<< ": " << expression.at(0).content << "123"<<std::endl;
+        std::cout <<"Unexpected token at line "<< expression.at(0).line << " column " << expression.at(0).index<< ": " << expression.at(0).content <<std::endl;
         exit(2);
     }
 
@@ -91,7 +91,7 @@ Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, N
         }
     }
     else if (expression.at(index).type == TokenType::number){          // when the element is number 
-        std::cout <<"test;" <<expression.at(index).content << std::endl;
+        // std::cout <<"test;" <<expression.at(index).content << std::endl;
         curr = new Node(expression.at(index).content);
 
         root->Children.push_back(curr);    //?    
