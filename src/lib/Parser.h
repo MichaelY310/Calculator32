@@ -12,9 +12,10 @@ struct Node {
     float num;
 
     Node(){
-        token = "empty";
+        token = "?";
         num = -1;
         Children = {};
+   
     }
 
     Node(Node &C){

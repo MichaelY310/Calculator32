@@ -76,7 +76,7 @@ Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, N
     }
 
     else if (expression.at(index).content == "+" || expression.at(index).content == "-" || expression.at(index).content == "*" || expression.at(index).content == "/"){
-        if (root == nullptr){
+        if (root->token == "?"){
             root = new Node(expression.at(index).content);  // for the first Root
         
             curr = ParserHelper(expression, index + 1, root); 
