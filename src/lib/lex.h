@@ -6,6 +6,7 @@
 #include <cmath>
 
 enum class TokenType {
+    none,
     number,
     plus,
     minus,
