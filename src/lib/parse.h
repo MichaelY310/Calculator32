@@ -111,7 +111,7 @@ public:
                 if (root.value.type == TokenType::divide) 
                 { 
                     if (root.children[i].value.value == 0) { 
-                        ErrorToken = root.children[i].value;
+                        ErrorToken = ErrorToken = Token(TokenType::error, "", -1, -1, -1);;
                         return 1; 
                     }
                     res /= calculate(root.children[i]); 
