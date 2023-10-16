@@ -95,6 +95,21 @@ int main() {
             return 2;
         }
     }
+
+
+    for (int i=0; i<TokenVector.size(); i++)
+    {
+        if (TokenVector[i].type == TokenType::rightParenthesis)
+        {
+            int left = findLeftParenthesis(TokenVector, 0, i-1);
+            if (left < 0)
+            {
+                std::cout << "Unexpected token at line " << TokenVector[0].line << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
+                return 2;
+            }
+            
+        }
+    }
     
 
     
