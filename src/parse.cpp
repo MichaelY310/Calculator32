@@ -74,6 +74,7 @@ int main() {
     {  
         std::cout << "Unexpected token at line " << TokenVector[right].line << " column " << TokenVector[right].index << ": " << TokenVector[right].content << std::endl;
     }
+    
 
     
     Node root = Parser::MakeTree(TokenVector, 0, TokenVector.size() - 2);
