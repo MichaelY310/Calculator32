@@ -68,6 +68,13 @@ int main() {
         return 1;
     }
 
+    // Multiple expression
+    int right = findRightParenthesis(TokenVector, 0, TokenVector.size()-2);
+    if (right != TokenVector.size()-2) 
+    {  
+        std::cout << "Unexpected token at line " << TokenVector[right].line << " column " << TokenVector[right].index << ": " << TokenVector[right].content << std::endl;
+    }
+
     
     Node root = Parser::MakeTree(TokenVector, 0, TokenVector.size() - 2);
     if (Parser::ErrorToken.type != TokenType::none)
