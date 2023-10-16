@@ -72,6 +72,15 @@ public:
         // operation
         else if (expression[leftBound].type == TokenType::plus || expression[leftBound].type == TokenType::minus || expression[leftBound].type == TokenType::multiply || expression[leftBound].type == TokenType::divide)
         {
+
+            // nothing follows the symbol
+            if (leftBound == rightBound)
+            { 
+                if (ErrorToken.type == TokenType::none) 
+                { ErrorToken = expression[leftBound]; return Node(); } 
+            }
+
+            
             Node res = Node(expression[leftBound]);
             int p = leftBound + 1;
             while (p <= rightBound)
