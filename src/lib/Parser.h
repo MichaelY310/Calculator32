@@ -27,9 +27,7 @@ class Parser {
     public:
         Parser(const std::vector<Token> );
         Node * ParserHelper(const std::vector<Token>, size_t , Node * );
-        ~Parser(){
-            destroyTree(Root);
-        };
+        ~Parser(){};
         size_t maxindex = 0;
 
         void printinfix();
@@ -42,15 +40,6 @@ class Parser {
         Node * Root;
         std::string FixExp = "";
         double applyOp(char op, double b, double a);
-        void destroyTree(Node* node) {
-            if (node == nullptr) {
-                return;
-            }
-            for (Node* child : node->Children) {
-                destroyTree(child);
-            }
-            delete node;
-        }
 
 };
 

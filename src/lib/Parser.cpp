@@ -33,13 +33,16 @@ Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, N
     else if (expression.at(index).content == "+" || expression.at(index).content == "-" || expression.at(index).content == "*" || expression.at(index).content == "/"){
         if (root == nullptr){
             root = new Node(expression.at(index).content);  // for the first Root
-        
+            root->Children = std::vector<Node*>();
+
             curr = ParserHelper(expression, index + 1, root); 
         
             return root;
         }
         else{   
             curr = new Node(expression.at(index).content);  
+            curr->Children = std::vector<Node*>();
+
             curr = ParserHelper(expression, index + 1, curr);
             root->Children.push_back(curr);
             return root;
@@ -47,6 +50,8 @@ Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, N
     }
     else {          // when the element is number 
         curr = new Node(expression.at(index).content);
+        curr->Children = std::vector<Node*>();
+
         root->Children.push_back(curr);         
         ParserHelper(expression, index+1, root); 
         return root;
