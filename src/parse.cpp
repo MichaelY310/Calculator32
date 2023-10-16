@@ -72,7 +72,7 @@ int main() {
     int right = findRightParenthesis(TokenVector, 1, (int)TokenVector.size()-2);
     if (right != (int)TokenVector.size()-2) 
     {  
-        std::cout << "Unexpected token at line " << TokenVector[right].line << " column " << TokenVector[right].index << ": " << TokenVector[right].content << std::endl;
+        std::cout << "Unexpected token at line " << TokenVector[right-1].line << " column " << TokenVector[right-1].index << ": " << TokenVector[right-1].content << std::endl;
         return 2;
         
     }
