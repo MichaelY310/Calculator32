@@ -24,13 +24,10 @@ struct Node {
         num = C.num;
     }
     ~Node(){
-        // for (auto & ele : Children){
-        //     deleteHelp(ele);
-        //     ele = nullptr;
-        // }
+        
     }
 
-    void deleteHelp(Node * root);
+
 
 
     Node(std::string inputStr){
@@ -50,8 +47,10 @@ class Parser {
         Parser(const std::vector<Token> );
         Node * ParserHelper(const std::vector<Token>, size_t , Node * );
         ~Parser(){
-            delete Root;
+            deleteHelp(Root);
         };
+
+        void deleteHelp(Node * root);
 
         
 

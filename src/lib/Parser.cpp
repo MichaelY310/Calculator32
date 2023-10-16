@@ -244,32 +244,28 @@ double Parser::evaluateExpression() {
     return values.top();
 }
 
-// void Node::deleteHelp(Node * root){
-//     if(root->Children.size()==0){
-//         std::cout << "delete root : " << root->token << std::endl;
-//         delete root;
-//         root = nullptr;
-//         return;
-//     }
-//     for (int i = root->Children.size()-1; i>= 0; i--){
-//         if (root->Children.at(i)->token =="0" ||  root->Children.at(i)->token == "1" || root->Children.at(i)->token == "2" || root->Children.at(i)->token == "3" || root->Children.at(i)->token == "4" || root->Children.at(i)->token == "5" || root->Children.at(i)->token == "6" || root->Children.at(i)->token == "7" || root->Children.at(i)->token == "8" || root->Children.at(i)->token == "9"){
-//             std::cout << "delete child : " << root->Children.at(i)->token << std::endl;
-//             delete root->Children.at(i);
-//             root->Children.at(i) = nullptr;
-//             root->Children.pop_back();
-//             continue;
-//         }
-//         // if (i == 0){
-//         //     std::cout << "deleting: " << root->token <<std::endl;
-//         //     delete root;
-//         // }
-//         deleteHelp(root->Children.at(i));  
-//     }
-//     if(root != nullptr){
-//         std::cout << "deleting: " << root->token <<std::endl;
-//         delete root;
-//         root = nullptr;
-//     }
-//     return;
-// }
+void Parser::deleteHelp(Node * root){
+    if(root->Children.size()==0){
+        // std::cout << "delete root : " << root->token << std::endl;
+        delete root;
+        root = nullptr;
+        return;
+    }
+    for (int i = root->Children.size()-1; i>= 0; i--){
+        if (root->Children.at(i)->token =="0" ||  root->Children.at(i)->token == "1" || root->Children.at(i)->token == "2" || root->Children.at(i)->token == "3" || root->Children.at(i)->token == "4" || root->Children.at(i)->token == "5" || root->Children.at(i)->token == "6" || root->Children.at(i)->token == "7" || root->Children.at(i)->token == "8" || root->Children.at(i)->token == "9"){
+            // std::cout << "delete child : " << root->Children.at(i)->token << std::endl;
+            delete root->Children.at(i);
+            root->Children.at(i) = nullptr;
+            root->Children.pop_back();
+            continue;
+        }
+        deleteHelp(root->Children.at(i));  
+    }
+    if(root != nullptr){
+        // std::cout << "deleting: " << root->token <<std::endl;
+        delete root;
+        root = nullptr;
+    }
+    return;
+}
 
