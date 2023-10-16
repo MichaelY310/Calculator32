@@ -12,7 +12,9 @@ int main() {
         input += line;
     }
     input = input.substr(0, input.size()-1);
-    if (input.size() == 0 || input.at(0) != "(" || input.at(input.size()-1) != ")") { return 2; }
+    
+    if (input.size() == 0) { return 2; }
+    if (input.at(0) != '(' || input.at(input.size()-1) != ')') { return 2; }
 
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
     // Check ERROR
