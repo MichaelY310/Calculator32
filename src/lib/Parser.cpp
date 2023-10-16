@@ -4,7 +4,7 @@
 #include <cctype>
 
 Parser::Parser(const std::vector<Token> expression) {
-   
+
     Root = ParserHelper(expression, 0, nullptr);
 }
 
