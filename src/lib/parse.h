@@ -17,6 +17,7 @@ public:
 };
 
 
+// exclude leftParenthesis
 int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
 {
     int balance = 1;
@@ -29,6 +30,21 @@ int findRightParenthesis(std::vector<Token> expression, int leftBound, int right
     }
     return p;
 }
+
+// right leftParenthesis
+int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
+{
+    int balance = 1;
+    int p = rightBound;
+    while (p >= leftBound) {
+        if (expression[p].type == TokenType::leftParenthesis) { balance -= 1; }
+        if (expression[p].type == TokenType::rightParenthesis) { balance += 1; }
+        if (balance == 0) { break; }
+        p -= 1;
+    }
+    return p;
+}
+
 
 
 class Parser
