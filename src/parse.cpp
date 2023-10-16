@@ -89,7 +89,7 @@ int main() {
         //}
         
         // multiple numbers
-        if (TokenVector.size() >= 2)
+        if (TokenVector.size() >= 2 && TokenVector[0].type == TokenType::number)
         {  
             std::cout << "Unexpected token at line " << TokenVector[1].line << " column " << TokenVector[1].index << ": " << TokenVector[1].content << std::endl;
             return 2;
