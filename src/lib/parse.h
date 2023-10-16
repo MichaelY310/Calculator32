@@ -77,7 +77,7 @@ public:
             if (leftBound == rightBound)
             { 
                 if (ErrorToken.type == TokenType::none) 
-                { ErrorToken = expression[leftBound]; return Node(); } 
+                { ErrorToken = expression[leftBound+1]; return Node(); } 
             }
 
             
