@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "lib/parse.h"
 
 int main() {
     std::string input = "";
