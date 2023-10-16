@@ -80,7 +80,16 @@ int main() {
         }
     }
     else {
-        if (TokenVector.size() != 2)
+        // not started with (. must be a single number
+        
+        // not a number
+        if (TokenVector[0].type != TokenType::number) 
+        {
+            std::cout << "Unexpected token at line " << TokenVector[0].line << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
+        }
+        
+        // multiple numbers
+        if (TokenVector.size() >= 2)
         {  
             std::cout << "Unexpected token at line " << TokenVector[1].line << " column " << TokenVector[1].index << ": " << TokenVector[1].content << std::endl;
             return 2;
