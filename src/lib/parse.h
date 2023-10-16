@@ -32,7 +32,7 @@ int findRightParenthesis(std::vector<Token> expression, int leftBound, int right
     return p;
 }
 
-// right leftParenthesis
+// exclude rightParenthesis
 int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
 {
     int balance = 1;
