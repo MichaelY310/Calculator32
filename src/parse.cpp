@@ -73,6 +73,7 @@ int main() {
     if (right != TokenVector.size()-2) 
     {  
         std::cout << "Unexpected token at line " << TokenVector[right].line << " column " << TokenVector[right].index << ": " << TokenVector[right].content << std::endl;
+        return 2;
     }
     
 
