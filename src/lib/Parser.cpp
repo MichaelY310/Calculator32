@@ -15,7 +15,6 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
         if (rightIndex > rightBound)
         {
-            std::cout << "1" << std::endl;
             if (ErrorToken.type == TokenType::none) { ErrorToken = expression[rightIndex]; }
             return Node();
         }
