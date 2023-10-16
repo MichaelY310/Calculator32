@@ -27,21 +27,21 @@ int main() {
         return 2; 
         
     }
-    if (input.at(0) != '(') 
-    {
-        std::cout << "Unexpected token at line " << 1 << "  column  " << 1 << ": " << input.at(0) << std::endl;
-
-        return 2; 
-        
-    }
+    //if (input.at(0) != '(') 
+    //{
+    //    std::cout << "Unexpected token at line " << 1 << "  column  " << 1 << ": " << input.at(0) << std::endl;
+//
+    //    return 2; 
+   //     
+   // }
     
-    if (input.at(input.size()-1) != ')') 
-    {
-        std::cout << "Unexpected token at line " << Parser::ErrorToken.line << "  column  " << Parser::ErrorToken.index << ": " << Parser::ErrorToken.content << std::endl;
+   // if (input.at(input.size()-1) != ')') 
+    //{
+     //   std::cout << "Unexpected token at line " << Parser::ErrorToken.line << "  column  " << Parser::ErrorToken.index << ": " << Parser::ErrorToken.content << std::endl;
 
-        return 2; 
+     //   return 2; 
         
-    }
+    //}
     
     
     
