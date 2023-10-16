@@ -1,4 +1,4 @@
-#include "lex.h"
+#include "lib/lex.h"
 
 int main() {
 
