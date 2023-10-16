@@ -247,7 +247,7 @@ void Parser::deleteHelp(Node * root){
         delete root;
         return;
     }
-    for (size_t i = root->Children.size()-1; i>= 0; i--){
+    for (int i = root->Children.size()-1; i>= 0; i--){
         if (root->Children.at(i)->token =="0" ||  root->Children.at(i)->token == "1" || root->Children.at(i)->token == "2" || root->Children.at(i)->token == "3" || root->Children.at(i)->token == "4" || root->Children.at(i)->token == "5" || root->Children.at(i)->token == "6" || root->Children.at(i)->token == "7" || root->Children.at(i)->token == "8" || root->Children.at(i)->token == "9"){
             delete root->Children.at(i);
             root->Children.pop_back();
