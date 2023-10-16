@@ -111,6 +111,7 @@ public:
                 // ErrorToken
                 else
                 {
+                    std::cout << "";
                     if (ErrorToken.type == TokenType::none) { ErrorToken = expression[p]; }
                     return Node();
                 }
