@@ -48,7 +48,7 @@ Parser::Parser(const std::vector<Token> expression) {
 
 
 
-    Root = ParserHelper(T, 0, nullptr);
+    Root = ParserHelper(T, 0, Root);
 }
 
 

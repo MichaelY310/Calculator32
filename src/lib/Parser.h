@@ -50,8 +50,7 @@ class Parser {
         };
 
         Parser(){
-            Root = new Node();
-            
+            Root = new Node();  
         };
 
         void deleteHelp(Node * root);
