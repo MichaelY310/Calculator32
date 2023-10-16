@@ -28,9 +28,6 @@ struct Node {
         
     }
 
-
-
-
     Node(std::string inputStr){
         Children = {};
         token = inputStr;
@@ -50,6 +47,11 @@ class Parser {
         Node * ParserHelper(const std::vector<Token>, size_t , Node * );
         ~Parser(){
             deleteHelp(Root);
+        };
+
+        Parser(){
+            Root = new Node();
+            
         };
 
         void deleteHelp(Node * root);
