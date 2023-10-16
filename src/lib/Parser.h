@@ -8,8 +8,14 @@
 
 struct Node {
     std::string token;
-    std::vector<Node *> Children;   //vector can store more than 2 children
+    std::vector<Node *> Children{};   //vector can store more than 2 children
     float num;
+
+    Node(){
+        token = "empty";
+        num = -1;
+
+    }
 
     Node(Node &C){
         token = C.token;
@@ -19,14 +25,17 @@ struct Node {
         num = C.num;
     }
     ~Node(){
-        for (auto & ele : Children){
-            delete ele;
-            ele = nullptr;
-        }
+        // for (auto & ele : Children){
+        //     deleteHelp(ele);
+        //     ele = nullptr;
+        // }
     }
+
+    void deleteHelp(Node * root);
 
 
     Node(std::string inputStr){
+
         token = inputStr;
         num = -1;           //when the node is token its num will be -1
     };
@@ -42,10 +51,10 @@ class Parser {
         Parser(const std::vector<Token> );
         Node * ParserHelper(const std::vector<Token>, size_t , Node * );
         ~Parser(){
-            deleteHelp(Root);
+            delete Root;
         };
 
-        void deleteHelp(Node * root);
+        
 
         size_t maxindex = 0;
 
