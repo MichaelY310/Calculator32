@@ -110,7 +110,7 @@ public:
                 if (root.value.type == TokenType::multiply) { res *= calculate(root.children[i]); }
                 if (root.value.type == TokenType::divide) 
                 { 
-                    if (root.children[i].value.value == 0) { 
+                    if (calculate(root.children[i]) == 0) { 
                         ErrorToken = ErrorToken = Token(TokenType::error, "", -1, -1, -1);;
                         return 1; 
                     }
