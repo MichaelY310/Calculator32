@@ -59,7 +59,7 @@ int main() {
     Node root = Parser::MakeTree(TokenVector, 0, TokenVector.size() - 2);
     if (Parser::ErrorToken.type != TokenType::none)
     {
-        std::cout << "Unexpected token at line " << Parser::ErrorToken.line << "  column  " << Parser::ErrorToken.index << ": " << Parser::ErrorToken.content << std::endl;
+        std::cout << "Unexpected token at line " << Parser::ErrorToken.line << " column " << Parser::ErrorToken.index << ": " << Parser::ErrorToken.content << std::endl;
         return 2;
     }
     Parser::print(root);
