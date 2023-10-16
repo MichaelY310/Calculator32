@@ -71,7 +71,7 @@ int main() {
 
 
     // parenthesis check
-    for (int i=0; i<TokenVector.size(); i++)
+    for (int i=0; i < (int)TokenVector.size(); i++)
     {
         if (TokenVector[i].type == TokenType::leftParenthesis)
         {
@@ -83,7 +83,7 @@ int main() {
             }
         }
     }
-    for (int i=0; i<TokenVector.size(); i++)
+    for (int i=0; i < (int)TokenVector.size(); i++)
     {
         if (TokenVector[i].type == TokenType::rightParenthesis)
         {
