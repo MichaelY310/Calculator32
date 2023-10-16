@@ -59,13 +59,6 @@ public:
         // (+ 1 1 4)
         if (expression[leftBound].type == TokenType::leftParenthesis)
         {
-            // ( only
-            if (leftBound+1 > rightBound) {
-                if (ErrorToken.type == TokenType::none) {
-                    ErrorToken = expression[leftBound+1]; 
-                }
-                return Node();
-            }
             // ( not followed by operation symbol
             if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide)
             { 
@@ -124,15 +117,6 @@ public:
                 // (
                 else if (expression[p].type == TokenType::leftParenthesis) 
                 { 
-                    // ( only
-                    if (p+1 > rightBound) 
-                    {
-                        if (ErrorToken.type == TokenType::none) 
-                        { 
-                            ErrorToken = expression[p+1];
-                        }
-                        return Node();
-                    }
                     // ( not followed by operation symbol
                     if (expression[p + 1].type != TokenType::plus && expression[p + 1].type != TokenType::minus && expression[p + 1].type != TokenType::multiply && expression[p + 1].type != TokenType::divide)
                     { 
