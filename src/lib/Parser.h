@@ -8,12 +8,13 @@
 
 struct Node {
     std::string token;
-    std::vector<Node *> Children{};   //vector can store more than 2 children
+    std::vector<Node *> Children;   //vector can store more than 2 children
     float num;
 
     Node(){
         token = "empty";
         num = -1;
+        Children = {};
     }
 
     Node(Node &C){
@@ -31,13 +32,14 @@ struct Node {
 
 
     Node(std::string inputStr){
-
+        Children = {};
         token = inputStr;
         num = -1;           //when the node is token its num will be -1
     };
 
     Node(float inputNum){
         token = "?";
+        Children = {};
         num = inputNum;     // when the node is number it will have no token.
     };
 };
