@@ -143,12 +143,14 @@ public:
             std::cout << root.value.content;
         } else {
             std::cout << "(";
-            for (int i=1; i < (int)root.children.size(); i++)
+            for (int i=0; i < (int)root.children.size(); i++)
             {
                 print(root.children[i]);
-                std::cout << " " << root.value.content << " ";
+                if (i != (int)root.children.size()-1)
+                {
+                    std::cout << " " << root.value.content << " ";
+                }
             }
-            print(root.children[(int)root.children.size() - 1]);
             std::cout << ")";
         }
     }
