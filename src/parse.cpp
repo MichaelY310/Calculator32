@@ -68,6 +68,37 @@ int main() {
         return 1;
     }
 
+
+
+    // parenthesis check
+    for (int i=0; i<TokenVector.size(); i++)
+    {
+        if (TokenVector[i].type == TokenType::leftParenthesis)
+        {
+            int right = findRightParenthesis(TokenVector, i+1, (int)TokenVector.size()-2);
+            if (right > (int)TokenVector.size()-2)
+            {
+                std::cout << "Unexpected token at line " << TokenVector[(int)TokenVector.size()-1].line << " column " << TokenVector[(int)TokenVector.size()-1].index << ": " << TokenVector[(int)TokenVector.size()-1].content << std::endl;
+                return 2;
+            }
+        }
+    }
+    for (int i=0; i<TokenVector.size(); i++)
+    {
+        if (TokenVector[i].type == TokenType::rightParenthesis)
+        {
+            int left = findLeftParenthesis(TokenVector, 0, i-1);
+            if (left < 0)
+            {
+                std::cout << "Unexpected token at line " << TokenVector[0].line << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
+                return 2;
+            }
+            
+        }
+    }
+
+    
+
     // Multiple expression
     int right = findRightParenthesis(TokenVector, 1, (int)TokenVector.size()-2);
     // std::cout << right << std::endl;
@@ -93,22 +124,6 @@ int main() {
         {  
             std::cout << "Unexpected token at line " << TokenVector[1].line << " column " << TokenVector[1].index << ": " << TokenVector[1].content << std::endl;
             return 2;
-        }
-    }
-
-
-    
-    for (int i=0; i < (int)TokenVector.size(); i++)
-    {
-        if (TokenVector[i].type == TokenType::rightParenthesis)
-        {
-            int left = findLeftParenthesis(TokenVector, 0, i-1);
-            if (left < 0)
-            {
-                std::cout << "Unexpected token at line " << TokenVector[0].line << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
-                return 2;
-            }
-            
         }
     }
     
