@@ -62,7 +62,7 @@ int main() {
         std::cout << "Unexpected token at line " << Parser::ErrorToken.line << "  column  " << Parser::ErrorToken.index << ": " << Parser::ErrorToken.content << std::endl;
         return 2;
     }
-    // Parser::print(root);
+    Parser::print(root);
     
     double result= Parser::calculate(root);
     if (Parser::ErrorToken.type != TokenType::none)
@@ -71,7 +71,6 @@ int main() {
         return 3;
     }
 
-    Parser::print(root);
     std::cout << std::endl;
     std::cout << result << std::endl;
     
