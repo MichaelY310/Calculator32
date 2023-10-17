@@ -22,55 +22,103 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
     double afterPoint = 0;
     bool recordingNumber = false;
 
+    // for variable
+    int variableLength = 0;
+    std::string variableName;
+    bool recordingVariable = false;
+
     for (int i = 0; i < len; i++)
     {
         // std::cout << (int)input.at(i) << std::endl;
-        if (input.at(i) == '0' || input.at(i) == '1' || input.at(i) == '2' || input.at(i) == '3' || input.at(i) == '4' || input.at(i) == '5' || input.at(i) == '6' || input.at(i) == '7' || input.at(i) == '8' || input.at(i) == '9')
+
+        // variable
+        if (input.at(i) >= 'a' && input.at(i) <= 'z')
         {
-            recordingNumber = true;
-            if (afterPoint) {
-                currentValue += double(input.at(i) - '0') / std::pow(10.0f, afterPoint);
-                afterPoint += 1;
+            // 123abc
+            if (recordingNumber)
+            {
+                std::cout << "1" << std::endl;
+                std::cout << "Syntax error on line " << line << " column " << i << "." << std::endl;
+                exit(1);
             }
-            else {
-                currentValue *= 10;
-                currentValue += double(input.at(i) - '0');
+            else 
+            {
+                recordingVariable = true;
+                std::string s(1, input.at(i));
+                variableName += s;
+                variableLength += 1;
             }
-            std::string s(1, input.at(i));
-            currentStringValue += s;
-            numberLength += 1;
         }
+
+        // number
+        else if (input.at(i) == '0' || input.at(i) == '1' || input.at(i) == '2' || input.at(i) == '3' || input.at(i) == '4' || input.at(i) == '5' || input.at(i) == '6' || input.at(i) == '7' || input.at(i) == '8' || input.at(i) == '9')
+        {
+            // recording variable
+            // ab123
+            if (recordingVariable)
+            {
+                std::string s(1, input.at(i));
+                variableName += s;
+                variableLength += 1;
+            }
+            else 
+            {
+                recordingNumber = true;
+                if (afterPoint) {
+                    currentValue += double(input.at(i) - '0') / std::pow(10.0f, afterPoint);
+                    afterPoint += 1;
+                }
+                else {
+                    currentValue *= 10;
+                    currentValue += double(input.at(i) - '0');
+                }
+                std::string s(1, input.at(i));
+                currentStringValue += s;
+                numberLength += 1;
+            }
+        }
+
+        // .
         else if (input.at(i) == '.')
         {
             // nothing before a point
             if (!recordingNumber)
             {
                 // if there's error, the last token would be ERROR instead of END
-                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
-                return res;
+                std::cout << "2" << std::endl;
+
+                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
+                exit(1);
             }
             // already have a point
             if (afterPoint)
             {
                 // if there's error, the last token would be ERROR instead of END
-                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
-                return res;
+                std::cout << "3" << std::endl;
+
+                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
+                exit(1);
             }
             afterPoint += 1;
             numberLength += 1;
             recordingNumber = true;
             currentStringValue += ".";
         }
+
+        // operations, space, \t, \n
         else {
             // ERROR if point not followed by a number
             if (recordingNumber && currentStringValue.back() == '.')
             {
                 // if there's error, the last token would be ERROR instead of END
-                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
-                return res;
+                std::cout << "4" << std::endl;
+
+                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
+                exit(1);
             }
 
 
+            // number ends
             // the last digit is recorded
             if (recordingNumber) {
                 res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
@@ -79,6 +127,15 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
                 currentValue = 0;
                 currentStringValue = "";
                 numberLength = 0;
+            }
+
+            // variable ends
+            // the last character of variable is recorded
+            if (recordingVariable) {
+                res.emplace_back(TokenType::variable, variableName, line, index - variableLength, -1);
+                recordingVariable = false;
+                variableName = "";
+                variableLength = 0;
             }
 
             if (input.at(i) == '\n')
@@ -91,6 +148,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             }
             else if (input.at(i) == '\t')
             {
+            }
+            else if (input.at(i) == '=')
+            {
+                res.emplace_back(TokenType::equals, "=", line, index, -1);
             }
             else if (input.at(i) == '+')
             {
@@ -120,19 +181,24 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             else
             {
                 // if there's error, the last token would be ERROR instead of END
-                res.emplace_back(TokenType::error, "ERROR", line, index, -1);
-                return res;
+                std::cout << "5" << std::endl;
+
+                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
+                exit(1);
             }
         }
         index++;
     }
+
+    // final checks
     if (recordingNumber && currentStringValue.back() == '.')
     {
         // if there's error, the last token would be ERROR instead of END
-        res.emplace_back(TokenType::error, "ERROR", line, index, -1);
-        return res;
-    }
+        std::cout << "6" << std::endl;
 
+        std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
+        exit(1);
+    }
 
     // the last digit is recorded
     if (recordingNumber) {
@@ -143,6 +209,17 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         currentStringValue = "";
         numberLength = 0;
     }
+
+    // variable ends
+    // the last character of variable is recorded
+    if (recordingVariable) {
+        res.emplace_back(TokenType::variable, variableName, line, index - variableLength, -1);
+        recordingVariable = false;
+        variableName = "";
+        variableLength = 0;
+    }
+
+
     res.emplace_back(TokenType::end, "END", line, index, -1);
 
     return res;
@@ -151,17 +228,6 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 
 void Token::printLexer(std::vector<Token> TokenVector)
 {
-
-
-    // Check ERROR
-    Token lastToken = TokenVector.back();
-    if (lastToken.type == TokenType::error)
-    {
-        std::cout << "Syntax error on line " << lastToken.line << " column " << lastToken.index << "." << std::endl;
-        return;
-    }
-
-
     int spaceNumber;
     std::string content; // line or index to string
     for (Token t : TokenVector)
