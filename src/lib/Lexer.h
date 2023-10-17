@@ -7,7 +7,9 @@
 
 enum class TokenType {
     none,
+    variable,
     number,
+    equals,
     plus,
     minus,
     multiply,
