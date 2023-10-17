@@ -1,4 +1,4 @@
-#include "lib/parse.h"
+#include "lib/Parser.h"
 
 void errorCheck(std::vector<Token> expression) {
     if (expression.size() == 1 || !(expression.at(0).type == TokenType::leftParenthesis || expression.at(0).type == TokenType::number)) {
@@ -55,9 +55,6 @@ void errorCheck(std::vector<Token> expression) {
     }
 }
 
-
-
-
 int main() {
     std::string input = "";
     std::string line;
@@ -88,12 +85,7 @@ int main() {
     }
 
     errorCheck(TokenVector);
-
-    
-
-    
-
-    
+ 
     Node root = Parser::MakeTree(TokenVector, 0, TokenVector.size() - 2);
     if (Parser::ErrorToken.type != TokenType::none)
     {
@@ -111,7 +103,6 @@ int main() {
     }
 
     std::cout << result << std::endl;
-    
     
     return 0;
 }
