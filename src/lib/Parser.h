@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <map>
 #include "Lexer.h"
 
 
@@ -20,14 +21,15 @@ public:
 class Parser
 {
 public:
-    static Token ErrorToken;
     static Node MakeTree(std::vector<Token> expression, int leftBound, int rightBound);
     static double calculate(Node root);
     static void print(Node root);
-
+    static void setupExpression(std::vector<Token> expression);
+    static std::vector<std::vector<Token>> expressionLines;
+    static std::map<std::string, double> variableMap;
+    static std::map<std::string, bool> variableInitializedMap;
 private:
     static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
 };
-
 
