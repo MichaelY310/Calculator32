@@ -278,8 +278,47 @@ int Parser::findRightParenthesis(std::vector<Token> expression, int leftBound, i
 }
 
 
-// return vectors of lines
-// register variables in map 
+// // return vectors of lines
+// // register variables in map 
+// void Parser::setupExpression(std::vector<Token> expression)
+// {
+//     std::vector<std::vector<Token>> res;
+//     std::vector<Token> current;
+//     int currentLine = 1;
+//     for (Token token : expression)
+//     {
+//         // handle new variable
+//         if (variableMap.find(token.content) == variableMap.end())
+//         {
+//             variableMap.insert({ token.content, -1 });
+//             variableInitializedMap.insert({ token.content, false });
+//         }
+
+//         // handle line
+//         if (token.line != currentLine)
+//         {
+//             while (currentLine != token.line)
+//             {
+//                 if (current.size() == 0) { current.push_back(Token(TokenType::end, "END", currentLine, 1)); }
+//                 else { current.push_back(Token(TokenType::end, "END", currentLine, current[current.size()-1].index+1)); }
+//                 if (current.size() != 0 && current.size() != 1)
+//                 {
+//                     res.push_back(current);
+//                 }
+//                 current.clear();
+//                 currentLine += 1;
+//             }
+//         }
+//         current.push_back(token);
+//     }
+//     if (current.size() != 0 && current.size() != 1)
+//     {
+//         res.push_back(current);
+//     }
+//     expressionLines = res;
+// }
+
+
 void Parser::setupExpression(std::vector<Token> expression)
 {
     std::vector<std::vector<Token>> res;
@@ -299,8 +338,7 @@ void Parser::setupExpression(std::vector<Token> expression)
         {
             while (currentLine != token.line)
             {
-                if (current.size() == 0) { current.push_back(Token(TokenType::end, "END", currentLine, 1)); }
-                else { current.push_back(Token(TokenType::end, "END", currentLine, current[current.size()-1].index+1)); }
+                current.push_back(expression[expression.size()-1]);
                 if (current.size() != 0 && current.size() != 1)
                 {
                     res.push_back(current);

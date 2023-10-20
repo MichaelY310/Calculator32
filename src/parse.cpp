@@ -104,7 +104,7 @@ int main() {
     //std::string input = "(- (= b (+ b 5)) 7)";
     //std::string input = "(* a b)";
     //std::string input = "(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
-    std::string input = "    \n  \t\t\t   (- 2 3\n\n \n";    
+    std::string input = "(= a 6)\na\n";    
     // std::string input = "(=(n) 9)";
 #endif
 
