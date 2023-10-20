@@ -109,6 +109,18 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
             // (
             else if (expression[p].type == TokenType::leftParenthesis)
             {
+                int rightIndex = findRightParenthesis(expression, p + 1, rightBound);
+
+                // when =, the elements other than the last element shouldn't be a (...)
+                // = 3 a 4 b       3 = a = 4 = b
+                if (rightIndex != rightBound && expression[leftBound].type == TokenType::equals)
+                {
+#if DEBUG
+    std::cout << "6.5" << std::endl;
+#endif
+                    std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
+                    exit(2);
+                }
                 // // ( not followed by operation symbol
                 // if (expression[p + 1].type != TokenType::plus && expression[p + 1].type != TokenType::minus && expression[p + 1].type != TokenType::multiply && expression[p + 1].type != TokenType::divide)
                 // {
@@ -116,7 +128,6 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 //     exit(2);
                 // }
 
-                int rightIndex = findRightParenthesis(expression, p + 1, rightBound);
                 // // ) not found
                 // if (rightIndex > rightBound)
                 // {
