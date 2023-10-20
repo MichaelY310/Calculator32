@@ -303,7 +303,10 @@ void Parser::setupExpression(std::vector<Token> expression)
             while (currentLine != token.line)
             {
                 current.push_back(expression[expression.size()-1]);
-                res.push_back(current);
+                if (current.size() != 0 && current.size() != 1)
+                {
+                    res.push_back(current);
+                }
                 current.clear();
                 currentLine += 1;
             }
