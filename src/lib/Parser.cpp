@@ -299,7 +299,8 @@ void Parser::setupExpression(std::vector<Token> expression)
         {
             while (currentLine != token.line)
             {
-                current.push_back(expression[expression.size()-1]);
+                if (current.size() == 0) { current.push_back(Token(TokenType::end, "END", currentLine, 1)); }
+                else { current.push_back(Token(TokenType::end, "END", currentLine, current[current.size()-1].index+1)); }
                 if (current.size() != 0 && current.size() != 1)
                 {
                     res.push_back(current);
