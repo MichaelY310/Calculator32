@@ -82,6 +82,7 @@ void errorCheck(std::vector<Token> expression) {
 }
 
 int main() {
+#if DEBUG == 0
     // std::string input = "";
     // std::string line;
     
@@ -92,7 +93,8 @@ int main() {
     //     input += line;
     // }
     // input = input.substr(0, input.size()-1);
-
+#endif
+#if DEBUG == 1
     
     //std::string input = "(* (+ 1 2) 3 (/ 4 5 (- 6 7)))\n(* (+ 1 2) 3 (/ 4 5 (- 6 7)))\n(* (+ 1 2) 3 (/ 4 5 (- 6 7)))";
     //std::string input = "(= a b 3)";
@@ -100,7 +102,7 @@ int main() {
     //std::string input = "(* a b)";
     std::string input = "(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
     // std::string input = "(=(n) 9)";
-
+#endif
 
     if (input.size() == 0) 
     {
