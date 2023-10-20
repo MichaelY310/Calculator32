@@ -81,19 +81,22 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         int p = leftBound + 1;
         while (p <= rightBound)
         {
-            // when =, elements excepts the last one must be variable
-            if (expression[leftBound].type == TokenType::equals && p != rightBound && expression[p].type != TokenType::variable)
-            {
-#if DEBUG
-std::cout << "6" << std::endl;
-#endif
-                std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
-                exit(2);
-            }
-
             // number 
             if (expression[p].type == TokenType::number)
             {
+                // when =, the elements other than the last element shouldn't be a number
+                // = 3 a 4 b       3 = a = 4 = b
+                if (p != rightBound && expression[leftBound].type == TokenType::equals)
+                {
+#if DEBUG
+    std::cout << "6" << std::endl;
+#endif
+                    std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
+                    exit(2);
+                }
+
+
+
                 res.children.push_back(MakeTree(expression, p, p));
                 p += 1;
             }
@@ -278,47 +281,8 @@ int Parser::findRightParenthesis(std::vector<Token> expression, int leftBound, i
 }
 
 
-// // return vectors of lines
-// // register variables in map 
-// void Parser::setupExpression(std::vector<Token> expression)
-// {
-//     std::vector<std::vector<Token>> res;
-//     std::vector<Token> current;
-//     int currentLine = 1;
-//     for (Token token : expression)
-//     {
-//         // handle new variable
-//         if (variableMap.find(token.content) == variableMap.end())
-//         {
-//             variableMap.insert({ token.content, -1 });
-//             variableInitializedMap.insert({ token.content, false });
-//         }
-
-//         // handle line
-//         if (token.line != currentLine)
-//         {
-//             while (currentLine != token.line)
-//             {
-//                 if (current.size() == 0) { current.push_back(Token(TokenType::end, "END", currentLine, 1)); }
-//                 else { current.push_back(Token(TokenType::end, "END", currentLine, current[current.size()-1].index+1)); }
-//                 if (current.size() != 0 && current.size() != 1)
-//                 {
-//                     res.push_back(current);
-//                 }
-//                 current.clear();
-//                 currentLine += 1;
-//             }
-//         }
-//         current.push_back(token);
-//     }
-//     if (current.size() != 0 && current.size() != 1)
-//     {
-//         res.push_back(current);
-//     }
-//     expressionLines = res;
-// }
-
-
+// return vectors of lines
+// register variables in map 
 void Parser::setupExpression(std::vector<Token> expression)
 {
     std::vector<std::vector<Token>> res;
