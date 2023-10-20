@@ -81,22 +81,19 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         int p = leftBound + 1;
         while (p <= rightBound)
         {
+            // when =, elements excepts the last one must be variable
+            if (expression[leftBound].type == TokenType::equals && p != rightBound && expression[p].type != TokenType::variable)
+            {
+#if DEBUG
+std::cout << "6" << std::endl;
+#endif
+                std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
+                exit(2);
+            }
+
             // number 
             if (expression[p].type == TokenType::number)
             {
-                // when =, the elements other than the last element shouldn't be a number
-                // = 3 a 4 b       3 = a = 4 = b
-                if (p != rightBound && expression[leftBound].type == TokenType::equals)
-                {
-#if DEBUG
-    std::cout << "6" << std::endl;
-#endif
-                    std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
-                    exit(2);
-                }
-
-
-
                 res.children.push_back(MakeTree(expression, p, p));
                 p += 1;
             }
