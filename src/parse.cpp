@@ -32,10 +32,10 @@ void errorCheck(std::vector<Token> expression) {
 //         exit(2);
 //     }
 
-    int paraCheck = 1;
+    int balance = 1;
     for (size_t i = 1; i < expression.size() - 1; i++) {
         if (expression.at(i).content == "(") {
-            paraCheck += 1;
+            balance += 1;
 //             if (!(expression.at(i+1).type == TokenType::plus || expression.at(i+1).type == TokenType::minus || expression.at(i+1).type == TokenType::multiply || expression.at(i+1).type == TokenType::divide || expression.at(i+1).type == TokenType::equals)) {
 // #if DEBUG
 //     std::cout << "11" << std::endl;
@@ -45,7 +45,7 @@ void errorCheck(std::vector<Token> expression) {
 //             }
         }
         if (expression.at(i).content == ")") {
-            paraCheck -= 1;
+            balance -= 1;
         }
 
         if (expression.at(i).type == TokenType::plus || expression.at(i).type == TokenType::minus || expression.at(i).type == TokenType::multiply || expression.at(i).type == TokenType::divide || expression.at(i).type == TokenType::equals) {
@@ -58,14 +58,7 @@ void errorCheck(std::vector<Token> expression) {
             }
         }
 
-        if (paraCheck < 0) {          // check para is correct
-#if DEBUG
-    std::cout << "13" << std::endl;
-#endif
-            std::cout << "Unexpected token at line " << expression.at(i).line << " column " << expression.at(i).index << ": " << expression.at(i).content  << std::endl;
-            exit(2);
-        }
-        if (paraCheck == 0 && i != expression.size() - 2) {
+        if (balance == 0 && i != expression.size() - 2) {
 #if DEBUG
     std::cout << "14" << std::endl;
 #endif
@@ -73,7 +66,7 @@ void errorCheck(std::vector<Token> expression) {
             exit(2);
         }
     }
-    if (paraCheck != 0) {          // check para is correct
+    if (balance != 0) {
 #if DEBUG
     std::cout << "15" << std::endl;
 #endif
@@ -106,19 +99,15 @@ int main() {
     //std::string input = "(- (= b (+ b 5)) 7)";
     //std::string input = "(* a b)";
     // std::string input = "9\n(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
-    std::string input = "\t \n  (   - 3  -)";
+    //std::string input = "\t \n  (   - 3  -)";
+    std::string input = "12\n";
     //std::string input = "  \n          (- 1 10)\n";    
     // std::string input = "(=(n) 9)";
 #endif
 
-    if (input.size() == 0) 
-    {
-        std::cout << "Unexpected token at line 1 column 1: END" << std::endl;
-        return 2; 
-    }
+    if (input.size() == 0) { std::cout << "Unexpected token at line 1 column 1: END" << std::endl; return 2;  }
     
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
-
 
     Parser::setupExpression(TokenVector);
     //std::cout << Parser::expressionLines.size() << std::endl;
