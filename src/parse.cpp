@@ -102,7 +102,7 @@ int main() {
         // Token::printLexer(expressionLine);
         // std::cout << "==================" << std::endl;
 
-        errorCheck(expressionLine);
+        //errorCheck(expressionLine);
         Node root = Parser::MakeTree(expressionLine, 0, expressionLine.size() - 2);
         Parser::print(root);
         std::cout << std::endl;
