@@ -24,25 +24,10 @@ void errorCheck(std::vector<Token> expression) {
         }
     }
 
-//     if (!(expression.at(1).type == TokenType::plus || expression.at(1).type == TokenType::minus || expression.at(1).type == TokenType::multiply || expression.at(1).type == TokenType::divide || expression.at(1).type == TokenType::equals)) {
-// #if DEBUG
-//     std::cout << "10" << std::endl;
-// #endif
-//         std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
-//         exit(2);
-//     }
-
     int balance = 1;
     for (size_t i = 1; i < expression.size() - 1; i++) {
         if (expression.at(i).content == "(") {
             balance += 1;
-//             if (!(expression.at(i+1).type == TokenType::plus || expression.at(i+1).type == TokenType::minus || expression.at(i+1).type == TokenType::multiply || expression.at(i+1).type == TokenType::divide || expression.at(i+1).type == TokenType::equals)) {
-// #if DEBUG
-//     std::cout << "11" << std::endl;
-// #endif
-//                 std::cout << "Unexpected token at line " << expression.at(i+1).line << " column " << expression.at(i+1).index << ": " << expression.at(i+1).content << std::endl;
-//                 exit(2);
-//             }
         }
         if (expression.at(i).content == ")") {
             balance -= 1;
@@ -64,9 +49,9 @@ void errorCheck(std::vector<Token> expression) {
 #endif
             std::cout << "Unexpected token at line " << expression.at(i+1).line << " column " << expression.at(i+1).index << ": " << expression.at(i+1).content  << std::endl;
             exit(2);
+            }
         }
-    }
-    if (balance != 0) {
+        if (balance != 0) {
 #if DEBUG
     std::cout << "15" << std::endl;
 #endif
