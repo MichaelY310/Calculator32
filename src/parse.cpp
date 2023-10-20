@@ -11,18 +11,18 @@ void errorCheck(std::vector<Token> expression) {
     }
 
 
-//     if (expression.at(0).type == TokenType::number) {
-//         if (expression.size() != 2) {
-// #if DEBUG
-//     std::cout << "9" << std::endl;
-// #endif
-//             std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
-//             exit(2);
-//         }
-//         else {
-//             return;
-//         }
-//     }
+    if (expression.at(0).type == TokenType::number) {
+        if (expression.size() != 2) {
+#if DEBUG
+    std::cout << "9" << std::endl;
+#endif
+            std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
+            exit(2);
+        }
+        else {
+            return;
+        }
+    }
 
 //     if (!(expression.at(1).type == TokenType::plus || expression.at(1).type == TokenType::minus || expression.at(1).type == TokenType::multiply || expression.at(1).type == TokenType::divide || expression.at(1).type == TokenType::equals)) {
 // #if DEBUG
