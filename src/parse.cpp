@@ -93,6 +93,9 @@ int main() {
         input += line;
     }
     input = input.substr(0, input.size()-1);
+    std::cout << "LOLOLOLOLOLOLOLOLO" << std::endl;
+    std::cout << "input" << std::endl;
+    std::cout << "LOLOLOLOLOLOLOLOLO" << std::endl;
 #endif
 #if DEBUG == 1
     
