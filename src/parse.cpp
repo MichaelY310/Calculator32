@@ -83,16 +83,16 @@ void errorCheck(std::vector<Token> expression) {
 
 int main() {
 #if DEBUG == 0
-    // std::string input = "";
-    // std::string line;
+    std::string input = "";
+    std::string line;
     
-    // while(!std::cin.eof()) {
-    //     char c;
-    //     std::cin.get(c);
-    //     line = std::string(1, c);
-    //     input += line;
-    // }
-    // input = input.substr(0, input.size()-1);
+    while(!std::cin.eof()) {
+        char c;
+        std::cin.get(c);
+        line = std::string(1, c);
+        input += line;
+    }
+    input = input.substr(0, input.size()-1);
 #endif
 #if DEBUG == 1
     
