@@ -93,9 +93,9 @@ int main() {
         input += line;
     }
     input = input.substr(0, input.size()-1);
-    std::cout << "LOLOLOLOLOLOLOLOLO" << std::endl;
-    std::cout << input << std::endl;
-    std::cout << "LOLOLOLOLOLOLOLOLO" << std::endl;
+    // std::cout << "LOLOLOLOLOLOLOLOLO" << std::endl;
+    // std::cout << input << std::endl;
+    // std::cout << "LOLOLOLOLOLOLOLOLO" << std::endl;
 #endif
 #if DEBUG == 1
     
@@ -103,7 +103,8 @@ int main() {
     //std::string input = "(= a b 3)";
     //std::string input = "(- (= b (+ b 5)) 7)";
     //std::string input = "(* a b)";
-    std::string input = "(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
+    //std::string input = "(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
+    std::string input = "(2 3 5 7)\n";    
     // std::string input = "(=(n) 9)";
 #endif
 

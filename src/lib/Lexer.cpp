@@ -30,7 +30,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         // std::cout << (int)input.at(i) << std::endl;
 
         // variable
-        if ((input.at(i) >= 'a' && input.at(i) <= 'z') || input.at(i) == '_')
+        if ((input.at(i) >= 'a' && input.at(i) <= 'z') || (input.at(i) >= 'A' && input.at(i) <= 'Z') || input.at(i) == '_')
         {
             // 123abc
             if (recordingNumber)
