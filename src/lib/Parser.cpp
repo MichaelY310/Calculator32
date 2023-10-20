@@ -306,8 +306,9 @@ void Parser::setupExpression(std::vector<Token> expression)
     }
     std::vector<std::vector<Token>> res;
     std::vector<Token> current;
+    current.push_back(expression[0]);
     int currentLine = 1;
-    for (int i=0; i<(int)expression.size()-1; i++)
+    for (int i=1; i<(int)expression.size()-1; i++)
     {
         Token token = expression[i];
         // handle new variable
@@ -320,7 +321,7 @@ void Parser::setupExpression(std::vector<Token> expression)
         // handle line
         while (currentLine != token.line)
         {
-            if (current.size() != 0 && current.size() != 1)
+            if (current.size() != 0)
             {
                 current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
                 res.push_back(current);
