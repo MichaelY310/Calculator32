@@ -11,7 +11,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         // ( not followed by operation symbol
         if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide && expression[leftBound + 1].type != TokenType::equals)
         {
-            // std::cout << "1" << std::endl;
+#if DEBUG
+    std::cout << "1" << std::endl;
+#endif
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -19,7 +21,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
         if (rightIndex > rightBound)
         {
-            // std::cout << "2" << std::endl;
+#if DEBUG
+    std::cout << "2" << std::endl;
+#endif
             std::cout << "Unexpected token at line " << expression[rightIndex].line << " column " << expression[rightIndex].index << ": " << expression[rightIndex].content << std::endl;
             exit(2);
         }
@@ -33,7 +37,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         // 0 1 2
         if (leftBound != rightBound)
         {
-            // std::cout << "3" << std::endl;
+#if DEBUG
+    std::cout << "3" << std::endl;
+#endif
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -47,7 +53,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         // a 1 2
         if (leftBound != rightBound)
         {
-            // std::cout << "4" << std::endl;
+#if DEBUG
+    std::cout << "4" << std::endl;
+#endif
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -61,7 +69,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         // nothing follows the symbol
         if (leftBound == rightBound)
         {
-            // std::cout << "5" << std::endl;
+#if DEBUG
+    std::cout << "5" << std::endl;
+#endif
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -78,7 +88,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 // = 3 a 4 b       3 = a = 4 = b
                 if (p != rightBound && expression[leftBound].type == TokenType::equals)
                 {
-                    // std::cout << "6" << std::endl;
+#if DEBUG
+    std::cout << "6" << std::endl;
+#endif
                     std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
                     exit(2);
                 }
@@ -118,7 +130,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
             // ErrorToken
             else
             {
-                // std::cout << "7" << std::endl;
+#if DEBUG
+    std::cout << "7" << std::endl;
+#endif
                 std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
                 exit(2);
             }
@@ -296,6 +310,9 @@ void Parser::setupExpression(std::vector<Token> expression)
         }
         current.push_back(token);
     }
-    res.push_back(current);
+    if (current.size() != 0 && current.size() != 1)
+    {
+        res.push_back(current);
+    }
     expressionLines = res;
 }

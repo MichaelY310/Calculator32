@@ -5,6 +5,9 @@
 #include <iostream>
 #include <cmath>
 
+#include "Utils.h"
+
+
 enum class TokenType {
     none,
     variable,

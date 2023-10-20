@@ -1,11 +1,13 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <iostream>
 #include <cmath>
 #include <map>
-#include "Lexer.h"
 
+#include "Lexer.h"
+#include "Utils.h"
 
 
 class Node
