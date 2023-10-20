@@ -66,6 +66,14 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     // operations = + - * /
     else if (expression[leftBound].type == TokenType::plus || expression[leftBound].type == TokenType::minus || expression[leftBound].type == TokenType::multiply || expression[leftBound].type == TokenType::divide || expression[leftBound].type == TokenType::equals)
     {
+        if (leftBound == 0 || expression[leftBound-1].type != TokenType::leftParenthesis) 
+        {
+#if DEBUG
+    std::cout << "5" << std::endl;
+#endif
+            std::cout << "Unexpected token at line " << expression[leftBound].line << " column " << expression[leftBound].index << ": " << expression[leftBound].content << std::endl;
+            exit(2);
+        }
 
         // nothing follows the symbol
         if (leftBound == rightBound)
