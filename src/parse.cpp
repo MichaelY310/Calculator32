@@ -103,8 +103,8 @@ int main() {
     //std::string input = "(= a b 3)";
     //std::string input = "(- (= b (+ b 5)) 7)";
     //std::string input = "(* a b)";
-    //std::string input = "(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
-    std::string input = "(= (+1 1) 89)";    
+    std::string input = "(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
+    //std::string input = "  \n          (- 1 10)\n";    
     // std::string input = "(=(n) 9)";
 #endif
 
@@ -121,7 +121,9 @@ int main() {
     //std::cout << Parser::expressionLines.size() << std::endl;
     for (std::vector<Token> expressionLine : Parser::expressionLines)
     {
-        //Token::printLexer(expressionLine);
+        // Token::printLexer(expressionLine);
+        // std::cout << "==================" << std::endl;
+
         errorCheck(expressionLine);
         Node root = Parser::MakeTree(expressionLine, 0, expressionLine.size() - 2);
         Parser::print(root);

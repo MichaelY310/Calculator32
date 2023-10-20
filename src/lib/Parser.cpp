@@ -295,11 +295,21 @@ int Parser::findRightParenthesis(std::vector<Token> expression, int leftBound, i
 // register variables in map 
 void Parser::setupExpression(std::vector<Token> expression)
 {
+    if (expression.size() == 1)
+    {
+#if DEBUG
+    std::cout << "-1 empty expression" << std::endl;
+#endif
+
+        std::cout << "Unexpected token at line " << 1 << " column " << 1 << ": " << "END" << std::endl;
+        exit(2);
+    }
     std::vector<std::vector<Token>> res;
     std::vector<Token> current;
     int currentLine = 1;
-    for (Token token : expression)
+    for (int i=0; i<(int)expression.size()-1; i++)
     {
+        Token token = expression[i];
         // handle new variable
         if (variableMap.find(token.content) == variableMap.end())
         {
@@ -308,27 +318,20 @@ void Parser::setupExpression(std::vector<Token> expression)
         }
 
         // handle line
-        if (token.line != currentLine)
+        while (currentLine != token.line)
         {
-            while (currentLine != token.line)
+            if (current.size() != 0 && current.size() != 1)
             {
-                if (current.size() == 0) { current.push_back(Token(TokenType::end, "END", currentLine, 1)); }
-                else { current.push_back(Token(TokenType::end, "END", currentLine, current[current.size()-1].index+1)); }
-                if (current.size() != 0 && current.size() != 1)
-                {
-                    res.push_back(current);
-                }
-                current.clear();
-                currentLine += 1;
+                current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
+                res.push_back(current);
             }
+            current.clear();
+            currentLine += 1;
         }
         current.push_back(token);
     }
-    if (current.size() != 0 && current.size() != 1)
-    {
-        res.push_back(current);
-    }
+    current.push_back(expression[expression.size()-1]);
+    res.push_back(current);
     expressionLines = res;
 }
-
 
