@@ -17,7 +17,17 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
+
         int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
+
+        if (rightIndex != rightBound) {
+#if DEBUG
+    std::cout << "2" << std::endl;
+#endif
+            std::cout << "Unexpected token at line " << expression.at(rightIndex+1).line << " column " << expression.at(rightIndex+1).index << ": " << expression.at(rightIndex+1).content  << std::endl;
+            exit(2);
+        }
+
         return MakeTree(expression, leftBound + 1, rightIndex - 1);
     }
 
