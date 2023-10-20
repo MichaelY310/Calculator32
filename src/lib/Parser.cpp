@@ -294,7 +294,7 @@ void Parser::setupExpression(std::vector<Token> expression)
     std::vector<std::vector<Token>> res;
     std::vector<Token> current;
     current.push_back(expression[0]);
-    int currentLine = 1;
+    int currentLine = expression[0].line;
     for (int i=1; i<(int)expression.size()-1; i++)
     {
         Token token = expression[i];
@@ -310,7 +310,8 @@ void Parser::setupExpression(std::vector<Token> expression)
         {
             if (current.size() != 0)
             {
-                current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
+                // current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
+                current.push_back(Token(TokenType::end, "end", expression[i].line, expression[i].index));
                 res.push_back(current);
             }
             current.clear();
