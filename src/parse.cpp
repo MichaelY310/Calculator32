@@ -9,18 +9,20 @@ void errorCheck(std::vector<Token> expression) {
         std::cout << "Unexpected token at line " << expression.at(0).line << " column " << expression.at(0).index << ": " << expression.at(0).content << std::endl;
         exit(2);
     }
-    if (expression.at(0).type == TokenType::number) {
-        if (expression.size() != 2) {
-#if DEBUG
-    std::cout << "9" << std::endl;
-#endif
-            std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
-            exit(2);
-        }
-        else {
-            return;
-        }
-    }
+
+
+//     if (expression.at(0).type == TokenType::number) {
+//         if (expression.size() != 2) {
+// #if DEBUG
+//     std::cout << "9" << std::endl;
+// #endif
+//             std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
+//             exit(2);
+//         }
+//         else {
+//             return;
+//         }
+//     }
 
 //     if (!(expression.at(1).type == TokenType::plus || expression.at(1).type == TokenType::minus || expression.at(1).type == TokenType::multiply || expression.at(1).type == TokenType::divide || expression.at(1).type == TokenType::equals)) {
 // #if DEBUG
@@ -104,7 +106,7 @@ int main() {
     //std::string input = "(- (= b (+ b 5)) 7)";
     //std::string input = "(* a b)";
     // std::string input = "9\n(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
-    std::string input = "12\n  (   - 3  -)";
+    std::string input = "\t \n  (   - 3  -)";
     //std::string input = "  \n          (- 1 10)\n";    
     // std::string input = "(=(n) 9)";
 #endif
