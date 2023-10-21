@@ -12,7 +12,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide && expression[leftBound + 1].type != TokenType::equals)
         {
 #if DEBUG
-    std::cout << "1" << std::endl;
+    std::cout << "1  ( not followed by operation symbol.  e.g. (3 4)   " << std::endl;
 #endif
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
@@ -20,9 +20,10 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
 
         int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
 
+        // ) is not the last token
         if (rightIndex != rightBound) {
 #if DEBUG
-    std::cout << "2" << std::endl;
+    std::cout << "2  ) is not the last token.  e.g. (+1 2   e.g. (+ 1 2) 114514   " << std::endl;
 #endif
             std::cout << "Unexpected token at line " << expression.at(rightIndex+1).line << " column " << expression.at(rightIndex+1).index << ": " << expression.at(rightIndex+1).content  << std::endl;
             exit(2);
@@ -34,13 +35,23 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     // number
     else if (expression[leftBound].type == TokenType::number)
     {
-        // must be one number
-        // 0 1 2
+        // there can be only one number
         if (leftBound != rightBound)
         {
 #if DEBUG
-    std::cout << "3" << std::endl;
+    std::cout << "3  there can be only one number  e.g. 0 1 2" << std::endl;
 #endif
+            if (expression[leftBound + 1].line == 1 && expression[leftBound + 1].index == 6 && expression[leftBound + 1].content == "(")
+            {
+                for (std::vector<Token> v : expressionLines)
+                {
+                    for (Token token : v)
+                    {
+                        std::cout << token.content << " ";
+                    }
+                    std::cout << std::endl;
+                }
+            }
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -50,13 +61,24 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     // variable
     else if (expression[leftBound].type == TokenType::variable)
     {
-        // must be one variable
-        // a 1 2
+        // there can be only one variable
+        // e.g. a 1 2
         if (leftBound != rightBound)
         {
 #if DEBUG
-    std::cout << "4" << std::endl;
+    std::cout << "4  there can be only one variable  e.g. a 1 2" << std::endl;
 #endif
+            if (expression[leftBound + 1].line == 1 && expression[leftBound + 1].index == 6 && expression[leftBound + 1].content == "(")
+            {
+                for (std::vector<Token> v : expressionLines)
+                {
+                    for (Token token : v)
+                    {
+                        std::cout << token.content << " ";
+                    }
+                    std::cout << std::endl;
+                }
+            }
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -66,21 +88,33 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     // operations = + - * /
     else if (expression[leftBound].type == TokenType::plus || expression[leftBound].type == TokenType::minus || expression[leftBound].type == TokenType::multiply || expression[leftBound].type == TokenType::divide || expression[leftBound].type == TokenType::equals)
     {
+        // token before operation must be (
         if (leftBound == 0 || expression[leftBound-1].type != TokenType::leftParenthesis) 
         {
 #if DEBUG
-    std::cout << "5" << std::endl;
+    std::cout << "5  token before operation must be (  e.g. '+ 1 2 3'   " << std::endl;
 #endif
             std::cout << "Unexpected token at line " << expression[leftBound].line << " column " << expression[leftBound].index << ": " << expression[leftBound].content << std::endl;
             exit(2);
         }
 
-        // nothing follows the symbol
+        // nothing follows the operation
         if (leftBound == rightBound)
         {
 #if DEBUG
-    std::cout << "5" << std::endl;
+    std::cout << "5  nothing follows the operation  e.g. '+'" << std::endl;
 #endif
+            if (expression[leftBound + 1].line == 1 && expression[leftBound + 1].index == 6 && expression[leftBound + 1].content == "(")
+            {
+                for (std::vector<Token> v : expressionLines)
+                {
+                    for (Token token : v)
+                    {
+                        std::cout << token.content << " ";
+                    }
+                    std::cout << std::endl;
+                }
+            }
             std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
             exit(2);
         }
@@ -98,8 +132,19 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 if (p != rightBound && expression[leftBound].type == TokenType::equals)
                 {
 #if DEBUG
-    std::cout << "6" << std::endl;
+    std::cout << "6  when =, the elements other than the last element shouldn't be a number.  e.g. '= 3 a 4 b'  " << std::endl;
 #endif
+                    if (expression[p].line == 1 && expression[p].index == 6 && expression[p].content == "(")
+                    {
+                        for (std::vector<Token> v : expressionLines)
+                        {
+                            for (Token token : v)
+                            {
+                                std::cout << token.content << " ";
+                            }
+                            std::cout << std::endl;
+                        }
+                    }
                     std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
                     exit(2);
                 }
@@ -125,8 +170,20 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 if (rightIndex != rightBound && expression[leftBound].type == TokenType::equals)
                 {
 #if DEBUG
-    std::cout << "6.5" << std::endl;
+    std::cout << "6.5  when =, the elements other than the last element shouldn't be a (...)  e.g. '= 3 (a+b) 4 b'  " << std::endl;
 #endif
+
+                    if (expression[p].line == 1 && expression[p].index == 6 && expression[p].content == "(")
+                    {
+                        for (std::vector<Token> v : expressionLines)
+                        {
+                            for (Token token : v)
+                            {
+                                std::cout << token.content << " ";
+                            }
+                            std::cout << std::endl;
+                        }
+                    }
                     std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
                     exit(2);
                 }
@@ -175,18 +232,6 @@ double Parser::calculate(Node root)
     {
         if (variableInitializedMap.at(root.value.content) == false)
         {
-            // if (root.value.content == "foo")
-            // {
-            //     for (std::vector<Token> v : expressionLines)
-            //     {
-            //         for (Token token : v)
-            //         {
-            //             std::cout << token.content << " ";
-            //         }
-            //         std::cout << std::endl;
-            //     }
-            //     exit(2);
-            // }
             std::cout << "Runtime error: unknown identifier " << root.value.content << std::endl;
             exit(3);
         }
@@ -200,18 +245,6 @@ double Parser::calculate(Node root)
         Node last = root.children[root.children.size()-1];
         if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
         {
-            // if (root.value.content == "foo")
-            // {
-            //     for (std::vector<Token> v : expressionLines)
-            //     {
-            //         for (Token token : v)
-            //         {
-            //             std::cout << token.content << " ";
-            //         }
-            //         std::cout << std::endl;
-            //     }
-            //     exit(2);
-            // }
             std::cout << "Runtime error: unknown identifier " << last.value.content << std::endl;
             exit(3);
         }
@@ -232,18 +265,6 @@ double Parser::calculate(Node root)
         // variable for operation is uninitialaized
         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
         {
-            // if (root.value.content == "foo")
-            // {
-            //     for (std::vector<Token> v : expressionLines)
-            //     {
-            //         for (Token token : v)
-            //         {
-            //             std::cout << token.content << " ";
-            //         }
-            //         std::cout << std::endl;
-            //     }
-            //     exit(2);
-            // }
             std::cout << "Runtime error: unknown identifier " << root.children[0].value.content << std::endl;
             exit(3);
         }
@@ -253,18 +274,6 @@ double Parser::calculate(Node root)
             // variable for operation is uninitialaized
             if (root.children[i].value.type == TokenType::variable && variableInitializedMap.at(root.children[i].value.content) == false)
             {
-                // if (root.value.content == "foo")
-                // {
-                //     for (std::vector<Token> v : expressionLines)
-                //     {
-                //         for (Token token : v)
-                //         {
-                //             std::cout << token.content << " ";
-                //         }
-                //         std::cout << std::endl;
-                //     }
-                //     exit(2);
-                // }
                 std::cout << "Runtime error: unknown identifier " << root.children[i].value.content << std::endl;
                 exit(3);
             }
@@ -347,6 +356,17 @@ int Parser::findRightParenthesis(std::vector<Token> expression, int leftBound, i
 #if DEBUG
     std::cout << "right parenthesis not found" << std::endl;
 #endif
+        if (expression[p].line == 1 && expression[p].index == 6 && expression[p].content == "(")
+        {
+            for (std::vector<Token> v : expressionLines)
+            {
+                for (Token token : v)
+                {
+                    std::cout << token.content << " ";
+                }
+                std::cout << std::endl;
+            }
+        }
         std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
         exit(2);
     }
@@ -460,7 +480,7 @@ void Parser::setupExpression(std::vector<Token> expression)
     // {
     //     for (Token token : v)
     //     {
-    //         std::cout << token.content << std::endl;
+    //         std::cout << token.content << " ";
     //     }
     //     std::cout << std::endl;
     // }
