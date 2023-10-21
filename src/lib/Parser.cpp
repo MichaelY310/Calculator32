@@ -92,7 +92,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         if (leftBound == 0 || expression[leftBound-1].type != TokenType::leftParenthesis) 
         {
 #if DEBUG
-    std::cout << "5  token before operation must be (  e.g. '+ 1 2 3'   " << std::endl;
+    std::cout << "4.5  token before operation must be (  e.g. '+ 1 2 3'   " << std::endl;
 #endif
             std::cout << "Unexpected token at line " << expression[leftBound].line << " column " << expression[leftBound].index << ": " << expression[leftBound].content << std::endl;
             exit(2);
@@ -122,6 +122,29 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         // iterate through all the elements and add them as children
         Node res = Node(expression[leftBound]);
         int p = leftBound + 1;
+
+        // the first element after = can not be number or (...)
+        if (expression[leftBound].type == TokenType::equals && (expression[p].type == TokenType::number || expression[p].type == TokenType::leftParenthesis))
+        {
+#if DEBUG
+    std::cout << "5.5  nothing follows the operation  e.g. '+'" << std::endl;
+#endif
+            if (expression[p].line == 1 && expression[p].index == 7 && expression[p].content == "89")
+            {
+                for (std::vector<Token> v : expressionLines)
+                {
+                    for (Token token : v)
+                    {
+                        std::cout << token.content << " ";
+                    }
+                    std::cout << std::endl;
+                }
+            }
+            std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
+            exit(2);  
+        }
+
+
         while (p <= rightBound)
         {
             // number 
