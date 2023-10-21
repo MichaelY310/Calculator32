@@ -157,18 +157,22 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
 #if DEBUG
     std::cout << "6  when =, the elements other than the last element shouldn't be a number.  e.g. '= 3 a 4 b'  " << std::endl;
 #endif
-                    if (expression[p].line == 1 && expression[p].index == 7 && expression[p].content == "89")
-                    {
-                        for (std::vector<Token> v : expressionLines)
-                        {
-                            for (Token token : v)
-                            {
-                                std::cout << token.content << " ";
-                            }
-                            std::cout << std::endl;
-                        }
-                    }
-                    std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
+
+// #if HINT
+//     hint(expression, Parser::expressionLines, p);
+// #endif
+                    // if (expression[p].line == 1 && expression[p].index == 7 && expression[p].content == "89")
+                    // {
+                    //     for (std::vector<Token> v : Parser::expressionLines)
+                    //     {
+                    //         for (Token token : v)
+                    //         {
+                    //             std::cout << token.content << " ";
+                    //         }
+                    //         std::cout << std::endl;
+                    //     }
+                    // }
+                    std::cout << "Unexpected token at line " << expression[p+1].line << " column " << expression[p+1].index << ": " << expression[p+1].content << std::endl;
                     exit(2);
                 }
 
