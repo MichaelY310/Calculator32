@@ -397,5 +397,14 @@ void Parser::setupExpression(std::vector<Token> expression)
 
 
     // expressionLines = res;
+
+    // for (std::vector<Token> v : expressionLines)
+    // {
+    //     for (Token token : v)
+    //     {
+    //         std::cout << token.content << std::endl;
+    //     }
+    //     std::cout << std::endl;
+    // }
 }
 
