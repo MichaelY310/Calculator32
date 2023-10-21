@@ -173,7 +173,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     std::cout << "6.5  when =, the elements other than the last element shouldn't be a (...)  e.g. '= 3 (a+b) 4 b'  " << std::endl;
 #endif
 
-                    if (expression[p].line == 1 && expression[p].index == 7 && expression[p].content == "89")
+                    if (expression[rightIndex+1].line == 1 && expression[rightIndex+1].index == 7 && expression[rightIndex+1p].content == "89")
                     {
                         for (std::vector<Token> v : expressionLines)
                         {
