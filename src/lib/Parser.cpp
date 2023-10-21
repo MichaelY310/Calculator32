@@ -198,7 +198,7 @@ double Parser::calculate(Node root)
         // variable for operation is uninitialaized
         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
         {
-            if (root.children[i].value.content == "foo")
+            if (root.children[0].value.content == "foo")
             {
                 for (std::vector<Token> v : expressionLines)
                 {
