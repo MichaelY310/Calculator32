@@ -6,6 +6,12 @@ std::map<std::string, bool> Parser::variableInitializedMap = std::map<std::strin
 
 Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBound)
 {
+    """
+    case 1. (
+    ERRORS:
+        1. ( not followed by operation symbol
+        2. ) is not the last token
+    """
     if (expression[leftBound].type == TokenType::leftParenthesis)
     {
         // ( not followed by operation symbol
@@ -38,6 +44,12 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         return MakeTree(expression, leftBound + 1, rightIndex - 1);
     }
 
+
+    """
+    case 2. number
+    ERRORS:
+        3. there can be only one number
+    """
     // number
     else if (expression[leftBound].type == TokenType::number)
     {
@@ -56,6 +68,12 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         return Node(expression[leftBound]);
     }
 
+
+    """
+    case 3. variable
+    ERRORS:
+        4. there can be only one variable
+    """
     // variable
     else if (expression[leftBound].type == TokenType::variable)
     {
@@ -75,6 +93,17 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         return Node(expression[leftBound]);
     }
 
+
+    """
+    case 4. operations
+    ERRORS:
+        4.5  token before operation must be (
+        5    nothing follows the operation
+        5.5  the first element after = can not be number or (...)
+        6    when =, a variable can only be assigned to one number
+        6.5  when =, a variable can only be assigned to one (...)
+
+    """
     // operations = + - * /
     else if (expression[leftBound].type == TokenType::plus || expression[leftBound].type == TokenType::minus || expression[leftBound].type == TokenType::multiply || expression[leftBound].type == TokenType::divide || expression[leftBound].type == TokenType::equals)
     {
@@ -112,7 +141,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         if (expression[leftBound].type == TokenType::equals && (expression[p].type == TokenType::number || expression[p].type == TokenType::leftParenthesis))
         {
 #if DEBUG
-    std::cout << "5.5  nothing follows the operation  e.g. '+'" << std::endl;
+    std::cout << "5.5  the first element after = can not be number or (...)  e.g. '= (a+2) 3'" << std::endl;
 #endif
 #if HINT
     hint(expression, Parser::expressionLines, p);
@@ -132,7 +161,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 if (p != rightBound && expression[leftBound].type == TokenType::equals)
                 {
 #if DEBUG
-    std::cout << "6  when =, the elements other than the last element shouldn't be a number.  e.g. '= 3 a 4 b'  " << std::endl;
+    std::cout << "6  when =, a variable can only be assigned to one number.  e.g. '= a 4 5 6 (error on 5)'  " << std::endl;
 #endif
 #if HINT
     hint(expression, Parser::expressionLines, p+1);
@@ -160,7 +189,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 if (rightIndex != rightBound && expression[leftBound].type == TokenType::equals)
                 {
 #if DEBUG
-    std::cout << "6.5  when =, the elements other than the last element shouldn't be a (...)  e.g. '= 3 (a+b) 4 b'  " << std::endl;
+    std::cout << "6.5  when =, a variable can only be assigned to one (...)  e.g. '= x (a+b) 4'  " << std::endl;
 #endif
 #if HINT
     hint(expression, Parser::expressionLines, rightIndex+1);
@@ -173,6 +202,10 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 p = rightIndex + 1;
             }
 
+
+            """
+            case 5. ErrorToken
+            """
             // ErrorToken
             else
             {
@@ -186,6 +219,11 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 exit(2);
             }
         }
+
+
+        """
+        Last ERROR Check
+        """
         // if =, there must be at least two children
         // (= foo)
         if (expression[leftBound].type == TokenType::equals && res.children.size() < 2)
@@ -201,6 +239,8 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
         }
         return res;
     }
+
+
     std::cout << "Something wrong..." << std::endl;
     exit(2);
     return Node();
@@ -228,7 +268,7 @@ double Parser::calculate(Node root)
     // =
     else if (root.value.type == TokenType::equals)
     {
-        // the last child must be a number or a initialized variable
+        // the last child must be a number or an initialized variable
         Node last = root.children[root.children.size()-1];
         if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
         {
