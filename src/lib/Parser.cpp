@@ -145,6 +145,16 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
                 exit(2);
             }
         }
+        // if =, there must be at least two children
+        // (= foo)
+        if (expression[leftBound].type == TokenType::equals && res.children.size() < 2)
+        {
+#if DEBUG
+    std::cout << "7.5 if =, there must be at least two children, e.g. (= foo)" << std::endl;
+#endif
+                std::cout << "Unexpected token at line " << expression[rightBound+1].line << " column " << expression[rightBound+1].index << ": " << expression[rightBound+1].content << std::endl;
+                exit(2);
+        }
         return res;
     }
     std::cout << "Something wrong..." << std::endl;
@@ -165,18 +175,18 @@ double Parser::calculate(Node root)
     {
         if (variableInitializedMap.at(root.value.content) == false)
         {
-            if (root.value.content == "foo")
-            {
-                for (std::vector<Token> v : expressionLines)
-                {
-                    for (Token token : v)
-                    {
-                        std::cout << token.content << std::endl;
-                    }
-                    std::cout << std::endl;
-                }
-                exit(2);
-            }
+            // if (root.value.content == "foo")
+            // {
+            //     for (std::vector<Token> v : expressionLines)
+            //     {
+            //         for (Token token : v)
+            //         {
+            //             std::cout << token.content << " ";
+            //         }
+            //         std::cout << std::endl;
+            //     }
+            //     exit(2);
+            // }
             std::cout << "Runtime error: unknown identifier " << root.value.content << std::endl;
             exit(3);
         }
@@ -190,18 +200,18 @@ double Parser::calculate(Node root)
         Node last = root.children[root.children.size()-1];
         if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
         {
-            if (last.value.content == "foo")
-            {
-                for (std::vector<Token> v : expressionLines)
-                {
-                    for (Token token : v)
-                    {
-                        std::cout << token.content << std::endl;
-                    }
-                    std::cout << std::endl;
-                }
-                exit(2);
-            }
+            // if (root.value.content == "foo")
+            // {
+            //     for (std::vector<Token> v : expressionLines)
+            //     {
+            //         for (Token token : v)
+            //         {
+            //             std::cout << token.content << " ";
+            //         }
+            //         std::cout << std::endl;
+            //     }
+            //     exit(2);
+            // }
             std::cout << "Runtime error: unknown identifier " << last.value.content << std::endl;
             exit(3);
         }
@@ -222,16 +232,17 @@ double Parser::calculate(Node root)
         // variable for operation is uninitialaized
         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
         {
-            // if (root.children[0].value.content == "foo")
+            // if (root.value.content == "foo")
             // {
             //     for (std::vector<Token> v : expressionLines)
             //     {
             //         for (Token token : v)
             //         {
-            //             std::cout << token.content << std::endl;
+            //             std::cout << token.content << " ";
             //         }
             //         std::cout << std::endl;
             //     }
+            //     exit(2);
             // }
             std::cout << "Runtime error: unknown identifier " << root.children[0].value.content << std::endl;
             exit(3);
@@ -242,16 +253,17 @@ double Parser::calculate(Node root)
             // variable for operation is uninitialaized
             if (root.children[i].value.type == TokenType::variable && variableInitializedMap.at(root.children[i].value.content) == false)
             {
-                // if (root.children[i].value.content == "foo")
+                // if (root.value.content == "foo")
                 // {
                 //     for (std::vector<Token> v : expressionLines)
                 //     {
                 //         for (Token token : v)
                 //         {
-                //             std::cout << token.content << std::endl;
+                //             std::cout << token.content << " ";
                 //         }
                 //         std::cout << std::endl;
                 //     }
+                //     exit(2);
                 // }
                 std::cout << "Runtime error: unknown identifier " << root.children[i].value.content << std::endl;
                 exit(3);
