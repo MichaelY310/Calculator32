@@ -295,6 +295,23 @@ int Parser::findRightParenthesis(std::vector<Token> expression, int leftBound, i
     return p;
 }
 
+int Parser::findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound)
+{
+    int balance = 1;
+    int p = leftBound;
+    while (p <= rightBound) {
+        if (expression[p].type == TokenType::leftParenthesis) { balance += 1; }
+        if (expression[p].type == TokenType::rightParenthesis) { balance -= 1; }
+        if (balance == 0) { break; }
+        p += 1;
+    }
+    if (p > rightBound) 
+    {
+        return -1;
+    }
+    return p;
+}
+
 
 // return vectors of lines
 // register variables in map 
@@ -339,6 +356,46 @@ void Parser::setupExpression(std::vector<Token> expression)
     }
     current.push_back(expression[expression.size()-1]);
     res.push_back(current);
-    expressionLines = res;
+
+
+
+    // merge multiple lines of S expression
+    std::vector sExpression = res[0];
+
+    for (int i=1; i<(int)res.size(); i++)
+    {
+        if (sExpression[0].type == TokenType::number)
+        {
+            expressionLines.push_back(sExpression);
+            sExpression.clear();
+        } 
+        else if (sExpression[0].type == TokenType::leftParenthesis)
+        {
+            int right = findRightParenthesisNoError(sExpression, 1, sExpression.size()-1);
+            if (right == -1)
+            {
+                sExpression.pop_back();
+            }
+            else
+            {
+                expressionLines.push_back(sExpression);
+                sExpression.clear();
+            }
+        }
+        else
+        {
+            expressionLines.push_back(sExpression);
+            sExpression.clear();
+        }
+        sExpression.insert(sExpression.end(), res[i].begin(), res[i].end());
+    }
+
+    if (sExpression.size() != 0)
+    {
+        expressionLines.push_back(sExpression);
+    }
+
+
+    // expressionLines = res;
 }
 

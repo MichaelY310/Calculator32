@@ -33,5 +33,6 @@ public:
 private:
     static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
+    static int findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound);
 };
 

@@ -1,66 +1,5 @@
 #include "lib/Parser.h"
 
-void errorCheck(std::vector<Token> expression) {
-    // the first token must be number or (
-    if (expression.size() == 1 || !(expression.at(0).type == TokenType::leftParenthesis || expression.at(0).type == TokenType::number)) {
-#if DEBUG
-    std::cout << "8" << std::endl;
-#endif
-        std::cout << "Unexpected token at line " << expression.at(0).line << " column " << expression.at(0).index << ": " << expression.at(0).content << std::endl;
-        exit(2);
-    }
-
-
-    if (expression.at(0).type == TokenType::number) {
-        if (expression.size() != 2) {
-#if DEBUG
-    std::cout << "9" << std::endl;
-#endif
-            std::cout << "Unexpected token at line " << expression.at(1).line << " column " << expression.at(1).index << ": " << expression.at(1).content << std::endl;
-            exit(2);
-        }
-        else {
-            return;
-        }
-    }
-
-    int balance = 1;
-    for (size_t i = 1; i < expression.size() - 1; i++) {
-        if (expression.at(i).content == "(") {
-            balance += 1;
-        }
-        if (expression.at(i).content == ")") {
-            balance -= 1;
-        }
-
-        if (expression.at(i).type == TokenType::plus || expression.at(i).type == TokenType::minus || expression.at(i).type == TokenType::multiply || expression.at(i).type == TokenType::divide || expression.at(i).type == TokenType::equals) {
-            if (expression.at(i - 1).type != TokenType::leftParenthesis) {
-#if DEBUG
-    std::cout << "12" << std::endl;
-#endif
-                std::cout << "Unexpected token at line " << expression.at(i).line << " column " << expression.at(i).index << ": " << expression.at(i).content << std::endl;
-                exit(2);
-            }
-        }
-
-        if (balance == 0 && i != expression.size() - 2) {
-#if DEBUG
-    std::cout << "14" << std::endl;
-#endif
-            std::cout << "Unexpected token at line " << expression.at(i+1).line << " column " << expression.at(i+1).index << ": " << expression.at(i+1).content  << std::endl;
-            exit(2);
-            }
-        }
-        if (balance != 0) {
-#if DEBUG
-    std::cout << "15" << std::endl;
-#endif
-
-        std::cout << "Unexpected token at line " << expression.at(expression.size() - 1).line << " column " << expression.at(expression.size() - 1).index << ": " << expression.at(expression.size() - 1).content << std::endl;
-        exit(2);
-    }
-}
-
 int main() {
 #if DEBUG == 0
     std::string input = "";
@@ -85,7 +24,8 @@ int main() {
     //std::string input = "(* a b)";
     // std::string input = "9\n(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
     // std::string input = "\t \n  (   - 3  -)";
-    std::string input = " \n+ 3 2";
+    std::string input = " (*\n(+ 17 34 - 51)\n(- 99 18 + 26)\n)";
+    //std::string input = " (* 3 4)3";
     //std::string input = "12\n";
     //std::string input = "  \n          (- 1 10)\n";    
     // std::string input = "(=(n) 9)";
@@ -102,7 +42,6 @@ int main() {
         // Token::printLexer(expressionLine);
         // std::cout << "==================" << std::endl;
 
-        //errorCheck(expressionLine);
         Node root = Parser::MakeTree(expressionLine, 0, expressionLine.size() - 2);
         Parser::print(root);
         std::cout << std::endl;
