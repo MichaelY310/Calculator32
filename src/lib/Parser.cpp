@@ -165,6 +165,17 @@ double Parser::calculate(Node root)
     {
         if (variableInitializedMap.at(root.value.content) == false)
         {
+            if (root.value.content == "foo")
+            {
+                for (std::vector<Token> v : expressionLines)
+                {
+                    for (Token token : v)
+                    {
+                        std::cout << token.content << std::endl;
+                    }
+                    std::cout << std::endl;
+                }
+            }
             std::cout << "Runtime error: unknown identifier " << root.value.content << std::endl;
             exit(3);
         }
@@ -178,6 +189,17 @@ double Parser::calculate(Node root)
         Node last = root.children[root.children.size()-1];
         if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
         {
+            if (last.value.content == "foo")
+            {
+                for (std::vector<Token> v : expressionLines)
+                {
+                    for (Token token : v)
+                    {
+                        std::cout << token.content << std::endl;
+                    }
+                    std::cout << std::endl;
+                }
+            }
             std::cout << "Runtime error: unknown identifier " << last.value.content << std::endl;
             exit(3);
         }
