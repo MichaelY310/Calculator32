@@ -1,7 +1,7 @@
 #include "Utils.h"
 
 void hint(std::vector<Token> expression, std::vector<std::vector<Token>> expressionLines, int checkIndex, 
-            int line=1, int index=7, std::string content="89")
+            int line, int index, std::string content)
 {
     if (expression[checkIndex].line == line && expression[checkIndex].index == index && expression[checkIndex].content == content)
     {
