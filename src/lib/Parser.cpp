@@ -1,271 +1,301 @@
 #include "Parser.h"
-#include <stack>
-#include <sstream>
-#include <cctype>
 
-Parser::Parser(const std::vector<Token> expression) {
-    std::vector<Token> T;
+std::vector<std::vector<Token>> Parser::expressionLines = std::vector<std::vector<Token>>();
+std::map<std::string, double> Parser::variableMap = std::map<std::string, double>();
+std::map<std::string, bool> Parser::variableInitializedMap = std::map<std::string, bool>();
 
-    if (expression.size()<=1){
-        std::cout <<"Unexpected token at line "<< expression.at(0).line << " column " << expression.at(0).index<< ": " << expression.at(0).content <<std::endl;
-        exit(2);
+Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBound)
+{
+    if (expression[leftBound].type == TokenType::leftParenthesis)
+    {
+        // ( not followed by operation symbol
+        if (expression[leftBound + 1].type != TokenType::plus && expression[leftBound + 1].type != TokenType::minus && expression[leftBound + 1].type != TokenType::multiply && expression[leftBound + 1].type != TokenType::divide && expression[leftBound + 1].type != TokenType::equals)
+        {
+            std::cout << "1" << std::endl;
+            std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
+            exit(2);
+        }
+        // right parentheses ) not found
+        int rightIndex = findRightParenthesis(expression, leftBound + 1, rightBound);
+        if (rightIndex > rightBound)
+        {
+            std::cout << "2" << std::endl;
+            std::cout << "Unexpected token at line " << expression[rightIndex].line << " column " << expression[rightIndex].index << ": " << expression[rightIndex].content << std::endl;
+            exit(2);
+        }
+        return MakeTree(expression, leftBound + 1, rightIndex - 1);
     }
 
-    int paraCheck = 0;
-    Token Last; 
+    // number
+    else if (expression[leftBound].type == TokenType::number)
+    {
+        // must be one number
+        // 0 1 2
+        if (leftBound != rightBound)
+        {
+            std::cout << "3" << std::endl;
+            std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
+            exit(2);
+        }
+        return Node(expression[leftBound]);
+    }
 
-    for (size_t i = 0; i < expression.size()-1; i++){
-        
-        if (i > 0) {            
-            Last = expression.at(i-1);
-            if (Last.type == expression.at(i).type ){
-                if (expression.at(i).type== TokenType::plus || expression.at(i).type== TokenType::minus || expression.at(i).type== TokenType::multiply || expression.at(i).type== TokenType::divide ){
-                    std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< " 6: " << expression.at(i).content <<std::endl;
+    // variable
+    else if (expression[leftBound].type == TokenType::variable)
+    {
+        // must be one variable
+        // a 1 2
+        if (leftBound != rightBound)
+        {
+            std::cout << "4" << std::endl;
+            std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
+            exit(2);
+        }
+        return Node(expression[leftBound]);
+    }
+
+    // operations = + - * /
+    else if (expression[leftBound].type == TokenType::plus || expression[leftBound].type == TokenType::minus || expression[leftBound].type == TokenType::multiply || expression[leftBound].type == TokenType::divide || expression[leftBound].type == TokenType::equals)
+    {
+
+        // nothing follows the symbol
+        if (leftBound == rightBound)
+        {
+            std::cout << "5" << std::endl;
+            std::cout << "Unexpected token at line " << expression[leftBound + 1].line << " column " << expression[leftBound + 1].index << ": " << expression[leftBound + 1].content << std::endl;
+            exit(2);
+        }
+
+        // iterate through all the elements and add them as children
+        Node res = Node(expression[leftBound]);
+        int p = leftBound + 1;
+        while (p <= rightBound)
+        {
+            // number 
+            if (expression[p].type == TokenType::number)
+            {
+                // when =, the elements other than the last element shouldn't be a number
+                // = 3 a 4 b       3 = a = 4 = b
+                if (p != rightBound && expression[leftBound].type == TokenType::equals)
+                {
+                    std::cout << "6" << std::endl;
+                    std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
                     exit(2);
                 }
-                // std::cout << "test" << expression.at(i).content <<std::endl;
-                // if (expression.at(i).type == TokenType::number) {
-                //     // std::cout << "Wrong" <<std::endl;
+
+
+
+                res.children.push_back(MakeTree(expression, p, p));
+                p += 1;
             }
-        }
-        if (expression.at(i).content == "("){
-            paraCheck += 1;
-        }
-        if (expression.at(i).content == ")"){
-            paraCheck -= 1;
-        }
+            // variable 
+            else if (expression[p].type == TokenType::variable)
+            {
+                res.children.push_back(MakeTree(expression, p, p));
+                p += 1;
+            }
+            // (
+            else if (expression[p].type == TokenType::leftParenthesis)
+            {
+                // // ( not followed by operation symbol
+                // if (expression[p + 1].type != TokenType::plus && expression[p + 1].type != TokenType::minus && expression[p + 1].type != TokenType::multiply && expression[p + 1].type != TokenType::divide)
+                // {
+                //     std::cout << "Unexpected token at line " << expression[p + 1].line << " column " << expression[p + 1].index << ": " << expression[p + 1].content << std::endl;
+                //     exit(2);
+                // }
 
-        if (paraCheck < 0){          // check para is correct
-            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content<< "234" <<std::endl;
-            exit(2);
-        }
-        if (paraCheck != 0 && i == expression.size()-2){
-            std::cout <<"Unexpected token at line "<< expression.at(i).line << " column " << expression.at(i).index<< ": " << expression.at(i).content<< "456" <<std::endl;
-            exit(2);
-        }
-        T.push_back(expression.at(i));
-    }
-
-    Root = new Node();
-
-    Root = ParserHelper(T, 0, Root);
-}
-
-
-Node * Parser::ParserHelper(const std::vector<Token> expression, size_t index, Node * root){
-    // std::cout << "running1" <<std::endl;
-    Node * curr = nullptr;
-    if (index >= maxindex) {
-        maxindex = index;    // used to check end
-    }
-    if (expression.at(index).content == ")"){  // Base Case
-        return root;            
-    }
-    
-    else if (expression.at(index).content == "("){ //When the element is (
-
-        root = ParserHelper(expression, index + 1, root);  
-
-        if (maxindex < expression.size()-1){ // Check whether the function reach the end of the vector
-            // std::cout << "running" << std::endl;
-
-            curr = ParserHelper(expression, maxindex+1, root); 
-        }
-    
-        return root;
-    }
-
-    else if (expression.at(index).content == "+" || expression.at(index).content == "-" || expression.at(index).content == "*" || expression.at(index).content == "/"){
-        if (root->token == "?"){
-            root = new Node(expression.at(index).content);  // for the first Root
-        
-            curr = ParserHelper(expression, index + 1, root); 
-        
-            return root;
-        }
-        else{   
-            curr = new Node(expression.at(index).content);  
-            curr = ParserHelper(expression, index + 1, curr);
-            root->Children.push_back(curr);
-            return root;
-        }
-    }
-    else if (expression.at(index).type == TokenType::number){          // when the element is number 
-        // std::cout <<"test;" <<expression.at(index).content << std::endl;
-        curr = new Node(expression.at(index).content);
-
-        root->Children.push_back(curr);    //?    
-        ParserHelper(expression, index+1, root); 
-        return root;
-    }
-    else{
-        std::cout << "wrong" <<std::endl;
-        exit(-1);
-    }
-}
-
-void Parser::printinfix(){
-    // std::cout << "running" <<std::endl;
-    FixExp = PrintHelp(Root, "", 0);
-    std::cout << FixExp << std::endl;
-}
-
-std::string Parser::PrintHelp(Node * root, std::string ExpStr, size_t index){
-    
-    
-    if (root == nullptr){
-        std::cout << "Nothing in the root !" << std::endl;
-        return ExpStr;
-    }
-    
-    if (index == root->Children.size()-1) {  // base case 
-        if (root->Children.at(index)->token == "+" || root->Children.at(index)->token == "-" || root->Children.at(index)->token == "*" || root->Children.at(index)->token == "/") {
-            ExpStr += " " + root->token + " " + PrintHelp(root->Children.at(index), "", 0) + ")"; //
-            return ExpStr;
-        }
-        else{
-            ExpStr += " " + root->token + " " + root->Children.at(index)->token + ")";
-            return ExpStr;
-        } 
-    }
-    else if (index == 0){       // start of the string
-        if (root->Children.at(index)->token == "+" || root->Children.at(index)->token == "-" || root->Children.at(index)->token == "*" || root->Children.at(index)->token == "/") {
-            ExpStr += "("  + PrintHelp(root->Children.at(index), "", 0); //1 2 
-
-            if (index < root->Children.size()-1) {
-                ExpStr += PrintHelp(root, "", index + 1);
+                int rightIndex = findRightParenthesis(expression, p + 1, rightBound);
+                // // ) not found
+                // if (rightIndex > rightBound)
+                // {
+                //     std::cout << "Unexpected token at line " << expression[rightIndex].line << " column " << expression[rightIndex].index << ": " << expression[rightIndex].content << std::endl;
+                //     exit(2);
+                // }
+                res.children.push_back(MakeTree(expression, p, rightIndex));
+                p = rightIndex + 1;
             }
 
-            return ExpStr;
+            // ErrorToken
+            else
+            {
+                std::cout << "7" << std::endl;
+                std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
+                exit(2);
+            }
         }
-        else{
-            ExpStr += "(" + root->Children.at(index)->token + PrintHelp(root, "" , index + 1);  //3
-            return ExpStr;
-        }
-        
+        return res;
     }
-    else if (index >= root->Children.size()) {       // if out of range exit
-        std::cout << "WRONG" << std::endl;
-        exit(-1);
-    }
-    else {      // other situation when 
-        if (root->Children.at(index)->token == "+" || root->Children.at(index)->token == "-" || root->Children.at(index)->token == "*" || root->Children.at(index)->token == "/") {
-            ExpStr += " " + root->token + " " + PrintHelp(root->Children.at(index), "", 0);
-            return ExpStr;
-        }
-        else{
-            ExpStr += " " + root->token + " " + root->Children.at(index)->token + PrintHelp(root, "", index + 1); //
-            return ExpStr;
-        }
-    }
-
+    std::cout << "Something wrong..." << std::endl;
+    exit(2);
+    return Node();
 }
 
-double Parser::applyOp(char op, double b, double a) {
-    switch (op) {
-    case '+':
-        return a + b;
-    case '-':
-        return a - b;
-    case '*':
-        return a * b;
-    case '/':
-        if (b == 0) {
-            std::cout << "Runtime error: division by zero." << std::endl;
+
+double Parser::calculate(Node root)
+{
+    // number
+    if (root.value.type == TokenType::number)
+    {
+        return root.value.value;
+    }
+
+    // variable
+    else if (root.value.type == TokenType::variable)
+    {
+        if (variableInitializedMap.at(root.value.content) == false)
+        {
+            std::cout << "Runtime error: unknown identifier " << root.value.content << std::endl;
             exit(3);
         }
-        return a / b;
+        return variableInitializedMap.at(root.value.content);
     }
-    return 0;
-}
 
-// Function to evaluate arithmetic expressions
-double Parser::evaluateExpression() {
-    std::istringstream iss(FixExp);
-    std::stack<double> values;
-    std::stack<char> ops;
-
-    char current;
-    while (iss >> current) {
-        if (isdigit(current) || current == '.') {
-            iss.putback(current);
-            double value;
-            iss >> value;
-            values.push(value);
+    // =
+    else if (root.value.type == TokenType::equals)
+    {
+        // the last child must be a number or a initialized variable
+        Node last = root.children[root.children.size()-1];
+        if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
+        {
+            std::cout << "Runtime error: unknown identifier " << last.value.content << std::endl;
+            exit(3);
         }
-        else if (current == '(') {
-            ops.push(current);
+        double res = calculate(last);
+
+        // set values
+        for (int i = 0; i < (int)root.children.size()-1; i++)
+        {
+            variableMap.at(root.children[i].value.content) = res;
+            variableInitializedMap.at(root.children[i].value.content) = true;
         }
-        else if (current == ')') {
-            while (ops.top() != '(') {
-                double val2 = values.top();
-                values.pop();
 
-                double val1 = values.top();
-                values.pop();
+        return res;
+    }
 
-                char op = ops.top();
-                ops.pop();
-
-                values.push(applyOp(op, val2, val1));
+    // + - * /
+    else {
+        // variable for operation is uninitialaized
+        if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
+        {
+            std::cout << "Runtime error: unknown identifier " << root.children[0].value.content << std::endl;
+            exit(3);
+        }
+        double res = calculate(root.children[0]);
+        for (int i = 1; i < (int)root.children.size(); i++)
+        {
+            // variable for operation is uninitialaized
+            if (root.children[i].value.type == TokenType::variable && variableInitializedMap.at(root.children[i].value.content) == false)
+            {
+                std::cout << "Runtime error: unknown identifier " << root.children[i].value.content << std::endl;
+                exit(3);
             }
-            ops.pop();
-        }
-        else if (current == '+' || current == '-' || current == '*' || current == '/') {
-            while (!ops.empty() && ops.top() != '(') {
-                double val2 = values.top();
-                values.pop();
-
-                double val1 = values.top();
-                values.pop();
-
-                char op = ops.top();
-                ops.pop();
-
-                values.push(applyOp(op, val2, val1));
+            if (root.value.type == TokenType::plus) { res += calculate(root.children[i]); }
+            if (root.value.type == TokenType::minus) { res -= calculate(root.children[i]); }
+            if (root.value.type == TokenType::multiply) { res *= calculate(root.children[i]); }
+            if (root.value.type == TokenType::divide)
+            {
+                if (calculate(root.children[i]) == 0) {
+                    std::cout << "Runtime error: division by zero." << std::endl;
+                    exit(3);
+                }
+                res /= calculate(root.children[i]);
             }
-            ops.push(current);
         }
+        return res;
     }
-
-    while (!ops.empty()) {
-        double val2 = values.top();
-        values.pop();
-
-        double val1 = values.top();
-        values.pop();
-
-        char op = ops.top();
-        ops.pop();
-
-        values.push(applyOp(op, val2, val1));
-    }
-
-    return values.top();
 }
 
-void Parser::deleteHelp(Node * root){
-    if(root->Children.size()==0){
-        // std::cout << "delete root : " << root->token << std::endl;
-        delete root;
-        root = nullptr;
-        return;
-    }
-    for (int i = root->Children.size()-1; i>= 0; i--){
-        if (root->Children.at(i)->token =="0" ||  root->Children.at(i)->token == "1" || root->Children.at(i)->token == "2" || root->Children.at(i)->token == "3" || root->Children.at(i)->token == "4" || root->Children.at(i)->token == "5" || root->Children.at(i)->token == "6" || root->Children.at(i)->token == "7" || root->Children.at(i)->token == "8" || root->Children.at(i)->token == "9"){
-            // std::cout << "delete child : " << root->Children.at(i)->token << std::endl;
-            delete root->Children.at(i);
-            root->Children.at(i) = nullptr;
-            root->Children.pop_back();
-            continue;
+
+void Parser::print(Node root)
+{
+    if (root.value.type == TokenType::number)
+    {
+        int v = floor(root.value.value);
+        // 1000.000  ->  1000
+        if ((double)v == root.value.value)
+        {
+            std::cout << v;
         }
-        deleteHelp(root->Children.at(i));  
+        else
+        {
+            std::cout << root.value.content;
+        }
     }
-    if(root != nullptr){
-        // std::cout << "deleting: " << root->token <<std::endl;
-        delete root;
-        root = nullptr;
+    else if (root.value.type == TokenType::variable)
+    {
+        std::cout << root.value.content;
     }
-    return;
+    else {
+        std::cout << "(";
+        for (int i = 0; i < (int)root.children.size(); i++)
+        {
+            print(root.children[i]);
+            if (i != (int)root.children.size() - 1)
+            {
+                std::cout << " " << root.value.content << " ";
+            }
+        }
+        std::cout << ")";
+    }
 }
 
+// exclude rightParenthesis
+int Parser::findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
+{
+    int balance = 1;
+    int p = rightBound;
+    while (p >= leftBound) {
+        if (expression[p].type == TokenType::leftParenthesis) { balance -= 1; }
+        if (expression[p].type == TokenType::rightParenthesis) { balance += 1; }
+        if (balance == 0) { break; }
+        p -= 1;
+    }
+    return p;
+}
+
+int Parser::findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
+{
+    int balance = 1;
+    int p = leftBound;
+    while (p <= rightBound) {
+        if (expression[p].type == TokenType::leftParenthesis) { balance += 1; }
+        if (expression[p].type == TokenType::rightParenthesis) { balance -= 1; }
+        if (balance == 0) { break; }
+        p += 1;
+    }
+    return p;
+}
+
+
+// return vectors of lines
+// register variables in map 
+void Parser::setupExpression(std::vector<Token> expression)
+{
+    std::vector<std::vector<Token>> res;
+    std::vector<Token> current;
+    int currentLine = 1;
+    for (Token token : expression)
+    {
+        // handle new variable
+        if (variableMap.find(token.content) == variableMap.end())
+        {
+            variableMap.insert({ token.content, -1 });
+            variableInitializedMap.insert({ token.content, false });
+        }
+
+        // handle line
+        if (token.line != currentLine)
+        {
+            while (currentLine != token.line)
+            {
+                current.push_back(expression[expression.size()-1]);
+                res.push_back(current);
+                current.clear();
+                currentLine += 1;
+            }
+        }
+        current.push_back(token);
+    }
+    res.push_back(current);
+    expressionLines = res;
+}

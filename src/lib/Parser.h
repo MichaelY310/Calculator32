@@ -1,79 +1,35 @@
-#ifndef PARSER_H
-#define PARSER_H
-
-#include <iostream>
+#pragma once
 #include <string>
 #include <vector>
+#include <iostream>
+#include <cmath>
+#include <map>
 #include "Lexer.h"
 
-struct Node {
-    std::string token;
-    std::vector<Node *> Children;   //vector can store more than 2 children
-    float num;
 
-    Node(){
-        token = "?";
-        num = -1;
-        Children = {};
-   
-    }
 
-    Node(Node &C){
-        token = C.token;
-        for (auto & ele : C.Children){
-            Children.push_back(ele);
-        }
-        num = C.num;
-    }
-    ~Node(){
-        
-    }
+class Node
+{
+public:
+    Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
+    Node(Token token) : value(token) {}
 
-    Node(std::string inputStr){
-        Children = {};
-        token = inputStr;
-        num = -1;           //when the node is token its num will be -1
-    };
-
-    Node(float inputNum){
-        token = "?";
-        Children = {};
-        num = inputNum;     // when the node is number it will have no token.
-    };
+    std::vector<Node> children;
+    Token value;
 };
 
-class Parser {
-    public:
-        Parser(const std::vector<Token> );
-        Node * ParserHelper(const std::vector<Token>, size_t , Node * );
-        ~Parser(){
-            deleteHelp(Root);
-        };
-
-        Parser(){
-            Root = new Node();  
-        };
-
-        void deleteHelp(Node * root);
-
-        
-
-        size_t maxindex = 0;
-
-        void printinfix();
-
-        std::string PrintHelp(Node * , std::string, size_t);
-        double evaluateExpression();
-
-
-    // private:
-        Node * Root;
-        std::string FixExp = "";
-        double applyOp(char op, double b, double a);
-
+class Parser
+{
+public:
+    static Node MakeTree(std::vector<Token> expression, int leftBound, int rightBound);
+    static double calculate(Node root);
+    static void print(Node root);
+    static void setupExpression(std::vector<Token> expression);
+    static std::vector<std::vector<Token>> expressionLines;
+    static std::map<std::string, double> variableMap;
+    static std::map<std::string, bool> variableInitializedMap;
+private:
+    static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
+    static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
 };
 
-
-
-
-#endif 

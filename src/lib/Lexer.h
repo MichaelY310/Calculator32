@@ -1,6 +1,4 @@
 #pragma once
-#ifndef LEXER_H
-#define LEXER_H
 
 #include <string>
 #include <vector>
@@ -8,7 +6,10 @@
 #include <cmath>
 
 enum class TokenType {
+    none,
+    variable,
     number,
+    equals,
     plus,
     minus,
     multiply,
@@ -23,7 +24,6 @@ class Token {
 
 public:
     Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue = -1);
-    Token(){};
     ~Token() = default;
 
     operator double() const {
@@ -43,5 +43,3 @@ public:
     double value = -1;       // a number has its own value. otherwise -1
 
 };
-
-#endif
