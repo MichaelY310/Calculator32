@@ -1,5 +1,6 @@
 #include "Utils.h"
 
+
 void hint(std::vector<Token> expression, std::vector<std::vector<Token>> expressionLines, int checkIndex, 
             int line, int index, std::string content)
 {

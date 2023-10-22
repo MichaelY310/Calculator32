@@ -23,6 +23,9 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
 #if DEBUG
     std::cout << "1  no expression  " << std::endl;
 #endif
+#if HINT
+    hint(expression, Parser::expressionLines, rightIndex+1);
+#endif
         std::cout << "Unexpected token at line " << expression[leftBound].line << " column " << expression[leftBound].index << ": " << expression[leftBound].content << std::endl;
         exit(2);
     }

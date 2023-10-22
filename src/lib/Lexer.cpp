@@ -39,6 +39,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 #if DEBUG
     std::cout << "1" << std::endl;
 #endif
+if (line == 1 && index == 4)
+{
+    std::cout << input << std::endl;;
+}
                 std::cout << "Syntax error on line " << line << " column " << i << "." << std::endl;
                 exit(1);
             }
@@ -89,6 +93,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 #if DEBUG
     std::cout << "2" << std::endl;
 #endif
+if (line == 1 && index == 4)
+{
+    std::cout << input << std::endl;;
+}
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -100,6 +108,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 #if DEBUG
     std::cout << "3" << std::endl;
 #endif
+if (line == 1 && index == 4)
+{
+    std::cout << input << std::endl;;
+}
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -119,6 +131,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 #if DEBUG
     std::cout << "4" << std::endl;
 #endif
+if (line == 1 && index == 4)
+{
+    std::cout << input << std::endl;;
+}
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -191,6 +207,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 #if DEBUG
     std::cout << "5" << std::endl;
 #endif
+if (line == 1 && index == 4)
+{
+    std::cout << input << std::endl;;
+}
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -206,7 +226,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 #if DEBUG
     std::cout << "6" << std::endl;
 #endif
-
+if (line == 1 && index == 4)
+{
+    std::cout << input << std::endl;;
+}
         std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
         exit(1);
     }
