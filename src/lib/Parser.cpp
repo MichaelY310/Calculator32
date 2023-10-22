@@ -424,7 +424,7 @@ int Parser::findRightParenthesisNoError(std::vector<Token> expression, int leftB
 
 // return vectors of lines
 // register variables in map 
-void ParserB::setupExpression(std::vector<Token> expression)
+void Parser::setupExpression(std::vector<Token> expression)
 {
     if (expression.size() == 1)
     {
