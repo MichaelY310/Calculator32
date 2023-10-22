@@ -10,20 +10,20 @@
 #include "Utils.h"
 
 
-class Node
+// class Node
+// {
+// public:
+//     Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
+//     Node(Token token) : value(token) {}
+
+//     std::vector<Node> children;
+//     Token value;
+// };
+
+class ParserB
 {
 public:
-    Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
-    Node(Token token) : value(token) {}
-
-    std::vector<Node> children;
-    Token value;
-};
-
-class Parser
-{
-public:
-    static Node MakeTree(std::vector<Token> expression, int leftBound, int rightBound);
+    static Node MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound);
     static double calculate(Node root);
     static void print(Node root);
     static void setupExpression(std::vector<Token> expression);
@@ -35,5 +35,7 @@ private:
     static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound);
+private:
+    static std::map<TokenType, int> hierarchyMap;
 };
 

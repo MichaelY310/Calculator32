@@ -246,6 +246,7 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     return Node();
 }
 
+
 double Parser::calculate(Node root)
 {
     // number
@@ -515,4 +516,3 @@ void Parser::setupExpression(std::vector<Token> expression)
     //     std::cout << std::endl;
     // }
 }
-
