@@ -69,11 +69,11 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
     }
 
 
-    """
-    case 3. variable
-    ERRORS:
-        4. there can be only one variable
-    """
+    // """
+    // case 3. variable
+    // ERRORS:
+    //     4. there can be only one variable
+    // """
     // variable
     else if (expression[leftBound].type == TokenType::variable)
     {
@@ -203,9 +203,9 @@ Node Parser::MakeTree(std::vector<Token> expression, int leftBound, int rightBou
             }
 
 
-            """
-            case 5. ErrorToken
-            """
+            // """
+            // case 5. ErrorToken
+            // """
             // ErrorToken
             else
             {
