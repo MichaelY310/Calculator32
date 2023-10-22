@@ -424,7 +424,7 @@ int Parser::findRightParenthesisNoError(std::vector<Token> expression, int leftB
 
 // return vectors of lines
 // register variables in map 
-void Parser::setupExpression(std::vector<Token> expression)
+void ParserB::setupExpression(std::vector<Token> expression)
 {
     if (expression.size() == 1)
     {
@@ -439,14 +439,26 @@ void Parser::setupExpression(std::vector<Token> expression)
     std::vector<Token> current;
     current.push_back(expression[0]);
     int currentLine = expression[0].line;
+    // handle the first token variable
+    if (expression[0].type == TokenType::variable)
+    {
+        if (variableMap.find(expression[0].content) == variableMap.end())
+        {
+            variableMap.insert({ expression[0].content, -1 });
+            variableInitializedMap.insert({ expression[0].content, false });
+        }
+    }
     for (int i=1; i<(int)expression.size()-1; i++)
     {
         Token token = expression[i];
         // handle new variable
-        if (variableMap.find(token.content) == variableMap.end())
+        if (token.type == TokenType::variable)
         {
-            variableMap.insert({ token.content, -1 });
-            variableInitializedMap.insert({ token.content, false });
+            if (variableMap.find(token.content) == variableMap.end())
+            {
+                variableMap.insert({ token.content, -1 });
+                variableInitializedMap.insert({ token.content, false });
+            }
         }
 
         // handle line

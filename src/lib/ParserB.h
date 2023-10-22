@@ -10,15 +10,15 @@
 #include "Utils.h"
 
 
-// class Node
-// {
-// public:
-//     Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
-//     Node(Token token) : value(token) {}
+class Node
+{
+public:
+    Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
+    Node(Token token) : value(token) {}
 
-//     std::vector<Node> children;
-//     Token value;
-// };
+    std::vector<Node> children;
+    Token value;
+};
 
 class ParserB
 {
