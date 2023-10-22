@@ -19,7 +19,8 @@ int main() {
 #if DEBUG == 1
     
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)";
-    std::string input = "b=13\n(7 - (b = (b + 5)))";
+    //std::string input = "b=13\n(7 - (b = (b + 5)))";
+    std::string input = "(7 - 5))";
 #endif
 
     if (input.size() == 0) { std::cout << "Unexpected token at line 1 column 1: END" << std::endl; return 2;  }

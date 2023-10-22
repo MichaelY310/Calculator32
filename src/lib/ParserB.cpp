@@ -38,6 +38,16 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
     }
     while (i <= rightBound)
     {
+        // not belongs to hierarchyMap
+        if (hierarchyMap.find(expression[i].type) == hierarchyMap.end())
+        {
+#if DEBUG
+    std::cout << "2  unknown token  " << std::endl;
+#endif
+        std::cout << "Unexpected token at line " << expression[i].line << " column " << expression[i].index << ": " << expression[i].content << std::endl;
+        exit(2);
+        } 
+
         // higher hierarchy
         if (hierarchyMap.at(expression[i].type) > hierarchyMap.at(expression[topIndex].type))
         {
@@ -101,6 +111,15 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
     {
         int rightIndex = findRightParenthesis(expression, topIndex+1, rightBound);
         return MakeTreeInfix(expression, topIndex+1, rightIndex-1);
+    }
+    // case 6 ERROR
+    else
+    {
+#if DEBUG
+    std::cout << "3   " << std::endl;
+#endif
+        std::cout << "Unexpected token at line " << expression[topIndex].line << " column " << expression[topIndex].index << ": " << expression[topIndex].content << std::endl;
+        exit(2);
     }
 
     std::cout << "Something wrong..." << expression[topIndex].content << std::endl;
