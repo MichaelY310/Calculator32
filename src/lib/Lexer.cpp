@@ -1,10 +1,11 @@
 #include "Lexer.h"
-// #include "Utils.h"
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
 {
 }
+
+
 
 std::vector<Token> Token::GenTokenVector(const std::string input) {
     int len = input.length();
@@ -31,14 +32,12 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         // std::cout << (int)input.at(i) << std::endl;
 
         // variable
-        if ((input.at(i) >= 'a' && input.at(i) <= 'z') || (input.at(i) >= 'A' && input.at(i) <= 'Z') || input.at(i) == '_')
+        if (input.at(i) >= 'a' && input.at(i) <= 'z')
         {
             // 123abc
             if (recordingNumber)
             {
-#if DEBUG
-    std::cout << "1" << std::endl;
-#endif
+                std::cout << "1" << std::endl;
                 std::cout << "Syntax error on line " << line << " column " << i << "." << std::endl;
                 exit(1);
             }
@@ -86,9 +85,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             if (!recordingNumber)
             {
                 // if there's error, the last token would be ERROR instead of END
-#if DEBUG
-    std::cout << "2" << std::endl;
-#endif
+                std::cout << "2" << std::endl;
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -97,9 +94,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             if (afterPoint)
             {
                 // if there's error, the last token would be ERROR instead of END
-#if DEBUG
-    std::cout << "3" << std::endl;
-#endif
+                std::cout << "3" << std::endl;
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -116,9 +111,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             if (recordingNumber && currentStringValue.back() == '.')
             {
                 // if there's error, the last token would be ERROR instead of END
-#if DEBUG
-    std::cout << "4" << std::endl;
-#endif
+                std::cout << "4" << std::endl;
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -188,9 +181,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             else
             {
                 // if there's error, the last token would be ERROR instead of END
-#if DEBUG
-    std::cout << "5" << std::endl;
-#endif
+                std::cout << "5" << std::endl;
 
                 std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
                 exit(1);
@@ -203,9 +194,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
     if (recordingNumber && currentStringValue.back() == '.')
     {
         // if there's error, the last token would be ERROR instead of END
-#if DEBUG
-    std::cout << "6" << std::endl;
-#endif
+        std::cout << "6" << std::endl;
 
         std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
         exit(1);
