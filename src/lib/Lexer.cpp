@@ -1,16 +1,13 @@
 #include "Lexer.h"
+#include "Utils.h"
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
 {
 }
 
-
-
-std::vector<Token> Token::GenTokenVector(const std::string input) {
+std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<Token>& res) {
     int len = input.length();
-
-    std::vector<Token> res;
 
     int line = 1;
     int index = 1;
@@ -32,14 +29,15 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
         // std::cout << (int)input.at(i) << std::endl;
 
         // variable
-        if (input.at(i) >= 'a' && input.at(i) <= 'z')
+        if ((input.at(i) >= 'a' && input.at(i) <= 'z') || (input.at(i) >= 'A' && input.at(i) <= 'Z') || input.at(i) == '_')
         {
             // 123abc
             if (recordingNumber)
             {
-                std::cout << "1" << std::endl;
-                std::cout << "Syntax error on line " << line << " column " << i << "." << std::endl;
-                exit(1);
+#if DEBUG
+    std::cout << "1" << std::endl;
+#endif
+                return { line, i };
             }
             else 
             {
@@ -85,19 +83,20 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             if (!recordingNumber)
             {
                 // if there's error, the last token would be ERROR instead of END
-                std::cout << "2" << std::endl;
-
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+#if DEBUG
+    std::cout << "2" << std::endl;
+#endif
+                return { line, index };
             }
             // already have a point
             if (afterPoint)
             {
                 // if there's error, the last token would be ERROR instead of END
-                std::cout << "3" << std::endl;
+#if DEBUG
+    std::cout << "3" << std::endl;
+#endif
 
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+                return { line, index };
             }
             afterPoint += 1;
             numberLength += 1;
@@ -111,10 +110,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             if (recordingNumber && currentStringValue.back() == '.')
             {
                 // if there's error, the last token would be ERROR instead of END
-                std::cout << "4" << std::endl;
-
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+#if DEBUG
+    std::cout << "4" << std::endl;
+#endif
+                return { line, index };
             }
 
 
@@ -181,10 +180,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
             else
             {
                 // if there's error, the last token would be ERROR instead of END
-                std::cout << "5" << std::endl;
-
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+#if DEBUG
+    std::cout << "5" << std::endl;
+#endif
+                return { line, index };
             }
         }
         index++;
@@ -194,10 +193,10 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
     if (recordingNumber && currentStringValue.back() == '.')
     {
         // if there's error, the last token would be ERROR instead of END
-        std::cout << "6" << std::endl;
-
-        std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-        exit(1);
+#if DEBUG
+    std::cout << "6" << std::endl;
+#endif
+        return { line, index };
     }
 
     // the last digit is recorded
@@ -222,7 +221,7 @@ std::vector<Token> Token::GenTokenVector(const std::string input) {
 
     res.emplace_back(TokenType::end, "END", line, index, -1);
 
-    return res;
+    return { -1, -1 };
 }
 
 
@@ -263,6 +262,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
 
 void Token::printLexer(const std::string input)
 {
-    std::vector<Token> TokenVector = GenTokenVector(input);
+    std::vector<Token> TokenVector;
+    GenTokenVector(input, TokenVector);
     Token::printLexer(TokenVector);
 }
