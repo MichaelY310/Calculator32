@@ -414,10 +414,6 @@ int Parser::findRightParenthesisNoError(std::vector<Token> expression, int leftB
         if (balance == 0) { break; }
         p += 1;
     }
-    if (p > rightBound) 
-    {
-        return -1;
-    }
     return p;
 }
 
@@ -493,7 +489,7 @@ void Parser::setupExpression(std::vector<Token> expression)
         else if (sExpression[0].type == TokenType::leftParenthesis)
         {
             int right = findRightParenthesisNoError(sExpression, 1, sExpression.size()-1);
-            if (right == -1)
+            if (right > (int)sExpression.size()-1)
             {
                 sExpression.pop_back();
             }

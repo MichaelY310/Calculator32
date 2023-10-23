@@ -23,9 +23,6 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 #if DEBUG
     std::cout << "1  no expression  " << std::endl;
 #endif
-#if HINT
-    hint(expression, Parser::expressionLines, rightIndex+1);
-#endif
         return { { expression[leftBound].line, expression[leftBound].index }, expression[leftBound].content };
     }
 
@@ -337,10 +334,6 @@ int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int left
         if (balance == 0) { break; }
         p += 1;
     }
-    if (p > rightBound) 
-    {
-        return -1;
-    }
     return p;
 }
 
@@ -415,8 +408,8 @@ void ParserB::setupExpression(std::vector<Token> expression)
         } 
         else if (sExpression[0].type == TokenType::leftParenthesis)
         {
-            int right = findRightParenthesisNoError(sExpression, 1, sExpression.size()-1);
-            if (right == -1)
+            int rightIndex = findRightParenthesisNoError(sExpression, 1, sExpression.size()-1);
+            if (rightIndex > (int)sExpression.size()-1)
             {
                 sExpression.pop_back();
             }
