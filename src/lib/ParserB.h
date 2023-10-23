@@ -57,7 +57,7 @@ class ParserB{
     int IsSigns(Token input);
     int nextSign(std::vector<Token> EXP, int index);
     int left_bound(std::vector<Token> EXP, int index);
-    Node * Build_Para(std::vector<Token> EXP, int index, int leftBoud);
+    Node * Build_Parenthesis(std::vector<Token> EXP, int index, int leftBoud);
 
 
     Node * mRoot;

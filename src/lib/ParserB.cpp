@@ -83,7 +83,7 @@ Node * ParserB::Build(std::vector<Token> EXP, int index, Node * root) {
         if (index > (int)EXP.size()-5){ 
             // there is error
         }
-        temp = Build_Para(EXP,index, leftB);
+        temp = Build_Parenthesis(EXP,index, leftB);
         if (root->value.content==""){
             if (left_bound(EXP,index) == (int)EXP.size()-1){
                 maxindex = leftB;
@@ -107,7 +107,7 @@ Node * ParserB::Build(std::vector<Token> EXP, int index, Node * root) {
     return root;
 }
 
-Node * ParserB::Build_Para(std::vector<Token> EXP, int index, int leftBound){
+Node * ParserB::Build_Parenthesis(std::vector<Token> EXP, int index, int leftBound){
     std::vector<Token> TempVect;
     for (int i = index + 1; i < leftBound; i++){
         TempVect.push_back(EXP.at(i));
