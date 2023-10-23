@@ -23,6 +23,9 @@ int main() {
     std::string input = "b=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
 #endif
 
+
+
+
     if (input.size() == 0) { return 0; }
     std::vector<std::string> expressions;
     std::stringstream ss(input);
@@ -35,6 +38,7 @@ int main() {
     int lineCount = 0;
     for (std::string expression : expressions)
     {
+
         lineCount += 1;
 
         if (expression.length() == 0)
@@ -50,6 +54,9 @@ int main() {
             std::cout << "Syntax error on line " << lineCount << " column " << errorPair.second << "." << std::endl;
             continue;
         }
+
+
+        ParserB::setupExpression(TokenVector);
 
         // ParserB
         Node root;
