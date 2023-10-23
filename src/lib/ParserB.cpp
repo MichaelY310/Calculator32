@@ -40,6 +40,15 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
         }
         i = rightIndex + 1;
     }
+    if (hierarchyMap.find(expression[topIndex].type) == hierarchyMap.end())
+    {
+#if DEBUG
+    std::cout << "1.5  the first token unknown token  " << std::endl;
+#endif
+    return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };
+    } 
+
+
     while (i <= rightBound)
     {
         // not belongs to hierarchyMap

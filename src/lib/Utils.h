@@ -2,7 +2,7 @@
 
 #include "Lexer.h"
 
-#define DEBUG 0
+#define DEBUG 1
 #define HINT 0
 
 void hint(std::vector<Token> expression, std::vector<std::vector<Token>> expressionLines, int checkIndex, 
