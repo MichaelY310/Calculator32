@@ -24,7 +24,7 @@ public:
 class ParserB
 {
 public:
-    static Node MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound);
+    static std::pair<std::pair<int, int>, std::string> MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node);
     static double calculate(Node root);
     static void print(Node root);
     static void setupExpression(std::vector<Token> expression);

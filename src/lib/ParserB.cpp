@@ -16,7 +16,7 @@ std::map<TokenType, int> ParserB::hierarchyMap = {
 
 };
 
-Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound)
+std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node)
 {
     if (leftBound > rightBound)
     {
@@ -26,8 +26,7 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
 #if HINT
     hint(expression, Parser::expressionLines, rightIndex+1);
 #endif
-        std::cout << "Unexpected token at line " << expression[leftBound].line << " column " << expression[leftBound].index << ": " << expression[leftBound].content << std::endl;
-        exit(2);
+        return { { expression[leftBound].line, expression[leftBound].index }, expression[leftBound].content };
     }
 
 
@@ -37,7 +36,12 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
     // skip parenthesis content for the first element
     if (expression[topIndex].type == TokenType::leftParenthesis)
     {
-        i = findRightParenthesis(expression, topIndex+1, rightBound) + 1;
+        int rightIndex = findRightParenthesisNoError(expression, topIndex+1, rightBound);
+        if (rightIndex > rightBound)
+        {
+            return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  
+        }
+        i = rightIndex + 1;
     }
     while (i <= rightBound)
     {
@@ -47,8 +51,7 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
 #if DEBUG
     std::cout << "2  unknown token  " << std::endl;
 #endif
-        std::cout << "Unexpected token at line " << expression[i].line << " column " << expression[i].index << ": " << expression[i].content << std::endl;
-        exit(2);
+        return { { expression[i].line, expression[i].index }, expression[i].content };
         } 
 
         // higher hierarchy
@@ -74,7 +77,12 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
         // ignore content inside (...)
         if (expression[i].type == TokenType::leftParenthesis)
         {
-            i = findRightParenthesis(expression, i+1, rightBound) + 1;
+            int rightIndex = findRightParenthesisNoError(expression, i+1, rightBound);
+            if (rightIndex > rightBound)
+            {
+                return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  
+            }
+            i = rightIndex + 1;
         }
         else
         {
@@ -85,35 +93,61 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
     // case 1 number
     if (expression[topIndex].type == TokenType::number)
     {
-        return Node(expression[topIndex]);
+        node = Node(expression[topIndex]);
+        return { { -1, -1 }, "" };
     }
     // case 2 variable
     else if (expression[topIndex].type == TokenType::variable)
     {
-        return Node(expression[topIndex]);
+        node = Node(expression[topIndex]);
+        return { { -1, -1 }, "" };
     }
     // case 3 =
     else if (expression[topIndex].type == TokenType::equals)
     {
         Node res = Node(expression[topIndex]);
-        res.children.push_back(MakeTreeInfix(expression, leftBound, topIndex-1));
-        res.children.push_back(MakeTreeInfix(expression, topIndex+1, rightBound));
-        return res;
+
+        Node node1;
+        std::pair<std::pair<int, int>, std::string> errorResult1 = MakeTreeInfix(expression, leftBound, topIndex-1, node1);
+        if (errorResult1.first.first != -1) { return errorResult1; }
+        res.children.push_back(node1);
+
+        Node node2;
+        std::pair<std::pair<int, int>, std::string> errorResult2 = MakeTreeInfix(expression, topIndex+1, rightBound, node2);
+        if (errorResult2.first.first != -1) { return errorResult2; }
+        res.children.push_back(node2);
+
+        node = res;
+        return { { -1, -1 }, "" };
     }
     // case 4 + - * /
     else if (expression[topIndex].type == TokenType::plus || expression[topIndex].type == TokenType::minus || 
             expression[topIndex].type == TokenType::multiply || expression[topIndex].type == TokenType::divide)
     {
         Node res = Node(expression[topIndex]);
-        res.children.push_back(MakeTreeInfix(expression, leftBound, topIndex-1));
-        res.children.push_back(MakeTreeInfix(expression, topIndex+1, rightBound));
-        return res;
+
+        Node node1;
+        std::pair<std::pair<int, int>, std::string> errorResult1 = MakeTreeInfix(expression, leftBound, topIndex-1, node1);
+        if (errorResult1.first.first != -1) { return errorResult1; }
+        res.children.push_back(node1);
+
+        Node node2;
+        std::pair<std::pair<int, int>, std::string> errorResult2 = MakeTreeInfix(expression, topIndex+1, rightBound, node2);
+        if (errorResult2.first.first != -1) { return errorResult2; }
+        res.children.push_back(node2);
+        
+        node = res;
+        return { { -1, -1 }, "" };
     }
     // case 5 (...)
     else if (expression[topIndex].type == TokenType::leftParenthesis)
     {
-        int rightIndex = findRightParenthesis(expression, topIndex+1, rightBound);
-        return MakeTreeInfix(expression, topIndex+1, rightIndex-1);
+        int rightIndex = findRightParenthesisNoError(expression, topIndex+1, rightBound);
+        if (rightIndex > rightBound)
+        {
+            return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  
+        }
+        return MakeTreeInfix(expression, topIndex+1, rightIndex-1, node);
     }
     // case 6 ERROR
     else
@@ -121,13 +155,8 @@ Node ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int ri
 #if DEBUG
     std::cout << "3   " << std::endl;
 #endif
-        std::cout << "Unexpected token at line " << expression[topIndex].line << " column " << expression[topIndex].index << ": " << expression[topIndex].content << std::endl;
-        exit(2);
+        return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };
     }
-
-    std::cout << "Something wrong..." << expression[topIndex].content << std::endl;
-    exit(2);
-    return Node();
 }
 
 
@@ -270,17 +299,6 @@ int ParserB::findRightParenthesis(std::vector<Token> expression, int leftBound, 
 #if DEBUG
     std::cout << "right parenthesis not found" << std::endl;
 #endif
-        if (expression[p].line == 1 && expression[p].index == 6 && expression[p].content == "(")
-        {
-            for (std::vector<Token> v : expressionLines)
-            {
-                for (Token token : v)
-                {
-                    std::cout << token.content << " ";
-                }
-                std::cout << std::endl;
-            }
-        }
         std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
         exit(2);
     }

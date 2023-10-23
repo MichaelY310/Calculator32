@@ -20,47 +20,46 @@ int main() {
     
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)";
     //std::string input = "b=13\n(7 - (b = (b + 5)))";
-    std::string input = "b=13\n(7 - (b = (b + 5)))\n\n\n1=a\n1+1\n";
+    std::string input = "b=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
 #endif
 
-    // if (input.size() == 0) { return 0; }
-    // std::vector<std::string> expressions;
-    // std::stringstream ss(input);
-    // std::string s;
+    if (input.size() == 0) { return 0; }
+    std::vector<std::string> expressions;
+    std::stringstream ss(input);
+    std::string s;
 
-    // while (std::getline(ss, s, '\n')) {
-    //     expressions.push_back(s);
-    // }
+    while (std::getline(ss, s, '\n')) {
+        expressions.push_back(s);
+    }
 
-    // for (string sss : expressions)
-    // {
-    //     std::cout << sss << std::endl;
-    // }
-    // return 0;
-    
-
-
-
-
-
-
-
-    
-    std::vector<Token> TokenVector = Token::GenTokenVector(input);
-
-    ParserB::setupExpressionInfix(TokenVector);
-    //std::cout << ParserB::expressionLines.size() << std::endl;
-    for (std::vector<Token> expressionLine : ParserB::expressionLines)
+    for (std::string expression : expressions)
     {
-        // Token::printLexer(expressionLine);
-        // std::cout << "==================" << std::endl;
+        if (expression.length() == 0)
+        {
+            continue;
+        }
 
-        Node root = ParserB::MakeTreeInfix(expressionLine, 0, expressionLine.size() - 2);
+        // Lexer
+        std::vector<Token> TokenVector;
+        std::pair<int, int> errorPair = Token::GenTokenVector(expression, TokenVector);
+        if (errorPair.first != -1)
+        {
+            std::cout << "Syntax error on line " << errorPair.first << " column " << errorPair.second << "." << std::endl;
+            exit(1);
+        }
+
+        // ParserB
+        Node root;
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 0, TokenVector.size() - 2, root);
+        if (errorResult.first.first != -1) 
+        {
+            std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+            exit(2);
+        }
+
         ParserB::print(root);
         std::cout << std::endl;
-        std::cout << ParserB::calculate(root) << std::endl;
-
+        //std::cout << ParserB::calculate(root) << std::endl;
     }
-    
     return 0;
 }
