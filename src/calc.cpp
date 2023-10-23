@@ -78,6 +78,12 @@ int main() {
         double result;
         std::map<TokenType, int> originalHierarchyMap = ParserB::hierarchyMap;
         std::string errorMessage = ParserB::calculate(root, result);
+
+        if (errorMessage == "114514") 
+        {
+            std::cout << input << std::endl;
+        }
+
         if (errorMessage.length() != 0)
         {
             std::cout << errorMessage << std::endl;

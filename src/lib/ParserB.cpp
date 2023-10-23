@@ -203,6 +203,28 @@ std::string ParserB::calculate(Node root, double& result)
         // set values
         for (int i = 0; i < (int)root.children.size()-1; i++)
         {
+
+
+
+
+
+
+
+            if (variableMap.find(root.children[i].value.content) == variableMap.end())
+            {
+                return "114514";
+            }
+
+
+
+
+
+
+
+
+
+
+
             variableMap.at(root.children[i].value.content) = result;
             variableInitializedMap.at(root.children[i].value.content) = true;
         }
