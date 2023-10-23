@@ -28,15 +28,17 @@ int main() {
     //std::string input = "(=(n) 9)";
 #endif
 
-    std::vector<Token> TokenVector = Token::GenTokenVector(input);
-    // Check ERROR
-    Token lastToken = TokenVector.back();
-    if (lastToken.type == TokenType::error)
-    {
-        std::cout << "Syntax error on line " << lastToken.line << " column " << lastToken.index << "." << std::endl;
-        return 1;
-    }
+    std::vector<Token> TokenVector;
+    std::pair<int, int> errorPair = Token::GenTokenVector(input, TokenVector);
 
+    int errorLine = errorPair.first;
+    int errorIndex = errorPair.second;
+
+    if (errorLine != -1)
+    {
+        std::cout << "Syntax error on line " << errorLine << " column " << errorIndex << "." << std::endl;
+        exit(1);
+    }
 
     Token::printLexer(TokenVector);
     return 0;
