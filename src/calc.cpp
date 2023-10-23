@@ -22,7 +22,7 @@ int main() {
     //std::string input = "b=13\n(7 - (b = (b + 5)))";
     //std::string input = "x=7\nx\n(y = ((12 / 4) + 2))\n(a = (b = (c = 12)))\n((a / 4) + (c / 3))";
     //std::string input = "(((a / 4) + (c / 3))";
-    //std::string input = "13 % 7";
+    std::string input = "x";
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
     //std::string input = "(x = 10)\n(y = 57)\n(z = 16)\n((((x = 3) + (y = 5)) + w) + (z = 145))\n((x + y) + z)";
     //std::string input = "()+)";

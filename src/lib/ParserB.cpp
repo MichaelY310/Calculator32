@@ -40,24 +40,25 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
         }
         i = rightIndex + 1;
     }
-    if (hierarchyMap.find(expression[topIndex].type) == hierarchyMap.end())
-    {
-#if DEBUG
-    std::cout << "1.5  the first token unknown token  " << std::endl;
-#endif
-    return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };
-    } 
 
 
     while (i <= rightBound)
     {
-        // not belongs to hierarchyMap
+        // current token does not belongs to hierarchyMap
         if (hierarchyMap.find(expression[i].type) == hierarchyMap.end())
         {
 #if DEBUG
     std::cout << "2  unknown token  " << std::endl;
 #endif
         return { { expression[i].line, expression[i].index }, expression[i].content };
+        } 
+        // top level token does not belongs to hierarchyMap
+        if (hierarchyMap.find(expression[topIndex].type) == hierarchyMap.end())
+        {
+#if DEBUG
+    std::cout << "1.5  the first token unknown token  " << std::endl;
+#endif
+        return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };
         } 
 
         // higher hierarchy
@@ -178,7 +179,7 @@ std::string ParserB::calculate(Node root, double& result)
     // variable
     else if (root.value.type == TokenType::variable)
     {
-        if (variableInitializedMap.at(root.value.content) == false)
+        if (variableInitializedMap.find(root.value.content) == variableInitializedMap.end())
         {
             return "Runtime error: unknown identifier " + root.value.content;
         }
@@ -191,7 +192,7 @@ std::string ParserB::calculate(Node root, double& result)
     {
         // the last child must be a number or an initialized variable
         Node last = root.children[root.children.size()-1];
-        if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
+        if (last.value.type == TokenType::variable && variableInitializedMap.find(last.value.content) == variableInitializedMap.end())
         {
             return "Runtime error: unknown identifier " + last.value.content;
         }
