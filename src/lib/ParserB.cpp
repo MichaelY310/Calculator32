@@ -25,8 +25,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 #endif
         return { { expression[leftBound].line, expression[leftBound].index }, expression[leftBound].content };
     }
-
-
+    
     // Find the top level token
     int topIndex = leftBound;
     int i = leftBound + 1;
