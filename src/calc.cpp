@@ -32,8 +32,11 @@ int main() {
         expressions.push_back(s);
     }
 
+    int lineCount = 0;
     for (std::string expression : expressions)
     {
+        lineCount += 1;
+
         if (expression.length() == 0)
         {
             continue;
@@ -44,8 +47,8 @@ int main() {
         std::pair<int, int> errorPair = Token::GenTokenVector(expression, TokenVector);
         if (errorPair.first != -1)
         {
-            std::cout << "Syntax error on line " << errorPair.first << " column " << errorPair.second << "." << std::endl;
-            exit(1);
+            std::cout << "Syntax error on line " << lineCount << " column " << errorPair.second << "." << std::endl;
+            continue;
         }
 
         // ParserB
@@ -53,13 +56,23 @@ int main() {
         std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 0, TokenVector.size() - 2, root);
         if (errorResult.first.first != -1) 
         {
-            std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
-            exit(2);
+            std::cout << "Unexpected token at line " << lineCount << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+            continue;
         }
-
         ParserB::print(root);
         std::cout << std::endl;
-        //std::cout << ParserB::calculate(root) << std::endl;
+
+        // Calculate
+        double result;
+        std::map<TokenType, int> originalHierarchyMap = ParserB::hierarchyMap;
+        std::string errorMessage = ParserB::calculate(root, result);
+        if (errorMessage.length() != 0)
+        {
+            std::cout << errorMessage << std::endl;
+            ParserB::hierarchyMap = originalHierarchyMap;
+            continue;
+        }
+        std::cout << result << std::endl;
     }
     return 0;
 }

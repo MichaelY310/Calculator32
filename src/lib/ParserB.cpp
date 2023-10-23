@@ -160,12 +160,13 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 }
 
 
-double ParserB::calculate(Node root)
+std::string ParserB::calculate(Node root, double& result)
 {
     // number
     if (root.value.type == TokenType::number)
     {
-        return root.value.value;
+        result = root.value.value;
+        return "";
     }
 
     // variable
@@ -173,10 +174,10 @@ double ParserB::calculate(Node root)
     {
         if (variableInitializedMap.at(root.value.content) == false)
         {
-            std::cout << "Runtime error: unknown identifier " << root.value.content << std::endl;
-            exit(3);
+            return "Runtime error: unknown identifier " + root.value.content;
         }
-        return variableMap.at(root.value.content);
+        result = variableMap.at(root.value.content);
+        return "";
     }
 
     // =
@@ -186,19 +187,20 @@ double ParserB::calculate(Node root)
         Node last = root.children[root.children.size()-1];
         if (last.value.type == TokenType::variable && variableInitializedMap.at(last.value.content) == false)
         {
-            std::cout << "Runtime error: unknown identifier " << last.value.content << std::endl;
-            exit(3);
+            return "Runtime error: unknown identifier " + last.value.content;
         }
-        double res = calculate(last);
+
+        std::string errorMessage = calculate(last, result);
+        if (errorMessage != "") { return errorMessage; }
 
         // set values
         for (int i = 0; i < (int)root.children.size()-1; i++)
         {
-            variableMap.at(root.children[i].value.content) = res;
+            variableMap.at(root.children[i].value.content) = result;
             variableInitializedMap.at(root.children[i].value.content) = true;
         }
 
-        return res;
+        return "";
     }
 
     // + - * /
@@ -206,31 +208,50 @@ double ParserB::calculate(Node root)
         // variable for operation is uninitialaized
         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
         {
-            std::cout << "Runtime error: unknown identifier " << root.children[0].value.content << std::endl;
-            exit(3);
+            return "Runtime error: unknown identifier " + root.children[0].value.content;
         }
-        double res = calculate(root.children[0]);
+
+        std::string errorMessage = calculate(root.children[0], result);
+        if (errorMessage != "") { return errorMessage; }
+
+
         for (int i = 1; i < (int)root.children.size(); i++)
         {
             // variable for operation is uninitialaized
             if (root.children[i].value.type == TokenType::variable && variableInitializedMap.at(root.children[i].value.content) == false)
             {
-                std::cout << "Runtime error: unknown identifier " << root.children[i].value.content << std::endl;
-                exit(3);
+                return "Runtime error: unknown identifier " + root.children[i].value.content;
             }
-            if (root.value.type == TokenType::plus) { res += calculate(root.children[i]); }
-            if (root.value.type == TokenType::minus) { res -= calculate(root.children[i]); }
-            if (root.value.type == TokenType::multiply) { res *= calculate(root.children[i]); }
-            if (root.value.type == TokenType::divide)
+            else if (root.value.type == TokenType::plus) {
+                double r;
+                std::string errorMessage = calculate(root.children[i], r);
+                if (errorMessage != "") { return errorMessage; }
+                result += r; 
+            }
+            else if (root.value.type == TokenType::minus) {
+                double r;
+                std::string errorMessage = calculate(root.children[i], r);
+                if (errorMessage != "") { return errorMessage; }
+                result -= r; 
+            }
+            else if (root.value.type == TokenType::multiply) { 
+                double r;
+                std::string errorMessage = calculate(root.children[i], r);
+                if (errorMessage != "") { return errorMessage; }
+                result *= r; 
+            }
+            else if (root.value.type == TokenType::divide)
             {
-                if (calculate(root.children[i]) == 0) {
-                    std::cout << "Runtime error: division by zero." << std::endl;
-                    exit(3);
+                double r;
+                std::string errorMessage = calculate(root.children[i], r);
+                if (errorMessage != "") { return errorMessage; }
+                if (r == 0) {
+                    return "Runtime error: division by zero.";
                 }
-                res /= calculate(root.children[i]);
+                result /= r; 
             }
         }
-        return res;
+        return "";
     }
 }
 
