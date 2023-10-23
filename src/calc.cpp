@@ -20,10 +20,31 @@ int main() {
     
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)";
     //std::string input = "b=13\n(7 - (b = (b + 5)))";
-    std::string input = "(7 + 5 - 1) + ()";
+    std::string input = "b=13\n(7 - (b = (b + 5)))\n\n\n1=a\n1+1\n";
 #endif
 
-    if (input.size() == 0) { std::cout << "Unexpected token at line 1 column 1: END" << std::endl; return 2;  }
+    // if (input.size() == 0) { return 0; }
+    // std::vector<std::string> expressions;
+    // std::stringstream ss(input);
+    // std::string s;
+
+    // while (std::getline(ss, s, '\n')) {
+    //     expressions.push_back(s);
+    // }
+
+    // for (string sss : expressions)
+    // {
+    //     std::cout << sss << std::endl;
+    // }
+    // return 0;
+    
+
+
+
+
+
+
+
     
     std::vector<Token> TokenVector = Token::GenTokenVector(input);
 

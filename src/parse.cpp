@@ -22,10 +22,10 @@ int main() {
     //std::string input = "(= a b 3)";
     //std::string input = "(- (= b (+ b 5)) 7)";
     //std::string input = "(* a b)";
-    // std::string input = "9\n(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
+    std::string input = "9\n(= foo b 3)\n( + b 0 )\n(- (= b (+ b 5)) 7)\n(* foo b)\n";
     // std::string input = "\t \n  (   - 3  -)";
-    std::string input = "( = ( + x ) 89 )";
-    std::string input = "( = a ( + 2 2 ) 4 )";
+    //std::string input = "( = ( + x ) 89 )";
+    //std::string input = "( = a ( + 2 2 ) 4 )";
     //std::string input = "12\n";
     //std::string input = "  \n          (- 1 10)\n";    
     // std::string input = "(=(n) 9)";
@@ -33,7 +33,20 @@ int main() {
 
     if (input.size() == 0) { std::cout << "Unexpected token at line 1 column 1: END" << std::endl; return 2;  }
     
-    std::vector<Token> TokenVector = Token::GenTokenVector(input);
+    std::vector<Token> TokenVector;
+    std::pair<int, int> errorPair = Token::GenTokenVector(input, TokenVector);
+    std::cout << "Syntax error onwtrbechvfgkh vcg llumn." << std::endl;
+
+    int errorLine = errorPair.first;
+    int errorIndex = errorPair.second;
+    std::cout << "Syntax error onwtrbechvfgkh vcg llumn." << std::endl;
+
+    if (errorLine != -1)
+    {
+        std::cout << "Syntax error on line " << errorLine << " column " << errorIndex << "." << std::endl;
+        exit(1);
+    }
+    //Token::printLexer(TokenVector);
 
     Parser::setupExpression(TokenVector);
     //std::cout << Parser::expressionLines.size() << std::endl;

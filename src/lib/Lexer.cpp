@@ -6,10 +6,8 @@ Token::Token(TokenType itype, std::string icontent, int iline, int iindex, doubl
 {
 }
 
-std::vector<Token> Token::GenTokenVector(const std::string input) {
+std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<Token>& res) {
     int len = input.length();
-
-    std::vector<Token> res;
 
     int line = 1;
     int index = 1;
@@ -43,8 +41,7 @@ if (line == 1 && index == 4)
 {
     std::cout << input << std::endl;;
 }
-                std::cout << "Syntax error on line " << line << " column " << i << "." << std::endl;
-                exit(1);
+                return { line, i };
             }
             else 
             {
@@ -97,9 +94,7 @@ if (line == 1 && index == 4)
 {
     std::cout << input << std::endl;;
 }
-
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+                return { line, index };
             }
             // already have a point
             if (afterPoint)
@@ -113,8 +108,7 @@ if (line == 1 && index == 4)
     std::cout << input << std::endl;;
 }
 
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+                return { line, index };
             }
             afterPoint += 1;
             numberLength += 1;
@@ -136,8 +130,7 @@ if (line == 1 && index == 4)
     std::cout << input << std::endl;;
 }
 
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+                return { line, index };
             }
 
 
@@ -212,8 +205,7 @@ if (line == 1 && index == 4)
     std::cout << input << std::endl;;
 }
 
-                std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-                exit(1);
+                return { line, index };
             }
         }
         index++;
@@ -230,8 +222,7 @@ if (line == 1 && index == 4)
 {
     std::cout << input << std::endl;;
 }
-        std::cout << "Syntax error on line " << line << " column " << index << "." << std::endl;
-        exit(1);
+        return { line, index };
     }
 
     // the last digit is recorded
@@ -256,7 +247,7 @@ if (line == 1 && index == 4)
 
     res.emplace_back(TokenType::end, "END", line, index, -1);
 
-    return res;
+    return { -1, -1 };
 }
 
 
@@ -297,6 +288,7 @@ void Token::printLexer(std::vector<Token> TokenVector)
 
 void Token::printLexer(const std::string input)
 {
-    std::vector<Token> TokenVector = GenTokenVector(input);
+    std::vector<Token> TokenVector;
+    GenTokenVector(input, TokenVector);
     Token::printLexer(TokenVector);
 }
