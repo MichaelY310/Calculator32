@@ -9,12 +9,34 @@ int main(){
     std::vector<Token> A;
     //Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue = -1)
 
+    // A.push_back(Token(TokenType::variable, "x", 1, 0));
+    // A.push_back(Token(TokenType::equals, "=", 1, 1));
+    // A.push_back(Token(TokenType::variable, "y", 1, 2));
+    // A.push_back(Token(TokenType::equals, "=", 1, 3));
+    // A.push_back(Token(TokenType::number, "0", 1, 4));
+    // A.push_back(Token(TokenType::plus, "+", 1, 5));
+    // A.push_back(Token(TokenType::number, "1", 1, 6));
+    // A.push_back(Token(TokenType::plus, "+", 1, 7));
+    // A.push_back(Token(TokenType::number, "2", 1, 8));
+    // A.push_back(Token(TokenType::multiply, "*", 1, 9));
+    // A.push_back(Token(TokenType::number, "3", 1, 10));
+    // A.push_back(Token(TokenType::minus, "-", 1, 11));
+    // A.push_back(Token(TokenType::number, "4", 1, 12));
+    // A.push_back(Token(TokenType::divide, "/", 1, 13));
+    // A.push_back(Token(TokenType::leftParenthesis, "(", 1, 14));
+    // A.push_back(Token(TokenType::number, "5", 1, 15));
+    // A.push_back(Token(TokenType::plus, "+", 1, 16));
+    // A.push_back(Token(TokenType::number, "6", 1, 17));
+    // A.push_back(Token(TokenType::rightParenthesis, ")", 1, 18));
+    // A.push_back(Token(TokenType::end, "", 1, 19));
+
+// (7 - (b = (b + 5)))
     A.push_back(Token(TokenType::variable, "x", 1, 0));
     A.push_back(Token(TokenType::equals, "=", 1, 1));
-    A.push_back(Token(TokenType::variable, "y", 1, 2));
-    A.push_back(Token(TokenType::equals, "=", 1, 3));
-    A.push_back(Token(TokenType::number, "0", 1, 4));
-    A.push_back(Token(TokenType::plus, "+", 1, 5));
+    A.push_back(Token(TokenType::variable, "(", 1, 2));
+    A.push_back(Token(TokenType::equals, "-", 1, 3));
+    A.push_back(Token(TokenType::number, "(", 1, 4));
+    A.push_back(Token(TokenType::plus, "b", 1, 5));
     A.push_back(Token(TokenType::number, "1", 1, 6));
     A.push_back(Token(TokenType::plus, "+", 1, 7));
     A.push_back(Token(TokenType::number, "2", 1, 8));
@@ -23,12 +45,6 @@ int main(){
     A.push_back(Token(TokenType::minus, "-", 1, 11));
     A.push_back(Token(TokenType::number, "4", 1, 12));
     A.push_back(Token(TokenType::divide, "/", 1, 13));
-    A.push_back(Token(TokenType::leftParenthesis, "(", 1, 14));
-    A.push_back(Token(TokenType::number, "5", 1, 15));
-    A.push_back(Token(TokenType::plus, "+", 1, 16));
-    A.push_back(Token(TokenType::number, "6", 1, 17));
-    A.push_back(Token(TokenType::rightParenthesis, ")", 1, 18));
-    A.push_back(Token(TokenType::end, "", 1, 19));
 
 
 

@@ -1,11 +1,5 @@
 #include "ParserB.h"
 
-// ParserB::~ParserB(){
-//     Node * curr = mRoot;
-//     While(curr->leftchild!=nullptr )
-//     curr = nullptr;
-// }
-
 ParserB::ParserB(std::vector<Token> expression){
     std::vector<Token> EXP;
     int index = 0;
