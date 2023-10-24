@@ -210,10 +210,11 @@ std::string ParserB::calculate(Node root, double& result)
 
 
 
-            if (variableMap.find(root.children[i].value.content) == variableMap.end())
-            {
-                return "114514";
-            }
+            // if (variableMap.find(root.children[i].value.content) == variableMap.end())
+            // {
+            //     return "114514";
+            // }
+            std::cout << "0000   " << root.children[i].value.content << "   0000" << std::endl;
 
 
 
@@ -494,23 +495,7 @@ void ParserB::setupExpressionInfix(std::vector<Token> expression)
         exit(2);
     }
 
-
-
-    std::vector<std::vector<Token>> res;
-    std::vector<Token> current;
-    current.push_back(expression[0]);
-    int currentLine = expression[0].line;
-
-    // handle the first token variable
-    if (expression[0].type == TokenType::variable)
-    {
-        if (variableMap.find(expression[0].content) == variableMap.end())
-        {
-            variableMap.insert({ expression[0].content, -1 });
-            variableInitializedMap.insert({ expression[0].content, false });
-        }
-    }
-    for (int i=1; i<(int)expression.size()-1; i++)
+    for (int i = 0; i < (int)expression.size()-1; i++)
     {
         Token token = expression[i];
         // handle new variable
@@ -522,32 +507,5 @@ void ParserB::setupExpressionInfix(std::vector<Token> expression)
                 variableInitializedMap.insert({ token.content, false });
             }
         }
-
-        // handle line
-        while (currentLine != token.line)
-        {
-            if (current.size() != 0)
-            {
-                current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
-                //current.push_back(Token(TokenType::end, "end", expression[i].line, expression[i].index));
-                res.push_back(current);
-            }
-            current.clear();
-            currentLine += 1;
-        }
-        current.push_back(token);
     }
-    current.push_back(expression[expression.size()-1]);
-    res.push_back(current);
-
-    expressionLines = res;
-
-    // for (std::vector<Token> v : expressionLines)
-    // {
-    //     for (Token token : v)
-    //     {
-    //         std::cout << token.content << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
 }
