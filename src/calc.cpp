@@ -88,12 +88,9 @@ int main() {
         if (errorMessage.length() != 0)
         {
             std::cout << errorMessage << std::endl;
-            for (const auto& pair : originalVariableMap) {
-                ParserB::variableMap.insert(pair);
-            }
-            for (const auto& pair : originalVariableInitializedMap) {
-                ParserB::variableInitializedMap.insert(pair);
-            }
+            ParserB::variableMap.swap(originalVariableMap);
+            ParserB::variableInitializedMap.swap(originalVariableInitializedMap);
+
             continue;
         }
         std::cout << result << std::endl;
