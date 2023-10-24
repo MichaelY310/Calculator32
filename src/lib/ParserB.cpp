@@ -120,7 +120,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
             return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content }; 
         // Error 2. Nothing after =   e.g a=
         if (topIndex == rightBound)
-            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content }; 
+            return { { expression[topIndex+1].line, expression[topIndex+1].index }, expression[topIndex+1].content }; 
         // Error 3. What is before = is not a variable      e.g 1=1
         if (expression[topIndex-1].type != TokenType::variable)
             return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
