@@ -498,3 +498,31 @@ void ParserB::setupExpressionInfix(std::vector<Token> expression)
         }
     }
 }
+
+
+
+// std::string ParserB::Checkerror(Node root, bool &result){  // only check whether all variable have value or will it be assigned value in the expression
+//     for (size_t i =0; i<root.children.size();i++){
+//         if(root.children.at(i).value.type==TokenType::variable && root.value.type != TokenType::equals){
+//             if (variableInitializedMap.at(root.children.at(i).value.content) == false){
+//                 result = false;
+//                 return root.children.at(i).value.content;
+//             }
+//         }
+//     }
+//     if(root.children.size()==0){
+//         result = true;
+//         return "";
+//     }
+
+//     if (Checkerror(root.children.at(0),result) != ""){
+//         result = false;
+//         return Checkerror(root.children.at(0), result);
+//     }
+//     else if (Checkerror(root.children.at(1), result) != ""){
+//         result = false;
+//         return Checkerror(root.children.at(0), result);
+//     }  
+//     result = true;
+//     return "";
+// }
