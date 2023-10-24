@@ -33,6 +33,8 @@ public:
     static std::map<std::string, double> variableMap;
     static std::map<std::string, bool> variableInitializedMap;
 
+    static std::string Checkerror(Node root, bool &result);
+
     static std::map<TokenType, int> hierarchyMap;
 private:
     static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);

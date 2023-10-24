@@ -167,9 +167,43 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 }
 
 
+std::string ParserB::Checkerror(Node root, bool &result){
+
+    for (size_t i =0; i<root.children.size();i++){
+        if(root.children.at(i).value.type==TokenType::variable && root.value.type != TokenType::equals){
+            if (variableInitializedMap.at(root.children.at(i).value.content) == false){
+                result = false;
+                return root.children.at(i).value.content;
+            }
+        }
+    }
+
+    if(root.children.size()==0){
+        result = true;
+        return "";
+    }
+
+    if (Checkerror(root.children.at(0),result) != ""){
+        result = false;
+        return Checkerror(root.children.at(0), result);
+    }
+    else if (Checkerror(root.children.at(1), result) != ""){
+        result = false;
+        return Checkerror(root.children.at(0), result);
+    }  
+    result = true;
+    return "";
+}
+
+
 std::string ParserB::calculate(Node root, double& result)
 {
     // number
+    bool check = true;
+    if(Checkerror(root,check) != "") { //only check whther all variables have values
+        return "Runtime error: unknown identifier " + Checkerror(root,check);
+    }
+
     if (root.value.type == TokenType::number)
     {
         result = root.value.value;
@@ -203,28 +237,10 @@ std::string ParserB::calculate(Node root, double& result)
         // set values
         for (int i = 0; i < (int)root.children.size()-1; i++)
         {
-
-
-
-
-
-
-
             if (variableMap.find(root.children[i].value.content) == variableMap.end())
             {
                 return "114514";
             }
-
-
-
-
-
-
-
-
-
-
-
             variableMap.at(root.children[i].value.content) = result;
             variableInitializedMap.at(root.children[i].value.content) = true;
         }
