@@ -22,7 +22,7 @@ int main() {
     //std::string input = "b=13\n(7 - (b = (b + 5)))";
     //std::string input = "x=7\nx\n(y = ((12 / 4) + 2))\n(a = (b = (c = 12)))\n((a / 4) + (c / 3))";
     //std::string input = "(((a / 4) + (c / 3))";
-    std::string input = "88=mgh";
+    std::string input = "88=mgh\n=\n=x\n=4321\nx=\nx = y =\n88 = mph";
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
     //std::string input = "(x = 10)\n(y = 57)\n(z = 16)\n((((x = 3) + (y = 5)) + w) + (z = 145))\n((x + y) + z)";
     //std::string input = "()+)";
@@ -74,14 +74,14 @@ int main() {
         ParserB::print(root);
         std::cout << std::endl;
 
-        std::cout << ParserB::variableMap.at("mgh") << std::endl;
-        std::cout << "aaaaaaaaaaaaaaaaa" << std::endl;
+        // std::cout << ParserB::variableMap.at("mgh") << std::endl;
+        // std::cout << "aaaaaaaaaaaaaaaaa" << std::endl;
 
 
         // Calculate
         double result;
-        std::map<std::string, double> originalVariableMap = ParserB::variableMap;
-        std::map<std::string, bool> originalVariableInitializedMap = ParserB::variableInitializedMap;
+        // std::map<std::string, double> originalVariableMap = ParserB::variableMap;
+        // std::map<std::string, bool> originalVariableInitializedMap = ParserB::variableInitializedMap;
         std::string errorMessage = ParserB::calculate(root, result);
 
         if (errorMessage == "114514") 
@@ -92,8 +92,8 @@ int main() {
         if (errorMessage.length() != 0)
         {
             std::cout << errorMessage << std::endl;
-            ParserB::variableMap = originalVariableMap;
-            ParserB::variableInitializedMap = originalVariableInitializedMap;
+            // ParserB::variableMap = originalVariableMap;
+            // ParserB::variableInitializedMap = originalVariableInitializedMap;
             continue;
         }
         std::cout << result << std::endl;

@@ -114,6 +114,18 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
     {
         Node res = Node(expression[topIndex]);
 
+        // check assignment ERROR
+        // Error 1. Nothing before =   e.g =8
+        if (topIndex == leftBound)
+            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content }; 
+        // Error 2. Nothing after =   e.g a=
+        if (topIndex == rightBound)
+            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content }; 
+        // Error 3. What is before = is not a variable      e.g 1=1
+        if (expression[topIndex-1].type != TokenType::variable)
+            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
+
+
         Node node1;
         std::pair<std::pair<int, int>, std::string> errorResult1 = MakeTreeInfix(expression, leftBound, topIndex-1, node1);
         if (errorResult1.first.first != -1) { return errorResult1; }
@@ -203,29 +215,6 @@ std::string ParserB::calculate(Node root, double& result)
         // set values
         for (int i = 0; i < (int)root.children.size()-1; i++)
         {
-
-
-
-
-
-
-
-            // if (variableMap.find(root.children[i].value.content) == variableMap.end())
-            // {
-            //     return "114514";
-            // }
-            std::cout << "0000   " << root.children[i].value.content << "   0000" << std::endl;
-
-
-
-
-
-
-
-
-
-
-
             variableMap.at(root.children[i].value.content) = result;
             variableInitializedMap.at(root.children[i].value.content) = true;
         }
