@@ -80,8 +80,8 @@ int main() {
 
         // Calculate
         double result;
-        std::map<TokenType, int> originalVariableMap = ParserB::variableMap;
-        std::map<TokenType, int> originalVariableInitializedMap = ParserB::variableInitializedMap;
+        std::map<std::string, double> originalVariableMap = ParserB::variableMap;
+        std::map<std::string, bool> originalVariableInitializedMap = ParserB::variableInitializedMap;
         std::string errorMessage = ParserB::calculate(root, result);
 
         if (errorMessage == "114514") 
