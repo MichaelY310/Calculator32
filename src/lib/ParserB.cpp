@@ -167,41 +167,54 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 }
 
 
-std::string ParserB::Checkerror(Node root, bool &result){
+// std::string ParserB::Checkerror(Node root, bool &result){  // only check whether all variable have value or will it be assigned value in the expression
+//     for (size_t i =0; i<root.children.size();i++){
+//         if(root.children.at(i).value.type==TokenType::variable && root.value.type != TokenType::equals){
+//             if (variableInitializedMap.at(root.children.at(i).value.content) == false){
+//                 result = false;
+//                 return root.children.at(i).value.content;
+//             }
+//         }
+//     }
+//     if(root.children.size()==0){
+//         result = true;
+//         return "";
+//     }
 
-    for (size_t i =0; i<root.children.size();i++){
-        if(root.children.at(i).value.type==TokenType::variable && root.value.type != TokenType::equals){
-            if (variableInitializedMap.at(root.children.at(i).value.content) == false){
-                result = false;
-                return root.children.at(i).value.content;
-            }
-        }
-    }
-
-    if(root.children.size()==0){
-        result = true;
-        return "";
-    }
-
-    if (Checkerror(root.children.at(0),result) != ""){
-        result = false;
-        return Checkerror(root.children.at(0), result);
-    }
-    else if (Checkerror(root.children.at(1), result) != ""){
-        result = false;
-        return Checkerror(root.children.at(0), result);
-    }  
-    result = true;
-    return "";
-}
-
+//     if (Checkerror(root.children.at(0),result) != ""){
+//         result = false;
+//         return Checkerror(root.children.at(0), result);
+//     }
+//     else if (Checkerror(root.children.at(1), result) != ""){
+//         result = false;
+//         return Checkerror(root.children.at(0), result);
+//     }  
+//     result = true;
+//     return "";
+// }
 
 std::string ParserB::calculate(Node root, double& result)
 {
     // number
-    bool check = true;
-    if(Checkerror(root,check) != "") { //only check whther all variables have values
-        return "Runtime error: unknown identifier " + Checkerror(root,check);
+    // bool check = true;
+
+    // if(Checkerror(root,check) != "") { //only check whther all variables have values
+    //     return "Runtime error: unknown identifier " + Checkerror(root,check);
+    // }
+
+    if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::divide || root.value.type == TokenType::multiply){
+        if (root.children.size() == 2){
+            if(root.children.at(0).value.type == TokenType::variable){
+                if (variableInitializedMap.at(root.children.at(0).value.content) == false){
+                    return "Runtime error: unknown identifier " + root.children.at(0).value.content;
+                }
+            }
+            else if(root.children.at(1).value.type == TokenType::variable){
+                if (variableInitializedMap.at(root.children.at(1).value.content) == false){
+                    return "Runtime error: unknown identifier " + root.children.at(1).value.content;
+                }
+            }
+        }
     }
 
     if (root.value.type == TokenType::number)
