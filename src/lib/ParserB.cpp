@@ -1,6 +1,9 @@
 #include "ParserB.h"
 
 // Initialize static member variables
+std::stack<int> jumptoStack = stack<int>();
+int currentLine = 1;
+bool skipLine = 1;
 std::vector<std::vector<Token>> ParserB::expressionLines = std::vector<std::vector<Token>>();
 std::map<std::string, double> ParserB::variableMap = std::map<std::string, double>();
 std::map<std::string, bool> ParserB::variableInitializedMap = std::map<std::string, bool>();
@@ -10,16 +13,25 @@ std::map<TokenType, int> ParserB::hierarchyMap = {
     {TokenType::leftParenthesis , 1}, // ()
     {TokenType::multiply ,        2}, // *
     {TokenType::divide ,          2}, // /
+    {TokenType::mod ,             2}, // %
     {TokenType::plus ,            3}, // +
-    {TokenType::minus ,           3}, // -
-    {TokenType::equals ,          4}  // =
+    {TokenType::minus ,           3}  // -
+    {TokenType::smaller ,         4}, // <
+    {TokenType::bigger ,          4}, // >
+    {TokenType::smaller_equal ,   4}, // <=
+    {TokenType::bigger_equal ,    4}, // >=
+    {TokenType::equality ,        5}, // ==
+    {TokenType::inequality ,      5}, // !=
+    {TokenType::and ,             6}, // &
+    {TokenType::exclusive_or ,    7}  // ^
+    {TokenType::inclusive_or ,    8}, // |
+    {TokenType::equals ,          9}  // =
 
 };
 
 std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node)
 {
-    if (leftBound > rightBound)
-    {
+    if (leftBound > rightBound) {
 #if DEBUG
     std::cout << "1  no expression  " << std::endl;
 #endif
@@ -74,8 +86,8 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
             {
                 topIndex = topIndex < i ? topIndex : i;
             }
-            else if (expression[i].type == TokenType::plus || expression[i].type == TokenType::minus || expression[i].type == TokenType::multiply
-             || expression[i].type == TokenType::divide)
+            // left associative
+            else
             {
                 topIndex = topIndex > i ? topIndex : i;
             }
@@ -160,7 +172,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
     }
     // case 5 (...)
     else if (expression[topIndex].type == TokenType::leftParenthesis)
-    {
+    {skipLine
         int rightIndex = findRightParenthesisNoError(expression, topIndex+1, rightBound);
         if (rightIndex > rightBound)
         {
@@ -176,6 +188,152 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 #endif
         return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };
     }
+}
+
+
+static void parseLines(std::vector<std::string> expressionLines);
+{
+    // line count start from 1
+    while (currentline < expressions.size() + 1)
+    {
+        expression = expressions[i-1];
+
+        // Lexer
+        std::vector<Token> TokenVector;
+        std::pair<int, int> errorPair = Token::GenTokenVector(expression, TokenVector);
+        if (errorPair.first != -1)
+        {
+            std::cout << "Syntax error on line " << lineCount << " column " << errorPair.second << "." << std::endl;
+            exit(1);
+        }
+
+
+        // ParserB
+        ParserB::setupExpressionInfix(TokenVector); // register variables
+
+        if (TokenVector[0].type == TokenType::while)
+        {
+            // Parse
+            Node root;
+            std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 1, TokenVector.size() - 3, root);
+            if (errorResult.first.first != -1) 
+            {
+                std::cout << "Unexpected token at line " << currentLine << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+                exit(2);
+            }
+
+            // Calculate
+            double result;
+            std::string errorMessage = ParserB::calculate(root, result);
+
+            if (errorMessage.length() != 0)
+            {
+                std::cout << errorMessage << std::endl;
+                exit(3);
+
+                continue;
+            }
+
+            if (result != 0)
+            {
+                jumptoStack.push(currentLine);
+            }
+            else {
+
+            }
+        } 
+        else if (TokenVector[0].type == TokenType::if)
+        {
+            // Parse
+            Node root;
+            std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 1, TokenVector.size() - 3, root);
+            if (errorResult.first.first != -1) 
+            {
+                std::cout << "Unexpected token at line " << currentLine << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+                exit(2);
+            }
+
+            // Calculate
+            double result;
+            std::string errorMessage = ParserB::calculate(root, result);
+
+            if (errorMessage.length() != 0)
+            {
+                std::cout << errorMessage << std::endl;
+                exit(3);
+
+                continue;
+            }
+        }
+        else if (TokenVector[0].type == TokenType::print)
+        {
+            // Parse
+            Node root;
+            std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 1, TokenVector.size() - 2, root);
+            if (errorResult.first.first != -1) 
+            {
+                std::cout << "Unexpected token at line " << currentLine << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+                exit(2);
+            }
+
+            // Calculate
+            double result;
+            std::string errorMessage = ParserB::calculate(root, result);
+
+            if (errorMessage.length() != 0)
+            {
+                std::cout << errorMessage << std::endl;
+                exit(3);
+
+                continue;
+            }
+
+            std::cout << result << std::endl;
+            currentLine += 1;
+        }
+        else if (TokenVector[0].type == TokenType::rightBracket)
+        {
+            // redundant }
+            if (jumptoStack.empty())
+            {
+                std::cout << "Unexpected token at line " << currentLine << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
+                exit(2);
+            }
+
+            currentLine = jumptoStack.top();
+            jumptoStack.pop();
+            currentLine += 1;
+        }
+        else
+        {
+            // ParserB
+            Node root;
+            std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 0, TokenVector.size() - 2, root);
+
+            if (errorResult.first.first != -1) 
+            {
+                std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+                continue;
+            }
+            ParserB::print(root);
+            std::cout << std::endl;
+
+            // Calculate
+            double result;
+            std::string errorMessage = ParserB::calculate(root, result);
+
+            if (errorMessage.length() != 0)
+            {
+                std::cout << errorMessage << std::endl;
+                exit(3);
+
+                continue;
+            }
+
+            currentLine += 1;
+        }
+    }
+
 }
 
 
@@ -308,44 +466,7 @@ void ParserB::print(Node root)
     }
 }
 
-
-// exclude rightParenthesis
-int ParserB::findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
-{
-    int balance = 1;
-    int p = rightBound;
-    while (p >= leftBound) {
-        if (expression[p].type == TokenType::leftParenthesis) { balance -= 1; }
-        if (expression[p].type == TokenType::rightParenthesis) { balance += 1; }
-        if (balance == 0) { break; }
-        p -= 1;
-    }
-    return p;
-}
-
-
-int ParserB::findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
-{
-    int balance = 1;
-    int p = leftBound;
-    while (p <= rightBound) {
-        if (expression[p].type == TokenType::leftParenthesis) { balance += 1; }
-        if (expression[p].type == TokenType::rightParenthesis) { balance -= 1; }
-        if (balance == 0) { break; }
-        p += 1;
-    }
-    if (p > rightBound) 
-    {
-#if DEBUG
-    std::cout << "right parenthesis not found" << std::endl;
-#endif
-        std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
-        exit(2);
-    }
-    return p;
-}
-
-
+// exclude left parenthesis
 int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound)
 {
     int balance = 1;
@@ -359,115 +480,19 @@ int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int left
     return p;
 }
 
-
-// return vectors of lines
-// register variables in map 
-void ParserB::setupExpression(std::vector<Token> expression)
+// exclude left bracket
+int ParserB::findRightBracketNoError(std::vector<Token> expression, int leftBound, int rightBound)
 {
-    if (expression.size() == 1)
-    {
-#if DEBUG
-    std::cout << "-1 empty expression" << std::endl;
-#endif
-
-        std::cout << "Unexpected token at line " << 1 << " column " << 1 << ": " << "END" << std::endl;
-        exit(2);
+    int balance = 1;
+    int p = leftBound;
+    while (p <= rightBound) {
+        if (expression[p].type == TokenType::leftParenthesis) { balance += 1; }
+        if (expression[p].type == TokenType::rightParenthesis) { balance -= 1; }
+        if (balance == 0) { break; }
+        p += 1;
     }
-    std::vector<std::vector<Token>> res;
-    std::vector<Token> current;
-    current.push_back(expression[0]);
-    int currentLine = expression[0].line;
-    // handle the first token variable
-    if (expression[0].type == TokenType::variable)
-    {
-        if (variableMap.find(expression[0].content) == variableMap.end())
-        {
-            variableMap.insert({ expression[0].content, -1 });
-            variableInitializedMap.insert({ expression[0].content, false });
-        }
-    }
-    for (int i=1; i<(int)expression.size()-1; i++)
-    {
-        Token token = expression[i];
-        // handle new variable
-        if (token.type == TokenType::variable)
-        {
-            if (variableMap.find(token.content) == variableMap.end())
-            {
-                variableMap.insert({ token.content, -1 });
-                variableInitializedMap.insert({ token.content, false });
-            }
-        }
-
-        // handle line
-        while (currentLine != token.line)
-        {
-            if (current.size() != 0)
-            {
-                current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
-                //current.push_back(Token(TokenType::end, "end", expression[i].line, expression[i].index));
-                res.push_back(current);
-            }
-            current.clear();
-            currentLine += 1;
-        }
-        current.push_back(token);
-    }
-    current.push_back(expression[expression.size()-1]);
-    res.push_back(current);
-
-
-
-    // merge multiple lines of S expression
-    std::vector sExpression = res[0];
-
-    for (int i=1; i<(int)res.size(); i++)
-    {
-        if (sExpression[0].type == TokenType::number)
-        {
-            expressionLines.push_back(sExpression);
-            sExpression.clear();
-        } 
-        else if (sExpression[0].type == TokenType::leftParenthesis)
-        {
-            int rightIndex = findRightParenthesisNoError(sExpression, 1, sExpression.size()-1);
-            if (rightIndex > (int)sExpression.size()-1)
-            {
-                sExpression.pop_back();
-            }
-            else
-            {
-                expressionLines.push_back(sExpression);
-                sExpression.clear();
-            }
-        }
-        else
-        {
-            expressionLines.push_back(sExpression);
-            sExpression.clear();
-        }
-        sExpression.insert(sExpression.end(), res[i].begin(), res[i].end());
-    }
-
-    if (sExpression.size() != 0)
-    {
-        expressionLines.push_back(sExpression);
-    }
-
-
-    // expressionLines = res;
-
-    // for (std::vector<Token> v : expressionLines)
-    // {
-    //     for (Token token : v)
-    //     {
-    //         std::cout << token.content << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
+    return p;
 }
-
-
 
 
 // return vectors of lines in infix notation
