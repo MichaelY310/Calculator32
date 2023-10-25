@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cmath>
 #include <map>
+#include <stack>
 
 #include "Lexer.h"
 #include "Utils.h"
@@ -25,11 +26,14 @@ class ParserB
 {
 public:
     static std::pair<std::pair<int, int>, std::string> MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node);
+    static void parseLines(std::vector<std::string> expressionLines);
     static std::string calculate(Node root, double& result);
     static void print(Node root);
     static void setupExpression(std::vector<Token> expression);
     static void setupExpressionInfix(std::vector<Token> expression);
     static std::vector<std::vector<Token>> expressionLines;
+
+    static std::stack<int> jumptoStack;
     static std::map<std::string, double> variableMap;
     static std::map<std::string, bool> variableInitializedMap;
 
