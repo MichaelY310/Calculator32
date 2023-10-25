@@ -7,18 +7,49 @@
 
 
 enum class TokenType {
-    none,
-    variable,
-    number,
-    equals,
-    plus,
-    minus,
-    multiply,
-    divide,
-    leftParenthesis,
-    rightParenthesis,
-    end,
-    error
+    none,               //
+    variable,           // a b c
+    number,             // 1 2 3
+
+    leftParenthesis,    // (
+    rightParenthesis,   // )
+
+    multiply,           // *
+    divide,             // /
+    mod,                // %
+
+    plus,               // +
+    minus,              // -
+
+    smaller,            // <
+    bigger,             // >
+    smaller_equal,      // <=
+    bigger_equal,       // >=
+
+    equality,           // ==
+    inequality,         // !=
+
+    AND,                // &
+
+    exclusive_or,       // ^
+
+    inclusive_or,       // |
+
+    equals,             // =
+
+    end,                // END
+    error,              // ERROR
+
+
+
+    leftBracket,    // {
+    rightBracket,   // }
+    TRUE,           
+    FALSE,
+    WHILE,
+    ELSE,
+    IF,
+    PRINT
 };
 
 class Token {
