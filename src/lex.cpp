@@ -43,3 +43,4 @@ int main() {
     Token::printLexer(TokenVector);
     return 0;
 }
+

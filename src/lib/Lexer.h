@@ -9,7 +9,7 @@
 enum class TokenType {
     none,               //
     variable,           // a b c
-    bool_varibale,       // when variable is assigned bool value
+    bool_variable,
     number,             // 1 2 3
 
     leftParenthesis,    // (
@@ -48,6 +48,7 @@ enum class TokenType {
     TRUE,           
     FALSE,
     WHILE,
+    ELSE,
     IF,
     PRINT
 };
@@ -73,6 +74,5 @@ public:
     int line = -1;
     int index = -1;
     double value = -1;       // a number has its own value. otherwise -1
-    bool bool_value = false;
 
 };

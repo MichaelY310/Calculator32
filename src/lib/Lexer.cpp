@@ -1,5 +1,5 @@
 #include "Lexer.h"
-// #include "Utils.h"
+#include "Utils.h"
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
@@ -27,6 +27,63 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
     for (int i = 0; i < len; i++)
     {
         // std::cout << (int)input.at(i) << std::endl;
+
+        // record while 
+        if ((input.at(i) == 'w')){
+            if (!recordingNumber && !recordingVariable && i + 4 < len){
+                if (input.substr(i,5) == "while"){
+                    if (i + 5 < len && input.substr(i,6) == "while "){
+                        res.emplace_back(TokenType::WHILE, "while", line, index, -1);
+                        i = i + 5;
+                        index = index + 6;
+                        continue;
+                    }
+                    else if (i + 5 == len){
+                        res.emplace_back(TokenType::WHILE, "while", line, index, -1);
+                        index = index + 5;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // record if
+        if ((input.at(i) == 'i')){
+            if (!recordingNumber && !recordingVariable && i + 1 < len){
+                if (input.substr(i,2) == "if"){
+                    if (i + 2 < len && input.substr(i,3) == "if "){
+                        res.emplace_back(TokenType::IF, "if", line, index, -1);
+                        i = i + 2;
+                        index = index + 3;
+                        continue;
+                    }
+                    else if (i + 2 == len){
+                        res.emplace_back(TokenType::IF, "if", line, index, -1);
+                        index = index + 2;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // record else
+        if ((input.at(i) == 'e')){
+            if (!recordingNumber && !recordingVariable && i + 3 < len){
+                if (input.substr(i,4) == "else"){
+                    if (i + 4 < len && input.substr(i,5) == "else "){
+                        res.emplace_back(TokenType::ELSE, "else", line, index, -1);
+                        i = i + 4;
+                        index = index + 5;
+                        continue;
+                    }
+                    else if (i + 4 == len){
+                        res.emplace_back(TokenType::ELSE, "else", line, index, -1);
+                        index = index + 4;
+                        break;
+                    }
+                }
+            }
+        }
 
         // variable
         if ((input.at(i) >= 'a' && input.at(i) <= 'z') || (input.at(i) >= 'A' && input.at(i) <= 'Z') || input.at(i) == '_')
@@ -150,7 +207,56 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             }
             else if (input.at(i) == '=')
             {
-                res.emplace_back(TokenType::equals, "=", line, index, -1);
+                if ( i + 1 < len && input.at(i+1) == '='){
+                    res.emplace_back(TokenType::equality,"==", line, index, -1);
+                    i++;
+                    index++;
+                }
+                else{
+                    res.emplace_back(TokenType::equals, "=", line, index, -1);
+                }
+            }
+            else if (input.at(i) == '>'){
+                if ( i + 1 < len && input.at(i+1) == '='){
+                    res.emplace_back(TokenType::bigger_equal,">=", line, index, -1);
+                    i++;
+                    index++;
+                }
+                else{
+                    res.emplace_back(TokenType::bigger, ">", line, index, -1);
+                }
+            }
+            else if (input.at(i) == '<'){
+                if ( i + 1 < len && input.at(i+1) == '='){
+                    res.emplace_back(TokenType::smaller_equal,"<=", line, index, -1);
+                    i++;
+                    index++;
+                }
+                else{
+                    res.emplace_back(TokenType::smaller, "<", line, index, -1);
+                }
+            }
+            else if (input.at(i) == '!'){
+                if ( i + 1 < len && input.at(i+1) == '='){
+                    res.emplace_back(TokenType::inequality,"!=", line, index, -1);
+                    i++;
+                    index++;
+                }
+                else{
+                    return  {line, index};
+                }
+            }
+            else if (input.at(i) == '&')
+            {
+                res.emplace_back(TokenType::AND, "&", line, index, -1);
+            }
+            else if (input.at(i) == '|')
+            {
+                res.emplace_back(TokenType::inclusive_or, "|", line, index, -1);
+            }
+            else if (input.at(i) == '^')
+            {
+                res.emplace_back(TokenType::exclusive_or, "^", line, index, -1);
             }
             else if (input.at(i) == '+')
             {
@@ -168,6 +274,10 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             {
                 res.emplace_back(TokenType::divide, "/", line, index, -1);
             }
+            else if (input.at(i) == '%')
+            {
+                res.emplace_back(TokenType::mod, "%", line, index, -1);
+            }
             else if (input.at(i) == '(')
             {
                 res.emplace_back(TokenType::leftParenthesis, "(", line, index, -1);
@@ -175,6 +285,14 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             else if (input.at(i) == ')')
             {
                 res.emplace_back(TokenType::rightParenthesis, ")", line, index, -1);
+            }
+            else if (input.at(i) == '{')
+            {
+                res.emplace_back(TokenType::leftBracket, "{", line, index, -1);
+            }
+            else if (input.at(i) == '}')
+            {
+                res.emplace_back(TokenType::rightBracket, "}", line, index, -1);
             }
             // Error
             else

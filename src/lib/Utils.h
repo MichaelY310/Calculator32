@@ -2,7 +2,7 @@
 
 #include "Lexer.h"
 
-#define DEBUG 0
+#define DEBUG 1
 #define HINT 0
 
 void hint(std::vector<Token> expression, std::vector<std::vector<Token>> expressionLines, int checkIndex, 
@@ -12,4 +12,4 @@ void hint(std::vector<Token> expression, std::vector<std::vector<Token>> express
 // git commit -m "Checkpoint2 partA finished"
 // git push origin Michael
 
-// g++ -Wall -Wextra -Werror -std=c++17 parse.cpp -o main lib/Parser.cpp lib/Lexer.cpp
+// g++ -Wall -Wextra -Werror -std=c++17 parse.cpp -o mai

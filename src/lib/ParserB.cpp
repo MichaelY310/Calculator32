@@ -352,14 +352,14 @@ std::string ParserB::calculate(Node root, double& result)
     }
 
     // variable
-    else if (root.value.type == TokenType::variable || root.value.type == TokenType::bool_varibale)
+    else if (root.value.type == TokenType::variable || root.value.type == TokenType::bool_variable)
     {
         if (variableInitializedMap.find(root.value.content) == variableInitializedMap.end())
         {
             return "Runtime error: unknown identifier " + root.value.content;
         }
         result = variableMap.at(root.value.content);
-        if (root.value.type == TokenType::bool_varibale) {
+        if (root.value.type == TokenType::bool_variable) {
             return "Bool";
         }
         return "";
@@ -381,7 +381,7 @@ std::string ParserB::calculate(Node root, double& result)
         if(errorMessage == "Bool"){
             variableMap.at(root.children[0].value.content) = result;
             variableInitializedMap.at(root.children[0].value.content) = true;
-            root.value.type = TokenType::bool_varibale;
+            root.value.type = TokenType::bool_variable;
             return "Bool";
         }
 
@@ -499,7 +499,7 @@ std::string ParserB::calculate(Node root, double& result)
         //when errorMessage == "Bool" means it is a bool expression
         if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
 
-        if (root.children[0].value.type == TokenType::bool_varibale && errorMessage != "Bool"){
+        if (root.children[0].value.type == TokenType::bool_variable && errorMessage != "Bool"){
             return "Runtime error: invalid operand type.";
         }
 
