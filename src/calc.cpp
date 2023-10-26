@@ -98,9 +98,7 @@ int main() {
 
             continue;
         }
-        std::cout << result << std::endl;
-
-    
+        std::cout << result << std::endl; 
     }
     return 0;
 }
