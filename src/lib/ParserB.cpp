@@ -1,6 +1,10 @@
 #include "ParserB.h"
+#include <stack>
 
 // Initialize static member variables
+// std::stack<int> jumptoStack = stack<int>();
+int currentLine = 1;
+bool skipLine = 1;
 std::vector<std::vector<Token>> ParserB::expressionLines = std::vector<std::vector<Token>>();
 std::map<std::string, double> ParserB::variableMap = std::map<std::string, double>();
 std::map<std::string, bool> ParserB::variableInitializedMap = std::map<std::string, bool>();
@@ -10,16 +14,25 @@ std::map<TokenType, int> ParserB::hierarchyMap = {
     {TokenType::leftParenthesis , 1}, // ()
     {TokenType::multiply ,        2}, // *
     {TokenType::divide ,          2}, // /
+    {TokenType::mod ,             2}, // %
     {TokenType::plus ,            3}, // +
-    {TokenType::minus ,           3}, // -
-    {TokenType::equals ,          4}  // =
+    {TokenType::minus ,           3},  // -
+    {TokenType::smaller ,         4}, // <
+    {TokenType::bigger ,          4}, // >
+    {TokenType::smaller_equal ,   4}, // <=
+    {TokenType::bigger_equal ,    4}, // >=
+    {TokenType::equality ,        5}, // ==
+    {TokenType::inequality ,      5}, // !=
+    {TokenType::AND ,             6}, // &
+    {TokenType::exclusive_or ,    7},  // ^
+    {TokenType::inclusive_or ,    8}, // |
+    {TokenType::equals ,          9}  // =
 
 };
 
 std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node)
 {
-    if (leftBound > rightBound)
-    {
+    if (leftBound > rightBound) {
 #if DEBUG
     std::cout << "1  no expression  " << std::endl;
 #endif
@@ -74,8 +87,8 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
             {
                 topIndex = topIndex < i ? topIndex : i;
             }
-            else if (expression[i].type == TokenType::plus || expression[i].type == TokenType::minus || expression[i].type == TokenType::multiply
-             || expression[i].type == TokenType::divide)
+            // left associative
+            else
             {
                 topIndex = topIndex > i ? topIndex : i;
             }
@@ -114,6 +127,18 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
     {
         Node res = Node(expression[topIndex]);
 
+        // check assignment ERROR
+        // Error 1. Nothing before =   e.g =8
+        if (topIndex == leftBound)
+            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content }; 
+        // Error 2. Nothing after =   e.g a=
+        if (topIndex == rightBound)
+            return { { expression[topIndex+1].line, expression[topIndex+1].index }, expression[topIndex+1].content }; 
+        // Error 3. What is before = is not a variable      e.g 1=1
+        if (expression[topIndex-1].type != TokenType::variable)
+            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
+
+
         Node node1;
         std::pair<std::pair<int, int>, std::string> errorResult1 = MakeTreeInfix(expression, leftBound, topIndex-1, node1);
         if (errorResult1.first.first != -1) { return errorResult1; }
@@ -127,9 +152,12 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
         node = res;
         return { { -1, -1 }, "" };
     }
-    // case 4 + - * /
+    // case 4 + - * / % < > <= >= != == & ^ | 
     else if (expression[topIndex].type == TokenType::plus || expression[topIndex].type == TokenType::minus || 
-            expression[topIndex].type == TokenType::multiply || expression[topIndex].type == TokenType::divide)
+            expression[topIndex].type == TokenType::multiply || expression[topIndex].type == TokenType::divide || expression[topIndex].type == TokenType::mod ||
+            expression[topIndex].type == TokenType::smaller || expression[topIndex].type == TokenType::bigger|| expression[topIndex].type == TokenType::smaller_equal ||
+            expression[topIndex].type == TokenType::bigger_equal || expression[topIndex].type == TokenType::inequality || expression[topIndex].type == TokenType::equality ||
+            expression[topIndex].type == TokenType::AND || expression[topIndex].type == TokenType::exclusive_or || expression[topIndex].type == TokenType::inclusive_or)
     {
         Node res = Node(expression[topIndex]);
 
@@ -156,6 +184,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
         }
         return MakeTreeInfix(expression, topIndex+1, rightIndex-1, node);
     }
+    
     // case 6 ERROR
     else
     {
@@ -167,56 +196,155 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 }
 
 
-// std::string ParserB::Checkerror(Node root, bool &result){  // only check whether all variable have value or will it be assigned value in the expression
-//     for (size_t i =0; i<root.children.size();i++){
-//         if(root.children.at(i).value.type==TokenType::variable && root.value.type != TokenType::equals){
-//             if (variableInitializedMap.at(root.children.at(i).value.content) == false){
-//                 result = false;
-//                 return root.children.at(i).value.content;
+// static void parseLines(std::vector<std::string> expressionLines)
+// {
+//     // line count start from 1
+//     while (currentLine < expressions.size() + 1)
+//     {
+//         expression = expressions[i-1];
+
+//         // Lexer
+//         std::vector<Token> TokenVector;
+//         std::pair<int, int> errorPair = Token::GenTokenVector(expression, TokenVector);
+//         if (errorPair.first != -1)
+//         {
+//             std::cout << "Syntax error on line " << lineCount << " column " << errorPair.second << "." << std::endl;
+//             exit(1);
+//         }
+
+
+//         // ParserB
+//         ParserB::setupExpressionInfix(TokenVector); // register variables
+
+//         if (TokenVector[0].type == TokenType::while)
+//         {
+//             // Parse
+//             Node root;
+//             std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 1, TokenVector.size() - 3, root);
+//             if (errorResult.first.first != -1) 
+//             {
+//                 std::cout << "Unexpected token at line " << currentLine << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+//                 exit(2);
+//             }
+
+//             // Calculate
+//             double result;
+//             std::string errorMessage = ParserB::calculate(root, result);
+
+//             if (errorMessage.length() != 0)
+//             {
+//                 std::cout << errorMessage << std::endl;
+//                 exit(3);
+
+//                 continue;
+//             }
+
+//             if (result != 0)
+//             {
+//                 jumptoStack.push(currentLine);
+//             }
+//             else {
+
+//             }
+//         } 
+//         else if (TokenVector[0].type == TokenType::if)
+//         {
+//             // Parse
+//             Node root;
+//             std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 1, TokenVector.size() - 3, root);
+//             if (errorResult.first.first != -1) 
+//             {
+//                 std::cout << "Unexpected token at line " << currentLine << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+//                 exit(2);
+//             }
+
+//             // Calculate
+//             double result;
+//             std::string errorMessage = ParserB::calculate(root, result);
+
+//             if (errorMessage.length() != 0)
+//             {
+//                 std::cout << errorMessage << std::endl;
+//                 exit(3);
+
+//                 continue;
 //             }
 //         }
-//     }
-//     if(root.children.size()==0){
-//         result = true;
-//         return "";
+//         else if (TokenVector[0].type == TokenType::print)
+//         {
+//             // Parse
+//             Node root;
+//             std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 1, TokenVector.size() - 2, root);
+//             if (errorResult.first.first != -1) 
+//             {
+//                 std::cout << "Unexpected token at line " << currentLine << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+//                 exit(2);
+//             }
+
+//             // Calculate
+//             double result;
+//             std::string errorMessage = ParserB::calculate(root, result);
+
+//             if (errorMessage.length() != 0)
+//             {
+//                 std::cout << errorMessage << std::endl;
+//                 exit(3);
+
+//                 continue;
+//             }
+
+//             std::cout << result << std::endl;
+//             currentLine += 1;
+//         }
+//         else if (TokenVector[0].type == TokenType::rightBracket)
+//         {
+//             // redundant }
+//             if (jumptoStack.empty())
+//             {
+//                 std::cout << "Unexpected token at line " << currentLine << " column " << TokenVector[0].index << ": " << TokenVector[0].content << std::endl;
+//                 exit(2);
+//             }
+
+//             currentLine = jumptoStack.top();
+//             jumptoStack.pop();
+//             currentLine += 1;
+//         }
+//         else
+//         {
+//             // ParserB
+//             Node root;
+//             std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 0, TokenVector.size() - 2, root);
+
+//             if (errorResult.first.first != -1) 
+//             {
+//                 std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+//                 continue;
+//             }
+//             ParserB::print(root);
+//             std::cout << std::endl;
+
+//             // Calculate
+//             double result;
+//             std::string errorMessage = ParserB::calculate(root, result);
+
+//             if (errorMessage.length() != 0)
+//             {
+//                 std::cout << errorMessage << std::endl;
+//                 exit(3);
+
+//                 continue;
+//             }
+
+//             currentLine += 1;
+//         }
 //     }
 
-//     if (Checkerror(root.children.at(0),result) != ""){
-//         result = false;
-//         return Checkerror(root.children.at(0), result);
-//     }
-//     else if (Checkerror(root.children.at(1), result) != ""){
-//         result = false;
-//         return Checkerror(root.children.at(0), result);
-//     }  
-//     result = true;
-//     return "";
 // }
 
+
 std::string ParserB::calculate(Node root, double& result)
-{
+{ 
     // number
-    // bool check = true;
-
-    // if(Checkerror(root,check) != "") { //only check whther all variables have values
-    //     return "Runtime error: unknown identifier " + Checkerror(root,check);
-    // }
-
-    if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::divide || root.value.type == TokenType::multiply){
-        if (root.children.size() == 2){
-            if(root.children.at(0).value.type == TokenType::variable){
-                if (variableInitializedMap.at(root.children.at(0).value.content) == false){
-                    return "Runtime error: unknown identifier " + root.children.at(0).value.content;
-                }
-            }
-            else if(root.children.at(1).value.type == TokenType::variable){
-                if (variableInitializedMap.at(root.children.at(1).value.content) == false){
-                    return "Runtime error: unknown identifier " + root.children.at(1).value.content;
-                }
-            }
-        }
-    }
-
     if (root.value.type == TokenType::number)
     {
         result = root.value.value;
@@ -224,13 +352,16 @@ std::string ParserB::calculate(Node root, double& result)
     }
 
     // variable
-    else if (root.value.type == TokenType::variable)
+    else if (root.value.type == TokenType::variable || root.value.type == TokenType::bool_varibale)
     {
         if (variableInitializedMap.find(root.value.content) == variableInitializedMap.end())
         {
             return "Runtime error: unknown identifier " + root.value.content;
         }
         result = variableMap.at(root.value.content);
+        if (root.value.type == TokenType::bool_varibale) {
+            return "Bool";
+        }
         return "";
     }
 
@@ -245,15 +376,18 @@ std::string ParserB::calculate(Node root, double& result)
         }
 
         std::string errorMessage = calculate(last, result);
-        if (errorMessage != "") { return errorMessage; }
+        if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+
+        if(errorMessage == "Bool"){
+            variableMap.at(root.children[0].value.content) = result;
+            variableInitializedMap.at(root.children[0].value.content) = true;
+            root.value.type = TokenType::bool_varibale;
+            return "Bool";
+        }
 
         // set values
         for (int i = 0; i < (int)root.children.size()-1; i++)
         {
-            if (variableMap.find(root.children[i].value.content) == variableMap.end())
-            {
-                return "114514";
-            }
             variableMap.at(root.children[i].value.content) = result;
             variableInitializedMap.at(root.children[i].value.content) = true;
         }
@@ -261,16 +395,24 @@ std::string ParserB::calculate(Node root, double& result)
         return "";
     }
 
-    // + - * /
-    else {
+    // + - * / %
+    else if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::multiply || root.value.type == TokenType::divide ||
+            root.value.type == TokenType::mod)
+    {
         // variable for operation is uninitialaized
         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
         {
             return "Runtime error: unknown identifier " + root.children[0].value.content;
         }
+        if (root.children[0].value.type == TokenType::TRUE || root.children[0].value.type == TokenType::FALSE)
+        {
+            //error cannot caculate the bool value 
+            // std::cout << "Runtime error: invalid operand type." << std::endl;
+        }
 
         std::string errorMessage = calculate(root.children[0], result);
         if (errorMessage != "") { return errorMessage; }
+        if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
 
 
         for (int i = 1; i < (int)root.children.size(); i++)
@@ -280,37 +422,175 @@ std::string ParserB::calculate(Node root, double& result)
             {
                 return "Runtime error: unknown identifier " + root.children[i].value.content;
             }
+            else if (root.children[i].value.type == TokenType::TRUE || root.children[i].value.type == TokenType::FALSE){
+                //error cannot caculate the bool value 
+                return "Runtime error: invalid operand type.";
+            }
             else if (root.value.type == TokenType::plus) {
                 double r;
                 std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "") { return errorMessage; }
+                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
                 result += r; 
             }
             else if (root.value.type == TokenType::minus) {
                 double r;
                 std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "") { return errorMessage; }
+                if (errorMessage != "" && errorMessage != "Bool" ) { return errorMessage; }
+                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
                 result -= r; 
             }
             else if (root.value.type == TokenType::multiply) { 
                 double r;
                 std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "") { return errorMessage; }
+                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
                 result *= r; 
             }
             else if (root.value.type == TokenType::divide)
             {
                 double r;
                 std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "") { return errorMessage; }
+                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
                 if (r == 0) {
                     return "Runtime error: division by zero.";
                 }
                 result /= r; 
             }
+            else if (root.value.type == TokenType::mod)
+            {
+                double r;
+                std::string errorMessage = calculate(root.children[i], r);
+                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+                result = std::fmod(result,r); 
+            }
         }
         return "";
     }
+    // == != < <= >= > & | ^
+    else if (root.value.type == TokenType::equality || root.value.type == TokenType::inequality || root.value.type == TokenType::smaller || 
+            root.value.type == TokenType::smaller_equal || root.value.type == TokenType::bigger || root.value.type == TokenType::bigger_equal || 
+            root.value.type == TokenType::AND || root.value.type == TokenType::inclusive_or || root.value.type == TokenType::exclusive_or) 
+    {      
+        // variable 1 for operation is uninitialaized
+        if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
+            {
+                return "Runtime error: unknown identifier " + root.children[0].value.content;
+            }
+        
+
+        std::string errorMessage = calculate(root.children[0], result);
+        if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+
+        std::string Last_errorMessage = errorMessage;
+
+        // variable 2 for operation is uninitialaized
+        if (root.children[1].value.type == TokenType::variable && variableInitializedMap.at(root.children[1].value.content) == false)
+            {
+                return "Runtime error: unknown identifier " + root.children[1].value.content;
+            }
+
+        double r;
+        errorMessage = calculate(root.children[1], r);
+
+        //when errorMessage == "" means there is no problem 
+        //when errorMessage == "Bool" means it is a bool expression
+        if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+
+        if (root.children[0].value.type == TokenType::bool_varibale && errorMessage != "Bool"){
+            return "Runtime error: invalid operand type.";
+        }
+
+        if ( Last_errorMessage != errorMessage) {
+            return  "Runtime error: invalid operand type." ;
+        }
+
+        else if (root.value.type == TokenType::equality)
+            {
+                if (result == r){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::inequality)
+            {
+                if (result != r){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::smaller)
+            {
+                if (result < r){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::smaller_equal)
+            {
+                if (result <= r){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::bigger)
+            {
+                if (result > r){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::bigger_equal)
+            {
+                if (result >= r){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::AND)
+            {
+                if (result == 1 && r == 1){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::inclusive_or)
+            {
+                if (result == 1 || r == 1){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        else if (root.value.type == TokenType::exclusive_or)
+            {
+                if ((result != r)){
+                    result = 1;
+                }
+                else {
+                    result = 0;
+                }
+            }
+        return "Bool";
+    }
+    return "WRONG";
 }
 
 
@@ -347,44 +627,7 @@ void ParserB::print(Node root)
     }
 }
 
-
-// exclude rightParenthesis
-int ParserB::findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
-{
-    int balance = 1;
-    int p = rightBound;
-    while (p >= leftBound) {
-        if (expression[p].type == TokenType::leftParenthesis) { balance -= 1; }
-        if (expression[p].type == TokenType::rightParenthesis) { balance += 1; }
-        if (balance == 0) { break; }
-        p -= 1;
-    }
-    return p;
-}
-
-
-int ParserB::findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound)
-{
-    int balance = 1;
-    int p = leftBound;
-    while (p <= rightBound) {
-        if (expression[p].type == TokenType::leftParenthesis) { balance += 1; }
-        if (expression[p].type == TokenType::rightParenthesis) { balance -= 1; }
-        if (balance == 0) { break; }
-        p += 1;
-    }
-    if (p > rightBound) 
-    {
-#if DEBUG
-    std::cout << "right parenthesis not found" << std::endl;
-#endif
-        std::cout << "Unexpected token at line " << expression[p].line << " column " << expression[p].index << ": " << expression[p].content << std::endl;
-        exit(2);
-    }
-    return p;
-}
-
-
+// exclude left parenthesis
 int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound)
 {
     int balance = 1;
@@ -398,115 +641,19 @@ int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int left
     return p;
 }
 
-
-// return vectors of lines
-// register variables in map 
-void ParserB::setupExpression(std::vector<Token> expression)
-{
-    if (expression.size() == 1)
-    {
-#if DEBUG
-    std::cout << "-1 empty expression" << std::endl;
-#endif
-
-        std::cout << "Unexpected token at line " << 1 << " column " << 1 << ": " << "END" << std::endl;
-        exit(2);
-    }
-    std::vector<std::vector<Token>> res;
-    std::vector<Token> current;
-    current.push_back(expression[0]);
-    int currentLine = expression[0].line;
-    // handle the first token variable
-    if (expression[0].type == TokenType::variable)
-    {
-        if (variableMap.find(expression[0].content) == variableMap.end())
-        {
-            variableMap.insert({ expression[0].content, -1 });
-            variableInitializedMap.insert({ expression[0].content, false });
-        }
-    }
-    for (int i=1; i<(int)expression.size()-1; i++)
-    {
-        Token token = expression[i];
-        // handle new variable
-        if (token.type == TokenType::variable)
-        {
-            if (variableMap.find(token.content) == variableMap.end())
-            {
-                variableMap.insert({ token.content, -1 });
-                variableInitializedMap.insert({ token.content, false });
-            }
-        }
-
-        // handle line
-        while (currentLine != token.line)
-        {
-            if (current.size() != 0)
-            {
-                current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
-                //current.push_back(Token(TokenType::end, "end", expression[i].line, expression[i].index));
-                res.push_back(current);
-            }
-            current.clear();
-            currentLine += 1;
-        }
-        current.push_back(token);
-    }
-    current.push_back(expression[expression.size()-1]);
-    res.push_back(current);
-
-
-
-    // merge multiple lines of S expression
-    std::vector sExpression = res[0];
-
-    for (int i=1; i<(int)res.size(); i++)
-    {
-        if (sExpression[0].type == TokenType::number)
-        {
-            expressionLines.push_back(sExpression);
-            sExpression.clear();
-        } 
-        else if (sExpression[0].type == TokenType::leftParenthesis)
-        {
-            int rightIndex = findRightParenthesisNoError(sExpression, 1, sExpression.size()-1);
-            if (rightIndex > (int)sExpression.size()-1)
-            {
-                sExpression.pop_back();
-            }
-            else
-            {
-                expressionLines.push_back(sExpression);
-                sExpression.clear();
-            }
-        }
-        else
-        {
-            expressionLines.push_back(sExpression);
-            sExpression.clear();
-        }
-        sExpression.insert(sExpression.end(), res[i].begin(), res[i].end());
-    }
-
-    if (sExpression.size() != 0)
-    {
-        expressionLines.push_back(sExpression);
-    }
-
-
-    // expressionLines = res;
-
-    // for (std::vector<Token> v : expressionLines)
-    // {
-    //     for (Token token : v)
-    //     {
-    //         std::cout << token.content << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-}
-
-
+// exclude left bracket
+// int ParserB::findRightBracketNoError(std::vector<Token> expression, int leftBound, int rightBound)
+// {
+//     int balance = 1;
+//     int p = leftBound;
+//     while (p <= rightBound) {
+//         if (expression[p].type == TokenType::leftParenthesis) { balance += 1; }
+//         if (expression[p].type == TokenType::rightParenthesis) { balance -= 1; }
+//         if (balance == 0) { break; }
+//         p += 1;
+//     }
+//     return p;
+// }
 
 
 // return vectors of lines in infix notation
@@ -523,23 +670,7 @@ void ParserB::setupExpressionInfix(std::vector<Token> expression)
         exit(2);
     }
 
-
-
-    std::vector<std::vector<Token>> res;
-    std::vector<Token> current;
-    current.push_back(expression[0]);
-    int currentLine = expression[0].line;
-
-    // handle the first token variable
-    if (expression[0].type == TokenType::variable)
-    {
-        if (variableMap.find(expression[0].content) == variableMap.end())
-        {
-            variableMap.insert({ expression[0].content, -1 });
-            variableInitializedMap.insert({ expression[0].content, false });
-        }
-    }
-    for (int i=1; i<(int)expression.size()-1; i++)
+    for (int i = 0; i < (int)expression.size()-1; i++)
     {
         Token token = expression[i];
         // handle new variable
@@ -551,32 +682,33 @@ void ParserB::setupExpressionInfix(std::vector<Token> expression)
                 variableInitializedMap.insert({ token.content, false });
             }
         }
-
-        // handle line
-        while (currentLine != token.line)
-        {
-            if (current.size() != 0)
-            {
-                current.push_back(Token(TokenType::end, expression[i].content, expression[i].line, expression[i].index));
-                //current.push_back(Token(TokenType::end, "end", expression[i].line, expression[i].index));
-                res.push_back(current);
-            }
-            current.clear();
-            currentLine += 1;
-        }
-        current.push_back(token);
     }
-    current.push_back(expression[expression.size()-1]);
-    res.push_back(current);
-
-    expressionLines = res;
-
-    // for (std::vector<Token> v : expressionLines)
-    // {
-    //     for (Token token : v)
-    //     {
-    //         std::cout << token.content << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
 }
+
+
+
+// std::string ParserB::Checkerror(Node root, bool &result){  // only check whether all variable have value or will it be assigned value in the expression
+//     for (size_t i =0; i<root.children.size();i++){
+//         if(root.children.at(i).value.type==TokenType::variable && root.value.type != TokenType::equals){
+//             if (variableInitializedMap.at(root.children.at(i).value.content) == false){
+//                 result = false;
+//                 return root.children.at(i).value.content;
+//             }
+//         }
+//     }
+//     if(root.children.size()==0){
+//         result = true;
+//         return "";
+//     }
+
+//     if (Checkerror(root.children.at(0),result) != ""){
+//         result = false;
+//         return Checkerror(root.children.at(0), result);
+//     }
+//     else if (Checkerror(root.children.at(1), result) != ""){
+//         result = false;
+//         return Checkerror(root.children.at(0), result);
+//     }  
+//     result = true;
+//     return "";
+// }

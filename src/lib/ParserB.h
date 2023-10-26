@@ -8,7 +8,7 @@
 #include <map>
 
 #include "Lexer.h"
-#include "Utils.h"
+// #include "Utils.h"
 
 
 class Node
@@ -32,8 +32,6 @@ public:
     static std::vector<std::vector<Token>> expressionLines;
     static std::map<std::string, double> variableMap;
     static std::map<std::string, bool> variableInitializedMap;
-
-    // static std::string Checkerror(Node root, bool &result);
 
     static std::map<TokenType, int> hierarchyMap;
 private:
