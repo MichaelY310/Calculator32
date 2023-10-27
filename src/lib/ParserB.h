@@ -9,13 +9,12 @@
 #include <stack>
 
 #include "Lexer.h"
-#include "Utils.h"
 
 
 class Node
 {
 public:
-    Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
+    Node() : value(Token(TokenType::NONE, "", -1, -1, -1)) {}
     Node(Token token) : value(token) {}
 
     std::vector<Node> children;
@@ -39,8 +38,7 @@ public:
 
     static std::map<TokenType, int> hierarchyMap;
 private:
-    static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
-    static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound);
+    static int findRightBracketNoError(std::vector<std::vector<Token>> TokenVectors, int leftBound, int rightBound);
 };
 
