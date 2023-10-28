@@ -738,6 +738,7 @@ std::string ParserB::calculate(Node root, double& result, DataType& resultType)
 
         // use bool_variable is variable store bool value
         // after we store the variable information into maps then change its type to bool_variable
+        // so we still can use variableMap to search bool_variable
         if (root.children[0].value.type != TokenType::variable && root.children[0].value.type != TokenType::bool_variable) {
             return "WRONG";
         }
@@ -761,18 +762,17 @@ std::string ParserB::calculate(Node root, double& result, DataType& resultType)
         DataType resultType2 = DataType::NONE;
         std::string errorMessage1 = calculate(root.children[0], result1, resultType1);
         if (errorMessage1 != "") { return errorMessage1; }
-        // resultType1 = resultType;
         std::string errorMessage2 = calculate(root.children[1], result2, resultType2);
         if (errorMessage2 != "") { return errorMessage2; }
-        // resultType2 = resultType;
 
         // + - * / %
         if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::multiply || root.value.type == TokenType::divide ||
             root.value.type == TokenType::mod) 
         {   
+            // arithmetic operator only works on double and return double
             if (resultType1 == DataType::BOOL || resultType2 == DataType::BOOL)
             {
-                return "Runtime error: invalid operand type. 4";
+                return "Runtime error: invalid operand type.";
             }
 
             if (root.value.type == TokenType::plus) {
@@ -806,7 +806,7 @@ std::string ParserB::calculate(Node root, double& result, DataType& resultType)
             // Comparsion operator only compare double and return bool
             if (resultType1 == DataType::BOOL || resultType2 == DataType::BOOL)
             {
-                return "Runtime error: invalid operand type. 3";
+                return "Runtime error: invalid operand type.";
             }
             // >
             else if (root.value.type == TokenType::bigger) {
@@ -831,10 +831,10 @@ std::string ParserB::calculate(Node root, double& result, DataType& resultType)
         else if (root.value.type == TokenType::AND || root.value.type == TokenType::inclusive_or || 
                 root.value.type == TokenType::exclusive_or) 
         {   
-            // only can work on bool and return bool
+            // & | ^ only work on bool and return bool
             if (resultType1 != DataType::BOOL || resultType2 != DataType::BOOL)
             {
-                return "Runtime error: invalid operand type. 1";
+                return "Runtime error: invalid operand type.";
             }
             // &
             else if (root.value.type == TokenType::AND) {
@@ -857,7 +857,7 @@ std::string ParserB::calculate(Node root, double& result, DataType& resultType)
             // inequality or equality can works on both double or bool but only return bool
             if (resultType1 != resultType2)
             {
-                return "Runtime error: invalid operand type. 2";
+                return "Runtime error: invalid operand type.";
             }
             // ==
             else if (root.value.type == TokenType::equality) {
