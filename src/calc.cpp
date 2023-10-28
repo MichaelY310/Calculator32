@@ -27,7 +27,8 @@ int main() {
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
     // std::string input = "(x = 10)\n(y = 57)\n(z = 16)\n((((x = 3) + (y = 5)) + w) + (z = 145))\n((x + y) + z)";
     //std::string input = "()+)";
-    std::string input = "x= (1==2) | (1<2) \n y=(1>2)\n y==x";
+    // std::string input = "x= (1==2) | (1<2) \n y=(1>2)\n y==x";
+    std::string input = "x= (1==2) | (1>2) \n y=(1>2)\n y==x";
 // #endif
 
 
@@ -82,7 +83,8 @@ int main() {
         double result;
         std::map<std::string, double> originalVariableMap(ParserB::variableMap);
         std::map<std::string, bool> originalVariableInitializedMap(ParserB::variableInitializedMap);
-        std::string errorMessage = ParserB::calculate(root, result);
+        DataType DataT = DataType::NONE;
+        std::string errorMessage = ParserB::calculate(root, result, DataT);
 
         if (errorMessage == "114514") 
         {

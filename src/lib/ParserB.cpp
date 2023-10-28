@@ -342,256 +342,256 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeTreeInfix(std::vector<T
 // }
 
 
-std::string ParserB::calculate(Node root, double& result)
-{ 
-    // number
-    if (root.value.type == TokenType::number)
-    {
-        result = root.value.value;
-        return "";
-    }
+// std::string ParserB::calculate(Node root, double& result)
+// { 
+//     // number
+//     if (root.value.type == TokenType::number)
+//     {
+//         result = root.value.value;
+//         return "";
+//     }
 
-    // variable
-    else if (root.value.type == TokenType::variable || root.value.type == TokenType::bool_variable)
-    {
-        if (variableInitializedMap.find(root.value.content) == variableInitializedMap.end())
-        {
-            return "Runtime error: unknown identifier " + root.value.content;
-        }
-        result = variableMap.at(root.value.content);
-        if (root.value.type == TokenType::bool_variable) {
-            return "Bool";
-        }
-        return "";
-    }
+//     // variable
+//     else if (root.value.type == TokenType::variable || root.value.type == TokenType::bool_variable)
+//     {
+//         if (variableInitializedMap.find(root.value.content) == variableInitializedMap.end())
+//         {
+//             return "Runtime error: unknown identifier " + root.value.content;
+//         }
+//         result = variableMap.at(root.value.content);
+//         if (root.value.type == TokenType::bool_variable) {
+//             return "Bool";
+//         }
+//         return "";
+//     }
 
-    // =
-    else if (root.value.type == TokenType::equals)
-    {
-        // the last child must be a number or an initialized variable
-        Node last = root.children[root.children.size()-1];
-        if (last.value.type == TokenType::variable && variableInitializedMap.find(last.value.content) == variableInitializedMap.end())
-        {
-            return "Runtime error: unknown identifier " + last.value.content;
-        }
+//     // =
+//     else if (root.value.type == TokenType::equals)
+//     {
+//         // the last child must be a number or an initialized variable
+//         Node last = root.children[root.children.size()-1];
+//         if (last.value.type == TokenType::variable && variableInitializedMap.find(last.value.content) == variableInitializedMap.end())
+//         {
+//             return "Runtime error: unknown identifier " + last.value.content;
+//         }
 
-        std::string errorMessage = calculate(last, result);
-        if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//         std::string errorMessage = calculate(last, result);
+//         if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
 
-        if(errorMessage == "Bool"){
-            variableMap.at(root.children[0].value.content) = result;
-            variableInitializedMap.at(root.children[0].value.content) = true;
-            root.value.type = TokenType::bool_variable;
-            return "Bool";
-        }
+//         if(errorMessage == "Bool"){
+//             variableMap.at(root.children[0].value.content) = result;
+//             variableInitializedMap.at(root.children[0].value.content) = true;
+//             root.value.type = TokenType::bool_variable;
+//             return "Bool";
+//         }
 
-        // set values
-        for (int i = 0; i < (int)root.children.size()-1; i++)
-        {
-            variableMap.at(root.children[i].value.content) = result;
-            variableInitializedMap.at(root.children[i].value.content) = true;
-        }
+//         // set values
+//         for (int i = 0; i < (int)root.children.size()-1; i++)
+//         {
+//             variableMap.at(root.children[i].value.content) = result;
+//             variableInitializedMap.at(root.children[i].value.content) = true;
+//         }
 
-        return "";
-    }
+//         return "";
+//     }
 
-    // + - * / %
-    else if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::multiply || root.value.type == TokenType::divide ||
-            root.value.type == TokenType::mod)
-    {
-        // variable for operation is uninitialaized
-        if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
-        {
-            return "Runtime error: unknown identifier " + root.children[0].value.content;
-        }
-        if (root.children[0].value.type == TokenType::TRUE || root.children[0].value.type == TokenType::FALSE)
-        {
-            //error cannot caculate the bool value 
-            // std::cout << "Runtime error: invalid operand type." << std::endl;
-        }
+//     // + - * / %
+//     else if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::multiply || root.value.type == TokenType::divide ||
+//             root.value.type == TokenType::mod)
+//     {
+//         // variable for operation is uninitialaized
+//         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
+//         {
+//             return "Runtime error: unknown identifier " + root.children[0].value.content;
+//         }
+//         if (root.children[0].value.type == TokenType::TRUE || root.children[0].value.type == TokenType::FALSE)
+//         {
+//             //error cannot caculate the bool value 
+//             // std::cout << "Runtime error: invalid operand type." << std::endl;
+//         }
 
-        std::string errorMessage = calculate(root.children[0], result);
-        if (errorMessage != "") { return errorMessage; }
-        if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+//         std::string errorMessage = calculate(root.children[0], result);
+//         if (errorMessage != "") { return errorMessage; }
+//         if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
 
 
-        for (int i = 1; i < (int)root.children.size(); i++)
-        {
-            // variable for operation is uninitialaized
-            if (root.children[i].value.type == TokenType::variable && variableInitializedMap.at(root.children[i].value.content) == false)
-            {
-                return "Runtime error: unknown identifier " + root.children[i].value.content;
-            }
-            else if (root.children[i].value.type == TokenType::TRUE || root.children[i].value.type == TokenType::FALSE){
-                //error cannot caculate the bool value 
-                return "Runtime error: invalid operand type.";
-            }
-            else if (root.value.type == TokenType::plus) {
-                double r;
-                std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
-                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
-                result += r; 
-            }
-            else if (root.value.type == TokenType::minus) {
-                double r;
-                std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "" && errorMessage != "Bool" ) { return errorMessage; }
-                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
-                result -= r; 
-            }
-            else if (root.value.type == TokenType::multiply) { 
-                double r;
-                std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
-                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
-                result *= r; 
-            }
-            else if (root.value.type == TokenType::divide)
-            {
-                double r;
-                std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
-                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
-                if (r == 0) {
-                    return "Runtime error: division by zero.";
-                }
-                result /= r; 
-            }
-            else if (root.value.type == TokenType::mod)
-            {
-                double r;
-                std::string errorMessage = calculate(root.children[i], r);
-                if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
-                if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
-                result = std::fmod(result,r); 
-            }
-        }
-        return "";
-    }
-    // == != < <= >= > & | ^
-    else if (root.value.type == TokenType::equality || root.value.type == TokenType::inequality || root.value.type == TokenType::smaller || 
-            root.value.type == TokenType::smaller_equal || root.value.type == TokenType::bigger || root.value.type == TokenType::bigger_equal || 
-            root.value.type == TokenType::AND || root.value.type == TokenType::inclusive_or || root.value.type == TokenType::exclusive_or) 
-    {      
-        // variable 1 for operation is uninitialaized
-        if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
-            {
-                return "Runtime error: unknown identifier " + root.children[0].value.content;
-            }
+//         for (int i = 1; i < (int)root.children.size(); i++)
+//         {
+//             // variable for operation is uninitialaized
+//             if (root.children[i].value.type == TokenType::variable && variableInitializedMap.at(root.children[i].value.content) == false)
+//             {
+//                 return "Runtime error: unknown identifier " + root.children[i].value.content;
+//             }
+//             else if (root.children[i].value.type == TokenType::TRUE || root.children[i].value.type == TokenType::FALSE){
+//                 //error cannot caculate the bool value 
+//                 return "Runtime error: invalid operand type.";
+//             }
+//             else if (root.value.type == TokenType::plus) {
+//                 double r;
+//                 std::string errorMessage = calculate(root.children[i], r);
+//                 if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//                 if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+//                 result += r; 
+//             }
+//             else if (root.value.type == TokenType::minus) {
+//                 double r;
+//                 std::string errorMessage = calculate(root.children[i], r);
+//                 if (errorMessage != "" && errorMessage != "Bool" ) { return errorMessage; }
+//                 if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+//                 result -= r; 
+//             }
+//             else if (root.value.type == TokenType::multiply) { 
+//                 double r;
+//                 std::string errorMessage = calculate(root.children[i], r);
+//                 if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//                 if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+//                 result *= r; 
+//             }
+//             else if (root.value.type == TokenType::divide)
+//             {
+//                 double r;
+//                 std::string errorMessage = calculate(root.children[i], r);
+//                 if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//                 if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+//                 if (r == 0) {
+//                     return "Runtime error: division by zero.";
+//                 }
+//                 result /= r; 
+//             }
+//             else if (root.value.type == TokenType::mod)
+//             {
+//                 double r;
+//                 std::string errorMessage = calculate(root.children[i], r);
+//                 if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//                 if (errorMessage == "Bool") {return "Runtime error: invalid operand type.";}
+//                 result = std::fmod(result,r); 
+//             }
+//         }
+//         return "";
+//     }
+//     // == != < <= >= > & | ^
+//     else if (root.value.type == TokenType::equality || root.value.type == TokenType::inequality || root.value.type == TokenType::smaller || 
+//             root.value.type == TokenType::smaller_equal || root.value.type == TokenType::bigger || root.value.type == TokenType::bigger_equal || 
+//             root.value.type == TokenType::AND || root.value.type == TokenType::inclusive_or || root.value.type == TokenType::exclusive_or) 
+//     {      
+//         // variable 1 for operation is uninitialaized
+//         if (root.children[0].value.type == TokenType::variable && variableInitializedMap.at(root.children[0].value.content) == false)
+//             {
+//                 return "Runtime error: unknown identifier " + root.children[0].value.content;
+//             }
         
 
-        std::string errorMessage = calculate(root.children[0], result);
-        if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//         std::string errorMessage = calculate(root.children[0], result);
+//         if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
 
-        std::string Last_errorMessage = errorMessage;
+//         std::string Last_errorMessage = errorMessage;
 
-        // variable 2 for operation is uninitialaized
-        if (root.children[1].value.type == TokenType::variable && variableInitializedMap.at(root.children[1].value.content) == false)
-            {
-                return "Runtime error: unknown identifier " + root.children[1].value.content;
-            }
+//         // variable 2 for operation is uninitialaized
+//         if (root.children[1].value.type == TokenType::variable && variableInitializedMap.at(root.children[1].value.content) == false)
+//             {
+//                 return "Runtime error: unknown identifier " + root.children[1].value.content;
+//             }
 
-        double r;
-        errorMessage = calculate(root.children[1], r);
+//         double r;
+//         errorMessage = calculate(root.children[1], r);
 
-        //when errorMessage == "" means there is no problem 
-        //when errorMessage == "Bool" means it is a bool expression
-        if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
+//         //when errorMessage == "" means there is no problem 
+//         //when errorMessage == "Bool" means it is a bool expression
+//         if (errorMessage != "" && errorMessage != "Bool") { return errorMessage; }
 
-        if (root.children[0].value.type == TokenType::bool_variable && errorMessage != "Bool"){
-            return "Runtime error: invalid operand type.";
-        }
+//         if (root.children[0].value.type == TokenType::bool_variable && errorMessage != "Bool"){
+//             return "Runtime error: invalid operand type.";
+//         }
 
-        if ( Last_errorMessage != errorMessage) {
-            return  "Runtime error: invalid operand type." ;
-        }
+//         if ( Last_errorMessage != errorMessage) {
+//             return  "Runtime error: invalid operand type." ;
+//         }
 
-        else if (root.value.type == TokenType::equality)
-            {
-                if (result == r){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::inequality)
-            {
-                if (result != r){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::smaller)
-            {
-                if (result < r){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::smaller_equal)
-            {
-                if (result <= r){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::bigger)
-            {
-                if (result > r){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::bigger_equal)
-            {
-                if (result >= r){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::AND)
-            {
-                if (result == 1 && r == 1){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::inclusive_or)
-            {
-                if (result == 1 || r == 1){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        else if (root.value.type == TokenType::exclusive_or)
-            {
-                if ((result != r)){
-                    result = 1;
-                }
-                else {
-                    result = 0;
-                }
-            }
-        return "Bool";
-    }
-    return "WRONG";
-}
+//         else if (root.value.type == TokenType::equality)
+//             {
+//                 if (result == r){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::inequality)
+//             {
+//                 if (result != r){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::smaller)
+//             {
+//                 if (result < r){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::smaller_equal)
+//             {
+//                 if (result <= r){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::bigger)
+//             {
+//                 if (result > r){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::bigger_equal)
+//             {
+//                 if (result >= r){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::AND)
+//             {
+//                 if (result == 1 && r == 1){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::inclusive_or)
+//             {
+//                 if (result == 1 || r == 1){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         else if (root.value.type == TokenType::exclusive_or)
+//             {
+//                 if ((result != r)){
+//                     result = 1;
+//                 }
+//                 else {
+//                     result = 0;
+//                 }
+//             }
+//         return "Bool";
+//     }
+//     return "WRONG";
+// }
 
 
 void ParserB::print(Node root)
@@ -684,6 +684,196 @@ void ParserB::setupExpressionInfix(std::vector<Token> expression)
         }
     }
 }
+
+
+// new version 
+std::string ParserB::calculate(Node root, double& result, DataType& resultType)
+{
+    // number
+    if (root.value.type == TokenType::number)
+    {
+        result = root.value.value;
+        resultType = DataType::DOUBLE;
+        return "";
+    }
+
+    // true
+    else if (root.value.type == TokenType::TRUE)
+    {
+        result = root.value.value;
+        resultType = DataType::BOOL;
+        return "";
+    }
+
+    // false
+    else if (root.value.type == TokenType::FALSE)
+    {
+        result = root.value.value;
+        resultType = DataType::BOOL;
+        return "";
+    }
+
+    // variable
+    else if (root.value.type == TokenType::variable || root.value.type == TokenType::bool_variable )
+    {
+        if (variableInitializedMap.at(root.value.content) == false)
+        {
+            return "Runtime error: unknown identifier " + root.value.content;
+        }
+        if (root.value.type == TokenType::bool_variable){
+            resultType = DataType::BOOL;
+        }
+        else{
+            resultType = DataType::DOUBLE;
+        }
+        result = variableMap.at(root.value.content);
+        return "";
+    }
+    // =
+    else if (root.value.type == TokenType::equals)
+    {
+        // the last child must be a number or an initialized variable
+        std::string errorMessage = calculate(root.children[1], result, resultType);
+        if (errorMessage != "") { return errorMessage; }
+
+        // use bool_variable is variable store bool value
+        // after we store the variable information into maps then change its type to bool_variable
+        if (root.children[0].value.type != TokenType::variable && root.children[0].value.type != TokenType::bool_variable) {
+            return "WRONG";
+        }
+
+        variableMap.at(root.children[0].value.content) = result;
+        variableInitializedMap.at(root.children[0].value.content) = true;
+        if (resultType == DataType::BOOL){
+            root.children[0].value.type = TokenType::bool_variable;
+        }
+
+        return "";
+    } 
+
+
+    // + - * / % == != > < >= <= & | ^
+    else {
+        // variable for operation is uninitialaized
+        double result1;
+        double result2;
+        DataType resultType1 = DataType::NONE;
+        DataType resultType2 = DataType::NONE;
+        std::string errorMessage1 = calculate(root.children[0], result1, resultType1);
+        if (errorMessage1 != "") { return errorMessage1; }
+        // resultType1 = resultType;
+        std::string errorMessage2 = calculate(root.children[1], result2, resultType2);
+        if (errorMessage2 != "") { return errorMessage2; }
+        // resultType2 = resultType;
+
+        // + - * / %
+        if (root.value.type == TokenType::plus || root.value.type == TokenType::minus || root.value.type == TokenType::multiply || root.value.type == TokenType::divide ||
+            root.value.type == TokenType::mod) 
+        {   
+            if (resultType1 == DataType::BOOL || resultType2 == DataType::BOOL)
+            {
+                return "Runtime error: invalid operand type. 4";
+            }
+
+            if (root.value.type == TokenType::plus) {
+                result = result1 + result2; 
+            }
+            else if (root.value.type == TokenType::minus) {
+                result = result1 - result2; 
+            }
+            else if (root.value.type == TokenType::multiply) { 
+                result = result1 * result2; 
+            }
+            else if (root.value.type == TokenType::divide)
+            {
+                if (result2 == 0) {
+                    return "Runtime error: division by zero.";
+                }
+                result = result1 / result2; 
+            }
+            // %
+            else if (root.value.type == TokenType::mod) {
+                result = std::fmod(result1, result2); 
+            }
+
+            resultType = DataType::DOUBLE;
+        }
+
+        // < <= > >= 
+        else if (root.value.type == TokenType::smaller || root.value.type == TokenType::smaller_equal || 
+                 root.value.type == TokenType::bigger  || root.value.type == TokenType::bigger_equal) 
+        { 
+            // Comparsion operator only compare double and return bool
+            if (resultType1 == DataType::BOOL || resultType2 == DataType::BOOL)
+            {
+                return "Runtime error: invalid operand type. 3";
+            }
+            // >
+            else if (root.value.type == TokenType::bigger) {
+                result = result1 > result2; 
+            }
+            // <
+            else if (root.value.type == TokenType::smaller) {
+                result = result1 < result2; 
+            }
+            // >=
+            else if (root.value.type == TokenType::bigger_equal) {
+                result = result1 >= result2; 
+            }
+            // <=
+            else if (root.value.type == TokenType::smaller_equal) {
+                result = result1 <= result2; 
+            }
+            resultType = DataType::BOOL;
+        }
+
+        // & | ^
+        else if (root.value.type == TokenType::AND || root.value.type == TokenType::inclusive_or || 
+                root.value.type == TokenType::exclusive_or) 
+        {   
+            // only can work on bool and return bool
+            if (resultType1 != DataType::BOOL || resultType2 != DataType::BOOL)
+            {
+                return "Runtime error: invalid operand type. 1";
+            }
+            // &
+            else if (root.value.type == TokenType::AND) {
+                result = result1 && result2; 
+            }
+            // |
+            else if (root.value.type == TokenType::inclusive_or) {
+                result = result1 || result2; 
+            }
+            // ^
+            else if (root.value.type == TokenType::exclusive_or) {
+                result = result1 != result2;
+            }
+
+            resultType = DataType::BOOL;
+        }
+        // == !=
+        else if (root.value.type == TokenType::equality || root.value.type == TokenType::inequality)
+        {
+            // inequality or equality can works on both double or bool but only return bool
+            if (resultType1 != resultType2)
+            {
+                return "Runtime error: invalid operand type. 2";
+            }
+            // ==
+            else if (root.value.type == TokenType::equality) {
+                result = result1 == result2; 
+            }
+            // !=
+            else if (root.value.type == TokenType::inequality) {
+                result = result1 != result2; 
+            }
+
+            resultType = DataType::BOOL;
+        }
+        return "";
+    }
+}
+
 
 
 

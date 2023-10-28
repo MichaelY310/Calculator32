@@ -21,11 +21,18 @@ public:
     Token value;
 };
 
+enum class DataType
+{
+    BOOL,
+    DOUBLE,
+    NONE
+};
+
 class ParserB
 {
 public:
     static std::pair<std::pair<int, int>, std::string> MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node);
-    static std::string calculate(Node root, double& result);
+    static std::string calculate(Node root, double& result, DataType& resultType);
     static void print(Node root);
     static void setupExpression(std::vector<Token> expression);
     static void setupExpressionInfix(std::vector<Token> expression);
