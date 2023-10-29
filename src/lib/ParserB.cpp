@@ -79,106 +79,119 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             std::unique_ptr<IfNode> node = std::make_unique<IfNode>(tokenVector[start]);
 
             // if
-            // find where { is
+            // find {
             int leftBracketIndex = start + 1;
             while (leftBracketIndex < rightBound)
             {
                 if (tokenVector[leftBracketIndex].type == TokenType::LEFT_BRACKET) { break; }
                 leftBracketIndex += 1;
             }
-            // { not found
+            // ERROR: { not found
             if (leftBracketIndex == rightBound)
-            {
-                return { { tokenVector[leftBracketIndex].line, tokenVector[leftBracketIndex].index }, tokenVector[leftBracketIndex].content };
-            }
+            { return { { tokenVector[leftBracketIndex].line, tokenVector[leftBracketIndex].index }, tokenVector[leftBracketIndex].content }; }
             // find }
             int rightBracketIndex = findRightBracketNoError(tokenVector, leftBracketIndex + 1, rightBound);
+            // ERROR: } not found
             if (rightBracketIndex > rightBound)
-            {
-                return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content };  
-            }
+            { return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content }; }
 
-            // the first condition
+            // condition
             std::unique_ptr<ExpressionNode> condition1 = std::make_unique<ExpressionNode>();
-            std::vector<std::unique_ptr<Node>> flows1;
             std::pair<std::pair<int, int>, std::string> errorResultCondition1 = MakeExpressionTree(tokenVector, start + 1, leftBracketIndex - 1, condition1);
-            if (errorResultCondition1.first.first != -1) 
-            {
-                return errorResultCondition1;
-            }
+            if (errorResultCondition1.first.first != -1) { return errorResultCondition1; }
+
             // statements and expressions inside {...}
+            std::vector<std::unique_ptr<Node>> flows1;
             std::pair<std::pair<int, int>, std::string> errorResultFlows1 = HandleTokenVector(tokenVector, leftBracketIndex + 1, rightBracketIndex - 1, flows1);
-            if (errorResultFlows1.first.first != -1) 
-            {
-                return errorResultFlows1;
-            }
+            if (errorResultFlows1.first.first != -1)  { return errorResultFlows1; }
             node->conditions.push_back(std::move(condition1));
             node->flowGroups.push_back(std::move(flows1));
             start = rightBracketIndex + 1;
 
 
-
-            // // else if
-            // while ()
-            // {
-            //     // find where { is
-            //     int leftBracketIndex = start + 1;
-            //     while (leftBracketIndex < rightBound)
-            //     {
-            //         if (tokenVector[leftBracketIndex].type == TokenType::LEFT_BRACKET) { break; }
-            //     }
-            //     // { not found
-            //     if (leftBracketIndex == rightBound)
-            //     {
-            //         return { { tokenVector[leftBracketIndex].line, tokenVector[leftBracketIndex].index }, tokenVector[leftBracketIndex].content };
-            //     }
-            //     // find }
-            //     int rightBracketIndex = findRightBracketNoError(tokenVector, leftBracketIndex + 1, rightBound);
-            //     if (rightBracketIndex > rightBound)
-            //     {
-            //         return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content };  
-            //     }
-
-            //     // the first condition
-            //     ExpressionNode condition1;
-            //     std::vector<Node> flows1;
-            //     std::pair<std::pair<int, int>, std::string> errorResultCondition = MakeExpressionTree(tokenVector, start + 1, leftBracketIndex - 1, condition1)
-            //     if (errorResultCondition.first.first != -1) 
-            //     {
-            //         return errorResultCondition;
-            //     }
-            //     // statements and expressions inside {...}
-            //     std::pair<std::pair<int, int>, std::string> errorResultFlows = HandleTokenVector(tokenVector, leftBracketIndex + 1, rightBracketIndex - 1, flows1)
-            //     if (errorResultFlows.first.first != -1) 
-            //     {
-            //         return errorResultFlows;
-            //     }
-            //     start = rightBracketIndex + 1;
-            // }
-
+            // Else
             if (tokenVector[start].type == TokenType::ELSE)
             {
-                if (tokenVector[start+1].type != TokenType::LEFT_BRACKET)
+                // Case 1 else {...}
+                if (tokenVector[start+1].type == TokenType::LEFT_BRACKET)
+                {
+                    // find where { is
+                    leftBracketIndex = start + 1;
+                    // find }
+                    rightBracketIndex = findRightBracketNoError(tokenVector, leftBracketIndex + 1, rightBound);
+                    // ERROR: } not found
+                    if (rightBracketIndex > rightBound)
+                    { return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content }; }
+                    
+                    // statements and expressions inside {...}
+                    std::vector<std::unique_ptr<Node>> flows;
+                    std::pair<std::pair<int, int>, std::string> errorResultFlows = HandleTokenVector(tokenVector, leftBracketIndex + 1, rightBracketIndex - 1, flows);
+                    if (errorResultFlows.first.first != -1) { return errorResultFlows; }
+                    node->flowGroups.push_back(std::move(flows));
+                    start = rightBracketIndex + 1;
+                }
+                // Case 2 else if {...}
+                else if (tokenVector[start+1].type == TokenType::IF)
+                {
+                    int newstart = start + 1;   // if
+                    // Find the end of the whole if statement
+                    // skip all else_if
+                    while (tokenVector[start].type == TokenType::ELSE && tokenVector[start + 1].type == TokenType::IF)
+                    {
+                        // find where { is
+                        int leftBracketIndex = start + 2;
+                        while (leftBracketIndex < rightBound)
+                        {
+                            if (tokenVector[leftBracketIndex].type == TokenType::LEFT_BRACKET) { break; }
+                            leftBracketIndex += 1;
+                        }
+                        // { not found
+                        if (leftBracketIndex == rightBound)
+                        { 
+                            // std::cout << "{ not found" << std::endl;
+                            return { { tokenVector[leftBracketIndex].line, tokenVector[leftBracketIndex].index }, tokenVector[leftBracketIndex].content }; 
+                        }
+                        // find }
+                        int rightBracketIndex = findRightBracketNoError(tokenVector, leftBracketIndex + 1, rightBound);
+                        if (rightBracketIndex > rightBound)
+                        { 
+                            // std::cout << "} not found" << std::endl;
+                            return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content }; 
+                        }
+
+                        start = rightBracketIndex + 1;
+                    }
+                    // skip else  (if there is one)
+                    if (tokenVector[start].type == TokenType::ELSE)
+                    {
+                        // find where { is
+                        // the last else must be "else", not else if
+                        if (tokenVector[start+1].type != TokenType::LEFT_BRACKET)
+                        {
+                            return { { tokenVector[start+1].line, tokenVector[start+1].index }, tokenVector[start+1].content };  
+                        }
+                        leftBracketIndex = start + 1;
+                        // find }
+                        rightBracketIndex = findRightBracketNoError(tokenVector, leftBracketIndex + 1, rightBound);
+                        // ERROR: } not found
+                        if (rightBracketIndex > rightBound)
+                        { return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content }; }
+                        
+                        start = rightBracketIndex + 1;
+                    }
+
+
+
+                    // statements and expressions after else
+                    std::vector<std::unique_ptr<Node>> flows;
+                    std::pair<std::pair<int, int>, std::string> errorResultFlows = HandleTokenVector(tokenVector, newstart, start - 1, flows);
+                    if (errorResultFlows.first.first != -1) { return errorResultFlows; }
+                    node->flowGroups.push_back(std::move(flows));
+                }
+                else
                 {
                     return { { tokenVector[start+1].line, tokenVector[start+1].index }, tokenVector[start+1].content };  
                 }
-                // find where { is
-                leftBracketIndex = start + 1;
-                // find }
-                rightBracketIndex = findRightBracketNoError(tokenVector, leftBracketIndex + 1, rightBound);
-                if (rightBracketIndex > rightBound)
-                {
-                    return { { tokenVector[rightBracketIndex].line, tokenVector[rightBracketIndex].index }, tokenVector[rightBracketIndex].content };  
-                }
-                // statements and expressions inside {...}
-                std::vector<std::unique_ptr<Node>> flows;
-                std::pair<std::pair<int, int>, std::string> errorResultFlows = HandleTokenVector(tokenVector, leftBracketIndex + 1, rightBracketIndex - 1, flows);
-                if (errorResultFlows.first.first != -1) 
-                {
-                    return errorResultFlows;
-                }
-                node->flowGroups.push_back(std::move(flows));
-                start = rightBracketIndex + 1;
             }
             nodes.push_back(std::move(node));
         }

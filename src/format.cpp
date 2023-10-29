@@ -29,19 +29,40 @@ int main() {
 
 // print steps)";  
 
-    std::string input = R"(print a = 49
-print b = 21
-while a != b {
-    if a > b {
-        a = (a - b)
-    }
-    else {
-        if b > a {
-            b = (b - a)
-        }
-    }
+//     std::string input = R"(
+// val  = 105
+// fizz = val % 3 == 0
+// buzz = false
+// if val % 5 == 0 {
+//     buzz = true
+// }
+
+// if fizz & buzz {
+//     if buzz {
+//         print 333555
+//     }
+//     else {
+//         print 333
+//     }
+// }
+// else if buzz {
+//     print 555
+// }
+// else {
+//     print val
+// })";
+
+    std::string input = R"(
+a = 0
+if (a == 0) {
+    print 0
+} else if (a == 1) {
+    print 11
+} else {
+    print 222
 }
-print a)";
+print a
+)";
 
 #endif
 
@@ -53,18 +74,18 @@ print a)";
         std::cout << "Syntax error on line " << errorPair.first << " column " << errorPair.second << "." << std::endl;
         exit(1);
     }
-    // Token::printLexer(TokenVector);
+    Token::printLexer(TokenVector);
 
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
     if (errorResult.first.first != -1) 
     {
-        if (errorResult.first.first == 16 && errorResult.first.second == 6)
-        {
-            std::cout << "ppppppppppppppppppppppp" << std::endl;
-            std::cout << input << std::endl;
-            std::cout << "ppppppppppppppppppppppp" << std::endl;
-        }
+        // if (errorResult.first.first == 16 && errorResult.first.second == 6)
+        // {
+        //     std::cout << "ppppppppppppppppppppppp" << std::endl;
+        //     std::cout << input << std::endl;
+        //     std::cout << "ppppppppppppppppppppppp" << std::endl;
+        // }
 
 
         std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
