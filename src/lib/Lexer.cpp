@@ -125,8 +125,8 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             // the last character of variable is recorded
             if (recordingVariable) {
                 if (variableName == "while") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
-                else if (variableName == "if") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
-                else if (variableName == "else") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
+                else if (variableName == "if") { res.emplace_back(TokenType::IF, variableName, line, index - variableLength, -1); }
+                else if (variableName == "else") { res.emplace_back(TokenType::ELSE, variableName, line, index - variableLength, -1); }
                 else if (variableName == "true") { res.emplace_back(TokenType::TRUE, variableName, line, index - variableLength, -1); }
                 else if (variableName == "false") { res.emplace_back(TokenType::FALSE, variableName, line, index - variableLength, -1); }
                 else if (variableName == "print") { res.emplace_back(TokenType::PRINT, variableName, line, index - variableLength, -1); }
@@ -266,8 +266,8 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
     // the last character of variable is recorded
     if (recordingVariable) {
         if (variableName == "while") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
-        else if (variableName == "if") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
-        else if (variableName == "else") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
+        else if (variableName == "if") { res.emplace_back(TokenType::IF, variableName, line, index - variableLength, -1); }
+        else if (variableName == "else") { res.emplace_back(TokenType::ELSE, variableName, line, index - variableLength, -1); }
         else if (variableName == "true") { res.emplace_back(TokenType::TRUE, variableName, line, index - variableLength, -1); }
         else if (variableName == "false") { res.emplace_back(TokenType::FALSE, variableName, line, index - variableLength, -1); }
         else if (variableName == "print") { res.emplace_back(TokenType::PRINT, variableName, line, index - variableLength, -1); }

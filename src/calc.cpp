@@ -60,30 +60,25 @@ int main() {
             continue;
         }
 
-        ParserB::setupExpressionInfix(TokenVector);
+        ParserB::setupExpression(TokenVector);
 
         // ParserB
-        Node root;
-        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 0, TokenVector.size() - 2, root);
+        std::unique_ptr<ExpressionNode> root;
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
 
         if (errorResult.first.first != -1) 
         {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-        ParserB::print(root);
+        ParserB::print(root.get());
         std::cout << std::endl;
 
         // Calculate
         double result;
         std::map<std::string, double> originalVariableMap(ParserB::variableMap);
         std::map<std::string, bool> originalVariableInitializedMap(ParserB::variableInitializedMap);
-        std::string errorMessage = ParserB::calculate(root, result);
-
-        if (errorMessage == "114514") 
-        {
-            std::cout << input << std::endl;
-        }
+        std::string errorMessage = ParserB::calculate(root.get(), result);
 
         if (errorMessage.length() != 0)
         {
