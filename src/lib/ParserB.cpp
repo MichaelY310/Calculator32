@@ -1,5 +1,4 @@
 #include "ParserB.h"
-#include <stack>
 
 // Initialize static member variables
 std::map<std::string, double> ParserB::variableMap = std::map<std::string, double>();
