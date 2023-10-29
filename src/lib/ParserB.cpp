@@ -7,6 +7,8 @@ std::map<std::string, bool> ParserB::variableInitializedMap = std::map<std::stri
 std::map<std::string, DataType> ParserB::variableTypeMap = std::map<std::string, DataType>();
 std::map<TokenType, int> ParserB::hierarchyMap = {
     {TokenType::NUMBER ,          0}, // 1 2 3
+    {TokenType::TRUE ,            0}, // true
+    {TokenType::FALSE ,           0}, // false
     {TokenType::VARIABLE ,        0}, // a b c
     {TokenType::LEFT_PARENTHESIS ,1}, // ()
     {TokenType::MULTIPLY ,        2}, // *
@@ -314,7 +316,19 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         node = std::make_unique<ExpressionNode>(expression[topIndex]);
         return { { -1, -1 }, "" };
     }
-    // case 3 =
+    // case 3 true
+    else if (expression[topIndex].type == TokenType::TRUE)
+    {
+        node = std::make_unique<ExpressionNode>(expression[topIndex]);
+        return { { -1, -1 }, "" };
+    }
+    // case 4 false
+    else if (expression[topIndex].type == TokenType::FALSE)
+    {
+        node = std::make_unique<ExpressionNode>(expression[topIndex]);
+        return { { -1, -1 }, "" };
+    }
+    // case 5 =
     else if (expression[topIndex].type == TokenType::ASSIGNMENT)
     {
         node = std::make_unique<ExpressionNode>(expression[topIndex]);
@@ -344,7 +358,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
 
         return { { -1, -1 }, "" };
     }
-    // case 4 + - * /
+    // case 6 + - * /
     else if (expression[topIndex].type == TokenType::PLUS || expression[topIndex].type == TokenType::MINUS || 
             expression[topIndex].type == TokenType::MULTIPLY || expression[topIndex].type == TokenType::DIVIDE || 
             expression[topIndex].type == TokenType::MOD ||
@@ -369,7 +383,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         
         return { { -1, -1 }, "" };
     }
-    // case 5 (...)
+    // case 7 (...)
     else if (expression[topIndex].type == TokenType::LEFT_PARENTHESIS)
     {
         int rightIndex = findRightParenthesisNoError(expression, topIndex+1, rightBound);
@@ -380,7 +394,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         // get rid of the parenthesis pair
         return MakeExpressionTree(expression, topIndex+1, rightIndex-1, node);
     }
-    // case 6 ERROR
+    // case 8 ERROR
     else
     {
 #if DEBUG
@@ -729,10 +743,6 @@ void ParserB::print(Node* root, int indent)
         print(printRoot->content.get());
     }
 
-
-
-
-
     // ExpressionNode
     else 
     {
@@ -773,6 +783,21 @@ void ParserB::print(Node* root, int indent)
         }
     }
 }
+
+void ParserB::printValue(double value, DataType valueType)
+{
+    if (valueType == DataType::BOOL)
+    {
+        if (value == 0) { std::cout << "false"; }
+        else            { std::cout << "true"; }
+    }
+
+    else
+    {
+        std::cout << value;
+    }
+}
+
 
 // exclude left parenthesis
 int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound)

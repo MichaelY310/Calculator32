@@ -14,25 +14,35 @@ int main() {
     input = input.substr(0, input.size()-1);
 #endif
 #if DEBUG == 1
-    std::string input = R"(x     = 42
-steps = 0
+//     std::string input = R"(x     = 42
+// steps = 0
 
-while x > 1 {
-  steps = steps + 1
-  if x % 2 == 0 {
-    x = x / 2
-  }
-  else {
-    x = 3 * x + 1
-  }
+// while x > 1 {
+//   steps = steps + 1
+//   if x % 2 == 0 {
+//     x = x / 2
+//   }
+//   else {
+//     x = 3 * x + 1
+//   }
+// }
+
+// print steps)";  
+
+    std::string input = R"(print (a = 49)
+print (b = 21)
+while (a != b) {
+    if (a > b) {
+        (a = (a - b))
+    }
+    else {
+        if (b > a) {
+            (b = (b - a))
+        }
+    }
 }
+print a)";
 
-print steps)";  
-
-    // std::string input = R"(print 114514)";  
-//     std::string input = R"(1 + 1
-// 2 + 2
-// 3 + 3 * (4 + 4))";  
 #endif
 
     std::vector<Token> TokenVector;
