@@ -74,7 +74,7 @@ print a
         std::cout << "Syntax error on line " << errorPair.first << " column " << errorPair.second << "." << std::endl;
         exit(1);
     }
-    Token::printLexer(TokenVector);
+    // Token::printLexer(TokenVector);
 
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
