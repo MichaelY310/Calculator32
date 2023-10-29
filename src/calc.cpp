@@ -76,9 +76,10 @@ int main() {
 
         // Calculate
         double result;
+        DataType resultType;
         std::map<std::string, double> originalVariableMap(ParserB::variableMap);
         std::map<std::string, bool> originalVariableInitializedMap(ParserB::variableInitializedMap);
-        std::string errorMessage = ParserB::calculate(root.get(), result);
+        std::string errorMessage = ParserB::calculate(root.get(), result, resultType);
 
         if (errorMessage.length() != 0)
         {
