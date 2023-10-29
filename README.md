@@ -1,5 +1,5 @@
 # Calculator32
-This project is tempoparity a calculator, and final goal is to making a lightweight script coding language.
+This project is temporarity a calculator, and final goal is to making a lightweight script coding language.
 
 In checkpoint 2, we added the support of variables so that variables could be assigned a value and being calculated, and we also supported infix expressions so that we could read direct infix expressions rather than S expressions.
 
@@ -25,6 +25,8 @@ This program supports interactive infix input lines, taking a line of input each
 
 > William Lin
 > 
+> 
 > Torry Tong
+> 
 > 
 > Michael Yang
