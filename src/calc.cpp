@@ -24,7 +24,7 @@ int main() {
     //std::string input = "(((a / 4) + (c / 3))";
     //std::string input = "88=mgh\n=\n=x\n=4321\nx=\nx = y =\n88 = mph";
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
-    std::string input = "(true != false)";
+    std::string input = "false";
     // std::string input = "(1 == 2)";
     //std::string input = "()+)";
 #endif
@@ -61,9 +61,8 @@ int main() {
             continue;
         }
 
-        ParserB::setupExpression(TokenVector);
-
         // ParserB
+        ParserB::setupExpression(TokenVector);
         std::unique_ptr<ExpressionNode> root;
         std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
 

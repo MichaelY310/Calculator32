@@ -82,7 +82,7 @@ public:
     static std::pair<std::pair<int, int>, std::string> HandleTokenVector(std::vector<Token> tokenVector, int leftBound, int rightBound, std::vector<std::unique_ptr<Node>>& nodes);
     static std::pair<std::pair<int, int>, std::string> MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node);
     static std::string calculate(Node* root, double& result, DataType& resultType);
-    static void print(Node* root, int indent = 0);\
+    static void print(Node* root, int indent = 0);
     static void printValue(double value, DataType valueType);
     static void setupExpression(std::vector<Token> expression);
 

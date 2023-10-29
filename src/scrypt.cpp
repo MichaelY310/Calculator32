@@ -29,7 +29,7 @@ int main() {
 
 // print steps)";  
 
-    std::string input = R"(12 < 12.1)";  
+    std::string input = R"(print (12 < 12.1))"; 
 
     // std::string input = R"(print 114514)";  
 //     std::string input = R"(1 + 1

@@ -481,7 +481,9 @@ std::string ParserB::calculate(Node* root, double& result, DataType& resultType)
         DataType flowResultType;
         std::string errorMessageFlow = calculate(printNode->content.get(), flowResult, flowResultType);
         if (errorMessageFlow != "") { return errorMessageFlow; }            
-        std::cout << flowResult << std::endl;
+        // std::cout << flowResult << std::endl;
+        ParserB::printValue(flowResult, flowResultType);
+        std::cout << std::endl;
     }
 
     // Expression
