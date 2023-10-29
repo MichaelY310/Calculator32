@@ -42,5 +42,3 @@ Checkpoint 3: Added support for Bool values, ordered comparisons, logic operatio
 > 
 > 
 > Michael Yang
-> 
-> Michael Yang
