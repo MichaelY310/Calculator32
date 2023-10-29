@@ -29,15 +29,15 @@ int main() {
 
 // print steps)";  
 
-    std::string input = R"(print (a = 49)
-print (b = 21)
-while (a != b) {
-    if (a > b) {
-        (a = (a - b))
+    std::string input = R"(print a = 49
+print b = 21
+while a != b {
+    if a > b {
+        a = (a - b)
     }
     else {
-        if (b > a) {
-            (b = (b - a))
+        if b > a {
+            b = (b - a)
         }
     }
 }
@@ -59,6 +59,14 @@ print a)";
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
     if (errorResult.first.first != -1) 
     {
+        if (errorResult.first.first == 16 && errorResult.first.second == 6)
+        {
+            std::cout << "ppppppppppppppppppppppp" << std::endl;
+            std::cout << input << std::endl;
+            std::cout << "ppppppppppppppppppppppp" << std::endl;
+        }
+
+
         std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
         exit(2);
     }
