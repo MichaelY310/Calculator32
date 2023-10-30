@@ -902,5 +902,3 @@ std::string ParserB::calculate(Node root, double& result, DataType& resultType)
 //     result = true;
 //     return "";
 // }
-
-djs;
