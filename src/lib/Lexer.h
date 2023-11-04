@@ -41,6 +41,11 @@ enum class TokenType {
     ERROR,              // ERROR
 
 
+    COMMA,              // ,
+    SEMICOLON,          // ;
+
+
+
 
     LEFT_BRACKET,    // {
     RIGHT_BRACKET,   // }

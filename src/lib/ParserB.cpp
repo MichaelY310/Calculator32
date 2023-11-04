@@ -250,6 +250,9 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         int rightIndex = findRightParenthesisNoError(expression, topIndex+1, rightBound);
         if (rightIndex > rightBound)
         {
+#if DEBUG
+    std::cout << "1.5  the first element is a parenthesis and has no right parenthesis  " << std::endl;
+#endif
             return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  
         }
         i = rightIndex + 1;
@@ -270,7 +273,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         if (hierarchyMap.find(expression[topIndex].type) == hierarchyMap.end())
         {
 #if DEBUG
-    std::cout << "1.5  the first token unknown token  " << std::endl;
+    std::cout << "2.5  the first token unknown token  " << std::endl;
 #endif
             return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };
         } 
@@ -354,8 +357,9 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         if (topIndex == rightBound)
             return { { expression[topIndex+1].line, expression[topIndex+1].index }, expression[topIndex+1].content }; 
         // Error 3. What is before = is not a variable      e.g 1=1
-        if (expression[topIndex-1].type != TokenType::VARIABLE)
-            return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
+        // Handled in runtime
+        // if (expression[topIndex-1].type != TokenType::VARIABLE)
+        //     return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
 
         // on the left
         std::unique_ptr<ExpressionNode> node1;
@@ -547,6 +551,10 @@ std::string ParserB::calculate(Node* root, double& result, DataType& resultType)
             std::string errorMessage = calculate(expressionNode->children[1].get(), result, resultType);
             if (errorMessage != "") { return errorMessage; }
 
+            // the first child must be a variable
+            if (expressionNode->children[1].get()->value.type != TokenType::VARIABLE)
+            { return "Runtime error: invalid assignee."; }
+
             variableMap.at(expressionNode->children[0]->value.content) = result;
             variableInitializedMap.at(expressionNode->children[0]->value.content) = true;
             variableTypeMap.at(expressionNode->children[0]->value.content) = resultType;
@@ -607,11 +615,6 @@ std::string ParserB::calculate(Node* root, double& result, DataType& resultType)
             // == !=
             else if (expressionNode->value.type == TokenType::EQUALITY || expressionNode->value.type == TokenType::INEQUALITY)
             {
-                // inequality or equality can works on both double or bool but only return bool
-                if (resultType1 != resultType2)
-                {
-                    return "Runtime error: invalid operand type.";
-                }
                 resultType = DataType::BOOL;
             }
 
@@ -639,11 +642,25 @@ std::string ParserB::calculate(Node* root, double& result, DataType& resultType)
             }
             // ==
             else if (expressionNode->value.type == TokenType::EQUALITY) {
-                result = result1 == result2; 
+                if (resultType1 != resultType2)
+                {
+                    result = false;
+                }
+                else
+                {
+                    result = result1 == result2; 
+                }
             }
             // !=
             else if (expressionNode->value.type == TokenType::INEQUALITY) {
-                result = result1 != result2; 
+                if (resultType1 != resultType2)
+                {
+                    result = true;
+                }
+                else
+                {
+                    result = result1 != result2; 
+                }
             }
             // >
             else if (expressionNode->value.type == TokenType::BIGGER) {
