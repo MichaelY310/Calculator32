@@ -50,6 +50,8 @@ enum class TokenType {
     IF,
     ELSE,
     PRINT
+
+    ARRAY
 };
 
 class Token {
