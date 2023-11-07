@@ -130,6 +130,9 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
                 else if (variableName == "true") { res.emplace_back(TokenType::TRUE, variableName, line, index - variableLength, 1); }
                 else if (variableName == "false") { res.emplace_back(TokenType::FALSE, variableName, line, index - variableLength, 0); }
                 else if (variableName == "print") { res.emplace_back(TokenType::PRINT, variableName, line, index - variableLength, -1); }
+                else if (variableName == "def") { res.emplace_back(TokenType::DEF, variableName, line, index - variableLength, -1); }
+                else if (variableName == "null") { res.emplace_back(TokenType::NUL, variableName, line, index - variableLength, -1); }
+                else if (variableName == "return") { res.emplace_back(TokenType::RETURN, variableName, line, index - variableLength, -1); }
                 else { res.emplace_back(TokenType::VARIABLE, variableName, line, index - variableLength, -1); }
                 recordingVariable = false;
                 variableName = "";
@@ -230,11 +233,11 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             }
             else if (input.at(i) == '{')
             {
-                res.emplace_back(TokenType::LEFT_BRACKET, "{", line, index, -1);
+                res.emplace_back(TokenType::LEFT_BRACE, "{", line, index, -1);
             }
             else if (input.at(i) == '}')
             {
-                res.emplace_back(TokenType::RIGHT_BRACKET, "}", line, index, -1);
+                res.emplace_back(TokenType::RIGHT_BRACE, "}", line, index, -1);
             }
             else if (input.at(i) == ',')
             {
@@ -279,6 +282,9 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
         else if (variableName == "true") { res.emplace_back(TokenType::TRUE, variableName, line, index - variableLength, 1); }
         else if (variableName == "false") { res.emplace_back(TokenType::FALSE, variableName, line, index - variableLength, 0); }
         else if (variableName == "print") { res.emplace_back(TokenType::PRINT, variableName, line, index - variableLength, -1); }
+        else if (variableName == "def") { res.emplace_back(TokenType::DEF, variableName, line, index - variableLength, -1); }
+        else if (variableName == "null") { res.emplace_back(TokenType::NUL, variableName, line, index - variableLength, -1); }
+        else if (variableName == "return") { res.emplace_back(TokenType::RETURN, variableName, line, index - variableLength, -1); }
         else { res.emplace_back(TokenType::VARIABLE, variableName, line, index - variableLength, -1); }
     }
 

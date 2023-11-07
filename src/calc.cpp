@@ -24,9 +24,9 @@ int main() {
     //std::string input = "(((a / 4) + (c / 3))";
     //std::string input = "88=mgh\n=\n=x\n=4321\nx=\nx = y =\n88 = mph";
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
-    std::string input = "1==false";
+    // std::string input = "1==false";
     // std::string input = "(1 == 2)";
-    //std::string input = "()+)";
+    std::string input = "x = 42\nx % 2 != 0";
 #endif
 
 
@@ -75,21 +75,23 @@ int main() {
         std::cout << std::endl;
 
         // Calculate
-        double result;
-        DataType resultType;
-        std::map<std::string, double> originalVariableMap(ParserB::variableMap);
-        std::map<std::string, bool> originalVariableInitializedMap(ParserB::variableInitializedMap);
-        std::string errorMessage = ParserB::calculate(root.get(), result, resultType);
+        Result result;
+        std::map<std::string, DataType> originalVariableTypeMap(ParserB::variableTypeMap);
+        std::map<std::string, double> originalVariableDoubleMap(ParserB::variableDoubleMap);
+        std::map<std::string, bool> originalVariableBoolMap(ParserB::variableBoolMap);
+
+        std::string errorMessage = ParserB::calculate(root.get(), result);
 
         if (errorMessage.length() != 0)
         {
             std::cout << errorMessage << std::endl;
-            ParserB::variableMap.swap(originalVariableMap);
-            ParserB::variableInitializedMap.swap(originalVariableInitializedMap);
+            ParserB::variableTypeMap.swap(originalVariableTypeMap);
+            ParserB::variableDoubleMap.swap(originalVariableDoubleMap);
+            ParserB::variableBoolMap.swap(originalVariableBoolMap);
 
             continue;
         }
-        ParserB::printValue(result, resultType);
+        ParserB::printValue(result);
         std::cout << std::endl;
     }
     return 0;
