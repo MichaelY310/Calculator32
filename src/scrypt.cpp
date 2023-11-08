@@ -15,6 +15,7 @@ int main() {
     input = input.substr(0, input.size()-1);
 #endif
 #if DEBUG == 1
+
 //     std::string input = R"(x     = 42
 // steps = 0
 
@@ -31,35 +32,29 @@ int main() {
 // print steps)";  
 
 
-//     std::string input = R"(
-// z = 42
-
-// def foo(x, y) {
-//   def square(value) {
-//     return value * value
-//   }
-
-//   print square(x + y + z)
-// }
-
-// z = 108
-// f = foo
-
-// result = f(1, 2)
-// if result != null {
-//   print result
-// }
-//     )";
-
 
     std::string input = R"(
+z = 42
 
 def foo(x, y) {
+  def square(value) {
+    return value * value
+  }
+
+  print square(x + y + z)
 }
 
+z = 108
 f = foo
 
-)";
+result = f(1, 2)
+if result != null {
+  print result
+}
+    )";
+
+
+
  
 #endif
 

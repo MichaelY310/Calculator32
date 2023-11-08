@@ -559,9 +559,10 @@ std::string ParserB::calculate(Node* root, Result& result)
         FunctionDefineNode* functionDefineNode = dynamic_cast<FunctionDefineNode*>(root);
         Result result;
         result.type = DataType::FUNCTION;
-        result.function = new Function();
+        result.function = std::make_shared<Function>();
         result.function->m_ParameterNames = functionDefineNode->parameterNames;
         result.function->m_FunctionFlows = std::move(functionDefineNode->flows);
+        result.function->m_CaptureScope = Scope(ScopeStack.top());
         setVariable(functionDefineNode->functionName, result);
         return "";
     }
@@ -634,7 +635,6 @@ std::string ParserB::calculate(Node* root, Result& result)
         Result flowResult;
         std::string errorMessageFlow = calculate(printNode->content.get(), flowResult);
         if (errorMessageFlow != "") { return errorMessageFlow; }            
-        // std::cout << flowResult << std::endl;
         ParserB::printValue(flowResult);
         std::cout << std::endl;
     }
@@ -701,9 +701,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 {
                     return "Runtime error: not a function.";
                 }
+
+
                 Result functionResult;
                 getVariable(expressionNode->value.content, functionResult);
-                Function*& function = functionResult.function;
+                std::shared_ptr<Function> function = functionResult.function;
                 
                 // Parameters don't match
                 if (function->m_ParameterNames.size() != expressionNode->children.size()-1)
@@ -714,9 +716,12 @@ std::string ParserB::calculate(Node* root, Result& result)
                 // execute the function
                 // 1. create a new scope
                 Scope localScope(ScopeStack.top());
+                // Overwrite the localscope with the captured scope
+                localScope.OverwriteBy(function->m_CaptureScope);
+
                 ScopeStack.push(localScope); 
                 // 2. set parameter values
-                for (int i=1; i < (int)expressionNode->children.size(); i++)
+                for (int i = 1; i < (int)expressionNode->children.size(); i++)
                 {
                     Result parameterResult;
                     calculate(expressionNode->children[i].get(), parameterResult);
@@ -727,9 +732,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                     calculate(function->m_FunctionFlows[i].get(), result);
                     if (function->m_FunctionFlows[i]->value.type == TokenType::RETURN)
                     {
-                        break;
+                        ScopeStack.pop();
+                        return "";
                     }
                 }
+                result.type = DataType::NUL;
                 ScopeStack.pop();
             }
             else 
@@ -750,11 +757,7 @@ std::string ParserB::calculate(Node* root, Result& result)
             if (expressionNode->children[0].get()->value.type != TokenType::VARIABLE)
             { return "Runtime error: invalid assignee."; }
 
-
             setVariable(expressionNode->children[0]->value.content, result);
-            // std::cout << expressionNode->children[0]->value.content << std::endl;
-            // std::cout << expressionNode->children[0]->value.content << std::endl;
-            // std::cout << expressionNode->children[0]->value.content << std::endl;
 
             return "";
         }
@@ -862,7 +865,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 result.type = DataType::BOOL;
                 // ==
                 if (expressionNode->value.type == TokenType::EQUALITY) {
-                    if (result1.type != result2.type)
+                    if (result1.type == DataType::NUL && result2.type == DataType::NUL)
+                    {
+                        result.boolValue = true;
+                    }
+                    else if (result1.type != result2.type)
                     {
                         result.boolValue = false;
                     }
@@ -878,7 +885,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 }
                 // !=
                 else if (expressionNode->value.type == TokenType::INEQUALITY) {
-                    if (result1.type != result2.type)
+                    if (result1.type == DataType::NUL && result2.type == DataType::NUL)
+                    {
+                        result.boolValue = false;
+                    }
+                    else if (result1.type != result2.type)
                     {
                         result.boolValue = true;
                     }
@@ -1080,7 +1091,12 @@ void ParserB::print(Node* root, int indent)
 
 void ParserB::printValue(Result& value)
 {
-    if (value.type == DataType::BOOL)
+    if (value.type == DataType::NUL)
+    {
+        std::cout << "null";
+    }
+
+    else if (value.type == DataType::BOOL)
     {
         if (value.boolValue == 0) { std::cout << "false"; }
         else                      { std::cout << "true"; }
@@ -1093,6 +1109,8 @@ void ParserB::printValue(Result& value)
 
     else
     {
+        std::cout << (value.type == DataType::FUNCTION) << std::endl;
+        std::cout << (value.type == DataType::NUL) << std::endl;
         std::cout << "There is something wrong PrintValue" << std::endl;
     }
 }
@@ -1165,7 +1183,11 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     auto& variableBoolMap = ScopeStack.top().variableBoolMap;
     auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
     result.type = variableTypeMap[variableName];
-    if (result.type == DataType::DOUBLE)
+    if (result.type == DataType::NUL)
+    {
+        
+    }
+    else if (result.type == DataType::DOUBLE)
     {
         result.doubleValue = variableDoubleMap[variableName];
     }
@@ -1175,10 +1197,11 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     }        
     else if (result.type == DataType::FUNCTION)
     {
-        result.function = variableFunctionMap[variableName].get();
+        result.function = variableFunctionMap[variableName];
     }
     else 
     {
+        std::cout << (result.type == DataType::NUL) << std::endl;
         std::cout << "There is a problem getVariable" << std::endl;
     }
 }
@@ -1188,8 +1211,13 @@ void ParserB::setVariable(std::string& variableName, Result& result) {
     auto& variableDoubleMap = ScopeStack.top().variableDoubleMap;
     auto& variableBoolMap = ScopeStack.top().variableBoolMap;
     auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
+
     variableTypeMap[variableName] = result.type;
-    if (result.type == DataType::DOUBLE)
+    if (result.type == DataType::NUL)
+    {
+
+    }
+    else if (result.type == DataType::DOUBLE)
     {
         variableDoubleMap[variableName] = result.doubleValue;
     }
@@ -1199,24 +1227,7 @@ void ParserB::setVariable(std::string& variableName, Result& result) {
     }        
     else if (result.type == DataType::FUNCTION)
     {
-        // Function* function = result.function;
-
-        // std::shared_ptr<Function> function2 = std::make_shared<Function>();
-        // function2.reset(result.function); 
-
-        // std::cout << (int)function->m_ParameterNames.size() << std::endl;
-        // for (int i=0; i < (int)function->m_ParameterNames.size(); i++)
-        // {
-        // std::cout << function->m_ParameterNames[0] << std::endl;
-        // }
-
-        
-        // std::cout << ScopeStack.size() << std::endl;
-        // variableFunctionMap[variableName] = std::make_shared<Function>();
-        // variableFunctionMap[variableName].reset(result.function);
-
-        // result.function = variableFunctionMap[variableName].get();
-        // variableFunctionMap[variableName].reset();
+        variableFunctionMap[variableName] = result.function;
     }
     else
     {
