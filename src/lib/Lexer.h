@@ -5,52 +5,17 @@
 #include <iostream>
 #include <cmath>
 
-
 enum class TokenType {
-    none,               //
-    variable,           // a b c
-    bool_variable,
-    number,             // 1 2 3
-
-    leftParenthesis,    // (
-    rightParenthesis,   // )
-
-    multiply,           // *
-    divide,             // /
-    mod,                // %
-
-    plus,               // +
-    minus,              // -
-
-    smaller,            // <
-    bigger,             // >
-    smaller_equal,      // <=
-    bigger_equal,       // >=
-
-    equality,           // ==
-    inequality,         // !=
-
-    AND,                // &
-
-    exclusive_or,       // ^
-
-    inclusive_or,       // |
-
-    equals,             // =
-
-    end,                // END
-    error,              // ERROR
-
-
-
-    leftBracket,    // {
-    rightBracket,   // }
-    TRUE,           
-    FALSE,
-    WHILE,
-    ELSE,
-    IF,
-    PRINT
+    none,
+    number,
+    plus,
+    minus,
+    multiply,
+    divide,
+    leftParenthesis,
+    rightParenthesis,
+    end,
+    error
 };
 
 class Token {
@@ -64,7 +29,7 @@ public:
     }
 
 public:
-    static std::pair<int, int> GenTokenVector(const std::string& input, std::vector<Token>& res);  // returns a vector of tokens created from a string.
+    static std::vector<Token> GenTokenVector(const std::string input);  // returns a vector of tokens created from a string.
     static void printLexer(std::vector<Token> TokenVector);
     static void printLexer(const std::string input);
      

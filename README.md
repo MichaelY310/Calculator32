@@ -1,4 +1,18 @@
 # Calculator32
+
+there are two main functions
+
+# lex.cpp
+Turn the input string into a token vector and print their attributes
+
+# parse.cpp
+Turn the input string into a tree and then calculate the result of the expression.
+
+
+> William Lin
+> Torry Tong
+> Michael Yang
+
 This project is temporarity a calculator, and final goal is to making a lightweight script coding language.
 
 We have all of the functions with main() functions in /src/ folder, with other classes that designed as helper (i.e. without main functions) in /src/lib/ folder.
