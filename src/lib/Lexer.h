@@ -7,49 +7,59 @@
 
 
 enum class TokenType {
-    none,               //
-    variable,           // a b c
-    number,             // 1 2 3
+    NONE,               //
+    NUL,               // function return type
+    RETURN,
+    VARIABLE,           // a b c
+    NUMBER,             // 1 2 3
 
-    leftParenthesis,    // (
-    rightParenthesis,   // )
+    LEFT_PARENTHESIS,    // (
+    RIGHT_PARENTHESIS,   // )
+    LEFT_BRACKET,    // (
+    RIGHT_BRACKET,   // )
 
-    multiply,           // *
-    divide,             // /
-    mod,                // %
+    MULTIPLY,           // *
+    DIVIDE,             // /
+    MOD,                // %
 
-    plus,               // +
-    minus,              // -
+    PLUS,               // +
+    MINUS,              // -
 
-    smaller,            // <
-    bigger,             // >
-    smaller_equal,      // <=
-    bigger_equal,       // >=
+    SMALLER,            // <
+    BIGGER,             // >
+    SMALLER_EQUAL,      // <=
+    BIGGER_EQUAL,       // >=
 
-    equality,           // ==
-    inequality,         // !=
+    EQUALITY,           // ==
+    INEQUALITY,         // !=
 
     AND,                // &
 
-    exclusive_or,       // ^
+    EXCLUSIVE_OR,       // ^
 
-    inclusive_or,       // |
+    INCLUSIVE_OR,       // |
 
-    equals,             // =
+    ASSIGNMENT,         // =
 
-    end,                // END
-    error,              // ERROR
+    END,                // END
+    ERROR,              // ERROR
+
+
+    COMMA,              // ,
+    SEMICOLON,          // ;
 
 
 
-    leftBracket,    // {
-    rightBracket,   // }
+
+    LEFT_BRACE,       // {
+    RIGHT_BRACE,      // }
     TRUE,           
     FALSE,
     WHILE,
-    ELSE,
     IF,
-    PRINT
+    ELSE,
+    PRINT,
+    DEF,
 };
 
 class Token {

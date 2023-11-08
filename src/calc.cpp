@@ -24,8 +24,9 @@ int main() {
     //std::string input = "(((a / 4) + (c / 3))";
     //std::string input = "88=mgh\n=\n=x\n=4321\nx=\nx = y =\n88 = mph";
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
-    std::string input = "(x = 10)\n(y = 57)\n(z = 16)\n((((x = 3) + (y = 5)) + w) + (z = 145))\n((x + y) + z)";
-    //std::string input = "()+)";
+    // std::string input = "1==false";
+    // std::string input = "(1 == 2)";
+    std::string input = "x = 42\nx % 2 != 0";
 #endif
 
 
@@ -60,40 +61,38 @@ int main() {
             continue;
         }
 
-        ParserB::setupExpressionInfix(TokenVector);
-
         // ParserB
-        Node root;
-        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeTreeInfix(TokenVector, 0, TokenVector.size() - 2, root);
+        ParserB::setupExpression(TokenVector);
+        std::unique_ptr<ExpressionNode> root;
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
 
         if (errorResult.first.first != -1) 
         {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-        ParserB::print(root);
+        ParserB::print(root.get());
         std::cout << std::endl;
 
         // Calculate
-        double result;
-        std::map<std::string, double> originalVariableMap(ParserB::variableMap);
-        std::map<std::string, bool> originalVariableInitializedMap(ParserB::variableInitializedMap);
-        std::string errorMessage = ParserB::calculate(root, result);
+        Result result;
+        std::map<std::string, DataType> originalVariableTypeMap(ParserB::variableTypeMap);
+        std::map<std::string, double> originalVariableDoubleMap(ParserB::variableDoubleMap);
+        std::map<std::string, bool> originalVariableBoolMap(ParserB::variableBoolMap);
 
-        if (errorMessage == "114514") 
-        {
-            std::cout << input << std::endl;
-        }
+        std::string errorMessage = ParserB::calculate(root.get(), result);
 
         if (errorMessage.length() != 0)
         {
             std::cout << errorMessage << std::endl;
-            ParserB::variableMap.swap(originalVariableMap);
-            ParserB::variableInitializedMap.swap(originalVariableInitializedMap);
+            ParserB::variableTypeMap.swap(originalVariableTypeMap);
+            ParserB::variableDoubleMap.swap(originalVariableDoubleMap);
+            ParserB::variableBoolMap.swap(originalVariableBoolMap);
 
             continue;
         }
-        std::cout << result << std::endl;
+        ParserB::printValue(result);
+        std::cout << std::endl;
     }
     return 0;
 }

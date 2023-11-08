@@ -1,5 +1,4 @@
 #include "Lexer.h"
-#include "Utils.h"
 
 Token::Token(TokenType itype, std::string icontent, int iline, int iindex, double ivalue)
     : type(itype), content(icontent), line(iline), index(iindex), value(ivalue)
@@ -26,65 +25,6 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
 
     for (int i = 0; i < len; i++)
     {
-        // std::cout << (int)input.at(i) << std::endl;
-
-        // record while 
-        if ((input.at(i) == 'w')){
-            if (!recordingNumber && !recordingVariable && i + 4 < len){
-                if (input.substr(i,5) == "while"){
-                    if (i + 5 < len && input.substr(i,6) == "while "){
-                        res.emplace_back(TokenType::WHILE, "while", line, index, -1);
-                        i = i + 5;
-                        index = index + 6;
-                        continue;
-                    }
-                    else if (i + 5 == len){
-                        res.emplace_back(TokenType::WHILE, "while", line, index, -1);
-                        index = index + 5;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // record if
-        if ((input.at(i) == 'i')){
-            if (!recordingNumber && !recordingVariable && i + 1 < len){
-                if (input.substr(i,2) == "if"){
-                    if (i + 2 < len && input.substr(i,3) == "if "){
-                        res.emplace_back(TokenType::IF, "if", line, index, -1);
-                        i = i + 2;
-                        index = index + 3;
-                        continue;
-                    }
-                    else if (i + 2 == len){
-                        res.emplace_back(TokenType::IF, "if", line, index, -1);
-                        index = index + 2;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // record else
-        if ((input.at(i) == 'e')){
-            if (!recordingNumber && !recordingVariable && i + 3 < len){
-                if (input.substr(i,4) == "else"){
-                    if (i + 4 < len && input.substr(i,5) == "else "){
-                        res.emplace_back(TokenType::ELSE, "else", line, index, -1);
-                        i = i + 4;
-                        index = index + 5;
-                        continue;
-                    }
-                    else if (i + 4 == len){
-                        res.emplace_back(TokenType::ELSE, "else", line, index, -1);
-                        index = index + 4;
-                        break;
-                    }
-                }
-            }
-        }
-
         // variable
         if ((input.at(i) >= 'a' && input.at(i) <= 'z') || (input.at(i) >= 'A' && input.at(i) <= 'Z') || input.at(i) == '_')
         {
@@ -139,7 +79,6 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             // nothing before a point
             if (!recordingNumber)
             {
-                // if there's error, the last token would be ERROR instead of END
 #if DEBUG
     std::cout << "2" << std::endl;
 #endif
@@ -148,7 +87,6 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             // already have a point
             if (afterPoint)
             {
-                // if there's error, the last token would be ERROR instead of END
 #if DEBUG
     std::cout << "3" << std::endl;
 #endif
@@ -166,18 +104,16 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             // ERROR if point not followed by a number
             if (recordingNumber && currentStringValue.back() == '.')
             {
-                // if there's error, the last token would be ERROR instead of END
 #if DEBUG
     std::cout << "4" << std::endl;
 #endif
                 return { line, index };
             }
 
-
             // number ends
             // the last digit is recorded
             if (recordingNumber) {
-                res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
+                res.emplace_back(TokenType::NUMBER, currentStringValue, line, index - numberLength, currentValue);
                 recordingNumber = false;
                 afterPoint = false;
                 currentValue = 0;
@@ -188,7 +124,16 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             // variable ends
             // the last character of variable is recorded
             if (recordingVariable) {
-                res.emplace_back(TokenType::variable, variableName, line, index - variableLength, -1);
+                if (variableName == "while") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
+                else if (variableName == "if") { res.emplace_back(TokenType::IF, variableName, line, index - variableLength, -1); }
+                else if (variableName == "else") { res.emplace_back(TokenType::ELSE, variableName, line, index - variableLength, -1); }
+                else if (variableName == "true") { res.emplace_back(TokenType::TRUE, variableName, line, index - variableLength, 1); }
+                else if (variableName == "false") { res.emplace_back(TokenType::FALSE, variableName, line, index - variableLength, 0); }
+                else if (variableName == "print") { res.emplace_back(TokenType::PRINT, variableName, line, index - variableLength, -1); }
+                else if (variableName == "def") { res.emplace_back(TokenType::DEF, variableName, line, index - variableLength, -1); }
+                else if (variableName == "null") { res.emplace_back(TokenType::NUL, variableName, line, index - variableLength, -1); }
+                else if (variableName == "return") { res.emplace_back(TokenType::RETURN, variableName, line, index - variableLength, -1); }
+                else { res.emplace_back(TokenType::VARIABLE, variableName, line, index - variableLength, -1); }
                 recordingVariable = false;
                 variableName = "";
                 variableLength = 0;
@@ -208,37 +153,37 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             else if (input.at(i) == '=')
             {
                 if ( i + 1 < len && input.at(i+1) == '='){
-                    res.emplace_back(TokenType::equality,"==", line, index, -1);
+                    res.emplace_back(TokenType::EQUALITY,"==", line, index, -1);
                     i++;
                     index++;
                 }
                 else{
-                    res.emplace_back(TokenType::equals, "=", line, index, -1);
+                    res.emplace_back(TokenType::ASSIGNMENT, "=", line, index, -1);
                 }
             }
             else if (input.at(i) == '>'){
                 if ( i + 1 < len && input.at(i+1) == '='){
-                    res.emplace_back(TokenType::bigger_equal,">=", line, index, -1);
+                    res.emplace_back(TokenType::BIGGER_EQUAL,">=", line, index, -1);
                     i++;
                     index++;
                 }
                 else{
-                    res.emplace_back(TokenType::bigger, ">", line, index, -1);
+                    res.emplace_back(TokenType::BIGGER, ">", line, index, -1);
                 }
             }
             else if (input.at(i) == '<'){
                 if ( i + 1 < len && input.at(i+1) == '='){
-                    res.emplace_back(TokenType::smaller_equal,"<=", line, index, -1);
+                    res.emplace_back(TokenType::SMALLER_EQUAL,"<=", line, index, -1);
                     i++;
                     index++;
                 }
                 else{
-                    res.emplace_back(TokenType::smaller, "<", line, index, -1);
+                    res.emplace_back(TokenType::SMALLER, "<", line, index, -1);
                 }
             }
             else if (input.at(i) == '!'){
                 if ( i + 1 < len && input.at(i+1) == '='){
-                    res.emplace_back(TokenType::inequality,"!=", line, index, -1);
+                    res.emplace_back(TokenType::INEQUALITY,"!=", line, index, -1);
                     i++;
                     index++;
                 }
@@ -252,52 +197,59 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             }
             else if (input.at(i) == '|')
             {
-                res.emplace_back(TokenType::inclusive_or, "|", line, index, -1);
+                res.emplace_back(TokenType::INCLUSIVE_OR, "|", line, index, -1);
             }
             else if (input.at(i) == '^')
             {
-                res.emplace_back(TokenType::exclusive_or, "^", line, index, -1);
+                res.emplace_back(TokenType::EXCLUSIVE_OR, "^", line, index, -1);
             }
             else if (input.at(i) == '+')
             {
-                res.emplace_back(TokenType::plus, "+", line, index, -1);
+                res.emplace_back(TokenType::PLUS, "+", line, index, -1);
             }
             else if (input.at(i) == '-')
             {
-                res.emplace_back(TokenType::minus, "-", line, index, -1);
+                res.emplace_back(TokenType::MINUS, "-", line, index, -1);
             }
             else if (input.at(i) == '*')
             {
-                res.emplace_back(TokenType::multiply, "*", line, index, -1);
+                res.emplace_back(TokenType::MULTIPLY, "*", line, index, -1);
             }
             else if (input.at(i) == '/')
             {
-                res.emplace_back(TokenType::divide, "/", line, index, -1);
+                res.emplace_back(TokenType::DIVIDE, "/", line, index, -1);
             }
             else if (input.at(i) == '%')
             {
-                res.emplace_back(TokenType::mod, "%", line, index, -1);
+                res.emplace_back(TokenType::MOD, "%", line, index, -1);
             }
             else if (input.at(i) == '(')
             {
-                res.emplace_back(TokenType::leftParenthesis, "(", line, index, -1);
+                res.emplace_back(TokenType::LEFT_PARENTHESIS, "(", line, index, -1);
             }
             else if (input.at(i) == ')')
             {
-                res.emplace_back(TokenType::rightParenthesis, ")", line, index, -1);
+                res.emplace_back(TokenType::RIGHT_PARENTHESIS, ")", line, index, -1);
             }
             else if (input.at(i) == '{')
             {
-                res.emplace_back(TokenType::leftBracket, "{", line, index, -1);
+                res.emplace_back(TokenType::LEFT_BRACE, "{", line, index, -1);
             }
             else if (input.at(i) == '}')
             {
-                res.emplace_back(TokenType::rightBracket, "}", line, index, -1);
+                res.emplace_back(TokenType::RIGHT_BRACE, "}", line, index, -1);
+            }
+            else if (input.at(i) == ',')
+            {
+                res.emplace_back(TokenType::COMMA, ",", line, index, -1);
+            }
+            else if (input.at(i) == ';')
+            {
+                res.emplace_back(TokenType::SEMICOLON, ";", line, index, -1);
             }
             // Error
             else
             {
-                // if there's error, the last token would be ERROR instead of END
 #if DEBUG
     std::cout << "5" << std::endl;
 #endif
@@ -310,7 +262,6 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
     // final checks
     if (recordingNumber && currentStringValue.back() == '.')
     {
-        // if there's error, the last token would be ERROR instead of END
 #if DEBUG
     std::cout << "6" << std::endl;
 #endif
@@ -319,25 +270,26 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
 
     // the last digit is recorded
     if (recordingNumber) {
-        res.emplace_back(TokenType::number, currentStringValue, line, index - numberLength, currentValue);
-        recordingNumber = false;
-        afterPoint = false;
-        currentValue = 0;
-        currentStringValue = "";
-        numberLength = 0;
+        res.emplace_back(TokenType::NUMBER, currentStringValue, line, index - numberLength, currentValue);
     }
 
     // variable ends
     // the last character of variable is recorded
     if (recordingVariable) {
-        res.emplace_back(TokenType::variable, variableName, line, index - variableLength, -1);
-        recordingVariable = false;
-        variableName = "";
-        variableLength = 0;
+        if (variableName == "while") { res.emplace_back(TokenType::WHILE, variableName, line, index - variableLength, -1); }
+        else if (variableName == "if") { res.emplace_back(TokenType::IF, variableName, line, index - variableLength, -1); }
+        else if (variableName == "else") { res.emplace_back(TokenType::ELSE, variableName, line, index - variableLength, -1); }
+        else if (variableName == "true") { res.emplace_back(TokenType::TRUE, variableName, line, index - variableLength, 1); }
+        else if (variableName == "false") { res.emplace_back(TokenType::FALSE, variableName, line, index - variableLength, 0); }
+        else if (variableName == "print") { res.emplace_back(TokenType::PRINT, variableName, line, index - variableLength, -1); }
+        else if (variableName == "def") { res.emplace_back(TokenType::DEF, variableName, line, index - variableLength, -1); }
+        else if (variableName == "null") { res.emplace_back(TokenType::NUL, variableName, line, index - variableLength, -1); }
+        else if (variableName == "return") { res.emplace_back(TokenType::RETURN, variableName, line, index - variableLength, -1); }
+        else { res.emplace_back(TokenType::VARIABLE, variableName, line, index - variableLength, -1); }
     }
 
 
-    res.emplace_back(TokenType::end, "END", line, index, -1);
+    res.emplace_back(TokenType::END, "END", line, index, -1);
 
     return { -1, -1 };
 }

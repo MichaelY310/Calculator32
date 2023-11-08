@@ -6,37 +6,52 @@
 #include <sstream>
 #include <cmath>
 #include <map>
+#include <memory>
+#include <stack>
 
+#include "DataType.h"
 #include "Lexer.h"
-#include "Utils.h"
+#include "Scope.h"
+#include "Function.h"
+#include "ASTNode.h"
 
 
-class Node
-{
+
+class Result {
 public:
-    Node() : value(Token(TokenType::none, "", -1, -1, -1)) {}
-    Node(Token token) : value(token) {}
+    ~Result() {
+        if (type == DataType::FUNCTION && function != nullptr) {
+            // delete function;
+            // function = nullptr;
+        }
+    }
 
-    std::vector<Node> children;
-    Token value;
+    DataType type;
+
+    std::shared_ptr<Function> function;
+    union {
+        double doubleValue;
+        bool boolValue;
+    };
 };
 
 class ParserB
 {
 public:
-    static std::pair<std::pair<int, int>, std::string> MakeTreeInfix(std::vector<Token> expression, int leftBound, int rightBound, Node& node);
-    static std::string calculate(Node root, double& result);
-    static void print(Node root);
-    static void setupExpression(std::vector<Token> expression);
-    static void setupExpressionInfix(std::vector<Token> expression);
-    static std::vector<std::vector<Token>> expressionLines;
-    static std::map<std::string, double> variableMap;
-    static std::map<std::string, bool> variableInitializedMap;
+    static std::pair<std::pair<int, int>, std::string> HandleTokenVector(std::vector<Token> tokenVector, int leftBound, int rightBound, std::vector<std::unique_ptr<Node>>& nodes);
+    static std::pair<std::pair<int, int>, std::string> MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node);
+    static std::string calculate(Node* root, Result& result);
+    static void print(Node* root, int indent = 0);
+    static void printValue(Result& result);
+    static void setupExpression(std::vector<Token>& expression);
+    static void getVariable(std::string& variableName, Result& result);
+    static void setVariable(std::string& variableName, Result& result);
+    static int findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound);
+    static int findRightBracketNoError(std::vector<Token> expression, int leftBound, int rightBound);
+    static int findRightBraceNoError(std::vector<Token> expression, int leftBound, int rightBound);
 
+    static std::stack<Scope> ScopeStack;
     static std::map<TokenType, int> hierarchyMap;
 private:
-    static int findLeftParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
-    static int findRightParenthesis(std::vector<Token> expression, int leftBound, int rightBound);
-    static int findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound);
 };
 
