@@ -1,5 +1,6 @@
 #include "lib/ParserB.h"
 
+
 int main() {
 #if DEBUG == 0
     std::string input = "";
@@ -29,12 +30,37 @@ int main() {
 
 // print steps)";  
 
-    std::string input = R"(print (12 < 12.1))"; 
 
-    // std::string input = R"(print 114514)";  
-//     std::string input = R"(1 + 1
-// 2 + 2
-// 3 + 3 * (4 + 4))";  
+//     std::string input = R"(
+// z = 42
+
+// def foo(x, y) {
+//   def square(value) {
+//     return value * value
+//   }
+
+//   print square(x + y + z)
+// }
+
+// z = 108
+// f = foo
+
+// result = f(1, 2)
+// if result != null {
+//   print result
+// }
+//     )";
+
+
+    std::string input = R"(
+
+def foo(x, y) {
+}
+
+f = foo
+
+)";
+ 
 #endif
 
     // Lexer
@@ -48,6 +74,8 @@ int main() {
     // Token::printLexer(TokenVector);
 
     // Parser
+    // Add the global Scope
+    ParserB::ScopeStack.push(Scope());
     ParserB::setupExpression(TokenVector);
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
@@ -58,11 +86,11 @@ int main() {
     }
 
     // Calculate
+    // std::cout << "start calculating" << std::endl;
     for (int i=0; i < (int)flows.size(); i++)
     {
-        double result;
-        DataType resultType;
-        std::string errorMessage = ParserB::calculate(flows[i].get(), result, resultType);
+        Result result;
+        std::string errorMessage = ParserB::calculate(flows[i].get(), result);
 
         if (errorMessage.length() != 0)
         {

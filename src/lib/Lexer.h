@@ -8,11 +8,15 @@
 
 enum class TokenType {
     NONE,               //
+    NUL,               // function return type
+    RETURN,
     VARIABLE,           // a b c
     NUMBER,             // 1 2 3
 
     LEFT_PARENTHESIS,    // (
     RIGHT_PARENTHESIS,   // )
+    LEFT_BRACKET,    // [
+    RIGHT_BRACKET,   // ]
 
     MULTIPLY,           // *
     DIVIDE,             // /
@@ -35,21 +39,27 @@ enum class TokenType {
 
     INCLUSIVE_OR,       // |
 
-    ASSIGNMENT,             // =
+    ASSIGNMENT,         // =
 
     END,                // END
     ERROR,              // ERROR
 
 
+    COMMA,              // ,
+    SEMICOLON,          // ;
 
-    LEFT_BRACKET,    // {
-    RIGHT_BRACKET,   // }
+
+
+
+    LEFT_BRACE,       // {
+    RIGHT_BRACE,      // }
     TRUE,           
     FALSE,
     WHILE,
     IF,
     ELSE,
-    PRINT
+    PRINT,
+    DEF,
 
     ARRAY
 };

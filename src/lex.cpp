@@ -49,5 +49,6 @@ print steps)";
         exit(1);
     }
     Token::printLexer(TokenVector);
+
     return 0;
 }

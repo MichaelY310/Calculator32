@@ -52,17 +52,42 @@ int main() {
 //     print val
 // })";
 
+//     std::string input = R"(
+// a = 0
+// if (a == 0) {
+//     print 0
+// } else if (a == 1) {
+//     print 11
+// } else {
+//     print 222
+// }
+// print a
+// )";
+
     std::string input = R"(
-a = 0
-if (a == 0) {
-    print 0
-} else if (a == 1) {
-    print 11
-} else {
-    print 222
+z = 42
+
+def foo(x, y) {
+  def square(value) {
+    return value * value
+  }
+
+  print square(x + y + z)
 }
-print a
-)";
+
+z = 108
+f = foo
+print 1
+    )";
+
+//     std::string input = R"(
+// x=1
+// y=2
+
+// def add(a, b) {
+//     return a+b
+// }
+//     )";
 
 #endif
 
@@ -74,29 +99,20 @@ print a
         std::cout << "Syntax error on line " << errorPair.first << " column " << errorPair.second << "." << std::endl;
         exit(1);
     }
-    // Token::printLexer(TokenVector);
+    Token::printLexer(TokenVector);
 
-    std::vector<std::unique_ptr<Node>> flows;
-    std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
-    if (errorResult.first.first != -1) 
-    {
-        // if (errorResult.first.first == 16 && errorResult.first.second == 6)
-        // {
-        //     std::cout << "ppppppppppppppppppppppp" << std::endl;
-        //     std::cout << input << std::endl;
-        //     std::cout << "ppppppppppppppppppppppp" << std::endl;
-        // }
+    // std::vector<std::unique_ptr<Node>> flows;
+    // std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
+    // if (errorResult.first.first != -1) 
+    // {
+    //     std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+    //     exit(2);
+    // }
 
-
-        std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
-        exit(2);
-    }
-
-
-    for (int i=0; i < (int)flows.size(); i++)
-    {
-        ParserB::print(flows[i].get());
-        std::cout << std::endl;
-    }
+    // for (int i=0; i < (int)flows.size(); i++)
+    // {
+    //     ParserB::print(flows[i].get());
+    //     std::cout << std::endl;
+    // }
     return 0;
 }
