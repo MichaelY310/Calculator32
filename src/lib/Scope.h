@@ -38,7 +38,6 @@ public:
         for (std::pair<std::string, DataType> kv : other.variableTypeMap)
         {
             std::string variableName = kv.first;
-
             variableTypeMap[variableName] = other.variableTypeMap[variableName];
 
             if (other.variableTypeMap[variableName] == DataType::NUL)

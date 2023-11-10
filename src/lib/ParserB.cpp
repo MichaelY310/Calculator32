@@ -577,8 +577,7 @@ std::string ParserB::calculate(Node* root, Result& result)
         result.function->m_ParameterNames = functionDefineNode->parameterNames;
         result.function->m_FunctionFlows = std::move(functionDefineNode->flows);
         setVariable(functionDefineNode->functionName, result);
-
-        result.function->m_CaptureScope = Scope(ScopeStack.top());
+        result.function->setScope(ScopeStack.top());
         return "";
     }
     // While
@@ -722,8 +721,9 @@ std::string ParserB::calculate(Node* root, Result& result)
                     return "Runtime error: not a function.";
                 }
 
+                // get the function stored in the first child
                 Result functionResult;
-                getVariable(expressionNode->value.content, functionResult);
+                calculate(expressionNode->children[0].get(), functionResult);
                 std::shared_ptr<Function> function = functionResult.function;
                 
                 // Parameters don't match
@@ -744,10 +744,9 @@ std::string ParserB::calculate(Node* root, Result& result)
                 {
                     Result parameterResult;
                     calculate(expressionNode->children[i].get(), parameterResult);
-                    std::cout << 114514 << std::endl;
                     setVariable(function->m_ParameterNames[i-1], parameterResult);
-                    std::cout << 114514 << std::endl;
                 }
+                // 3. Execute flows
                 for (int i=0; i < (int)function->m_FunctionFlows.size(); i++)
                 {
                     calculate(function->m_FunctionFlows[i].get(), result);

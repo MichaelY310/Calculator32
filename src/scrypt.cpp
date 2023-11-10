@@ -33,38 +33,33 @@ int main() {
 
 
 
-    std::string input = R"(
-def add(a) {
-    print a;
-    if (a <= 1) { 
-        return a;
-    }
-    return a * add(a-1);
-}
-
-print add(5);
-    )";
-
-
 //     std::string input = R"(
-// z = 42
-
-// def foo(x, y) {
-//   def square(value) {
-//     return value * value
-//   }
-
-//   print square(x + y + z)
+// def add(a) {
+//     if (a <= 1) { 
+//         return a;
+//     }
+//     return a * add(a-1);
 // }
 
-// z = 108
-// f = foo
-
-// result = f(1, 2)
-// if result != null {
-//   print result
-// }
+// print add(5);
 //     )";
+
+
+    std::string input = R"(
+(z = 42);
+def foo(x, y) {
+    def square(value) {
+        return (value * value);
+    }
+    print square(((x + y) + z));
+}
+(z = 108);
+(f = foo);
+(result = f(1, 2));
+if (result != null) {
+    print result;
+}
+    )";
 
 
 
@@ -93,11 +88,11 @@ print add(5);
         exit(2);
     }
 
-    for (int i=0; i < (int)flows.size(); i++)
-    {
-        ParserB::print(flows[i].get());
-        std::cout << std::endl;
-    }
+    // for (int i=0; i < (int)flows.size(); i++)
+    // {
+    //     ParserB::print(flows[i].get());
+    //     std::cout << std::endl;
+    // }
 
     // Calculate
     // std::cout << "start calculating" << std::endl;
