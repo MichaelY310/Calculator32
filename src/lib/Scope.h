@@ -68,6 +68,42 @@ public:
         }
     }
 
+    void print()
+    {
+        std::cout << "======================" << std::endl;
+        for (std::pair<std::string, DataType> kv : variableTypeMap)
+        {
+            std::string variableName = kv.first;
+
+            if (variableTypeMap[variableName] == DataType::NUL)
+            {
+                std::cout << variableName << " null" << std::endl;
+            }
+            else if (variableTypeMap[variableName] == DataType::UNINITIALIZED)
+            {
+                std::cout << variableName << " uninitialized" << std::endl;
+            }
+            else if (variableTypeMap[variableName] == DataType::DOUBLE)
+            {
+                std::cout << variableName << " double " << variableDoubleMap[variableName] << std::endl;
+            }
+            else if (variableTypeMap[variableName] == DataType::BOOL)
+            {
+                std::cout << variableName << " bool " << variableBoolMap[variableName] << std::endl;
+            }        
+            else if (variableTypeMap[variableName] == DataType::FUNCTION)
+            {
+                std::cout << variableName << " function " << std::endl;
+            }
+            else
+            {
+                // std::cout << variableName << std::endl;
+                // std::cout << "There is a problem overwrite scope" << std::endl;
+            }
+        }
+        std::cout << "--------------------" << std::endl;
+    }
+
     std::map<std::string, DataType> variableTypeMap;
     std::map<std::string, double> variableDoubleMap;
     std::map<std::string, bool> variableBoolMap;

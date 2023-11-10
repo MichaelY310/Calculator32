@@ -932,7 +932,7 @@ std::string ParserB::calculate(Node* root, Result& result)
 }
 
 
-void ParserB::print(Node* root, int indent)
+void ParserB::print(Node* root, int indent, bool semicolon)
 {
     for (int i=0; i<indent; i++) { std::cout << "    "; }
 
@@ -969,7 +969,7 @@ void ParserB::print(Node* root, int indent)
         WhileNode* whileRoot = dynamic_cast<WhileNode*>(root);
 
         std::cout << "while ";
-        print(whileRoot->condition.get(), 0);
+        print(whileRoot->condition.get(), 0, false);
         std::cout << " {" << std::endl;
         for (int i=0;i < (int)whileRoot->flows.size(); i++)
         {
@@ -986,7 +986,7 @@ void ParserB::print(Node* root, int indent)
 
         // if
         std::cout << "if ";
-        print(ifRoot->conditions[0].get(), 0);
+        print(ifRoot->conditions[0].get(), 0, false);
         std::cout << " {" << std::endl;
         for (int i=0 ; i < (int)ifRoot->flowGroups[0].size(); i++)
         {
@@ -1002,7 +1002,7 @@ void ParserB::print(Node* root, int indent)
             std::cout << std::endl;
             for (int i=0; i<indent; i++) { std::cout << "    "; }
             std::cout << "else if ";
-            print(ifRoot->conditions[conditionIndex].get(), 0);
+            print(ifRoot->conditions[conditionIndex].get(), 0, false);
             std::cout << " {" << std::endl;
             for (int i=0; i < (int)ifRoot->flowGroups[conditionIndex].size(); i++)
             {
@@ -1034,7 +1034,8 @@ void ParserB::print(Node* root, int indent)
         PrintNode* printRoot = dynamic_cast<PrintNode*>(root);
 
         std::cout << "print ";
-        print(printRoot->content.get());
+        print(printRoot->content.get(), 0, false);
+        std::cout << ";";
     }
     // Return
     else if (root->value.type == TokenType::RETURN)
@@ -1068,11 +1069,11 @@ void ParserB::print(Node* root, int indent)
             // Function Call
             if (expressionNode->children.size() != 0)
             {
-                print(expressionNode->children[0].get());
+                print(expressionNode->children[0].get(), 0, false);
                 std::cout << "(";
                 for (int i = 1; i < (int)expressionNode->children.size(); i++)
                 {
-                    print(expressionNode->children[i].get());
+                    print(expressionNode->children[i].get(), 0, false);
                     if (i != (int)expressionNode->children.size() - 1) 
                     {
                         std::cout << ", ";
@@ -1098,13 +1099,14 @@ void ParserB::print(Node* root, int indent)
             std::cout << "(";
             for (int i = 0; i < (int)expressionNode->children.size(); i++)
             {
-                print(expressionNode->children[i].get());
+                print(expressionNode->children[i].get(), 0, false);
                 if (i != (int)expressionNode->children.size() - 1)
                 {
                     std::cout << " " << expressionNode->value.content << " ";
                 }
             }
             std::cout << ")";
+            if (semicolon) { std::cout << ";"; }
         }
     }
 }
@@ -1191,7 +1193,7 @@ void ParserB::setupExpression(std::vector<Token>& expression)
     {
         Token token = expression[i];
         // handle new variable
-        if (token.type == TokenType::VARIABLE)
+        if (variableTypeMap.find(token.content) == variableTypeMap.end() && token.type == TokenType::VARIABLE)
         {
             variableTypeMap[token.content] = DataType::UNINITIALIZED;
         }
