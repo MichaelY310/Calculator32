@@ -34,22 +34,22 @@ int main() {
 
 
     std::string input = R"(
-z = 42
+(z = 42);
 
 def foo(x, y) {
   def square(value) {
-    return value * value
+    return (value * value);
   }
 
-  print square(x + y + z)
+  print square(((x + y) + z));
 }
 
-z = 108
-f = foo
+(z = 108);
+(f = foo);
 
-result = f(1, 2)
-if result != null {
-  print result
+(result = f(1, 2));
+if (result != null) {
+    print result;
 }
     )";
 

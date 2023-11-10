@@ -36,8 +36,13 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
     int start = leftBound;
     while (start < rightBound)
     {
+        if (tokenVector[start].type == TokenType::SEMICOLON)
+        {
+            start += 1;
+        }
+
         // std::cout << start << std::endl;
-        if (tokenVector[start].type == TokenType::DEF)
+        else if (tokenVector[start].type == TokenType::DEF)
         {
             std::unique_ptr<FunctionDefineNode> node = std::make_unique<FunctionDefineNode>(tokenVector[start]);
 
@@ -313,6 +318,12 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
 
 std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node)
 { 
+
+    if (expression[rightBound].type == TokenType::SEMICOLON)
+    {
+        rightBound -= 1;
+    }
+
     if (leftBound > rightBound) {
 #if DEBUG
     std::cout << "1  no expression  " << std::endl;
@@ -433,6 +444,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
             // add parameter values into children
             // parameter values are seperated by comma. Remember to skip parenthesis.
             int left = leftParenthesisIndex + 1;
+
             while (left <= rightParenthesisIndex-1)
             {
                 std::unique_ptr<ExpressionNode> parameterNode = std::make_unique<ExpressionNode>();
@@ -442,7 +454,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     // Skip parenthesis  e.g. add(add(1, 2), 3)
                     if (expression[right].type == TokenType::LEFT_PARENTHESIS)
                     {
-                        int right = findRightParenthesisNoError(expression, right+1, rightParenthesisIndex-1);
+                        right = findRightParenthesisNoError(expression, right+1, rightParenthesisIndex-1);
                         if (right > rightParenthesisIndex-1)
                         {
                             return { { expression[right].line, expression[right].index }, expression[right].content };  
@@ -450,9 +462,11 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     }
                     right += 1;
                 }
+
                 MakeExpressionTree(expression, left, right-1, parameterNode);
                 node->children.push_back(std::move(parameterNode));
                 left = right + 1;
+
             }
         }
         // variable
