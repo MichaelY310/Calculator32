@@ -231,6 +231,14 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             {
                 res.emplace_back(TokenType::RIGHT_PARENTHESIS, ")", line, index, -1);
             }
+            else if (input.at(i) == '[')
+            {
+                res.emplace_back(TokenType::LEFT_BRACKET, "[", line, index, -1);
+            }
+            else if (input.at(i) == ']')
+            {
+                res.emplace_back(TokenType::RIGHT_BRACKET, "]", line, index, -1);
+            }
             else if (input.at(i) == '{')
             {
                 res.emplace_back(TokenType::LEFT_BRACE, "{", line, index, -1);

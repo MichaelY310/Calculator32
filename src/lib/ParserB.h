@@ -19,13 +19,6 @@
 
 class Result {
 public:
-    ~Result() {
-        if (type == DataType::FUNCTION && function != nullptr) {
-            // delete function;
-            // function = nullptr;
-        }
-    }
-
     DataType type;
     bool isreturn = false;
     std::shared_ptr<Function> function;
