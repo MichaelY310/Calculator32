@@ -1080,6 +1080,7 @@ void ParserB::print(Node* root, int indent, bool semicolon)
                     }
                 }
                 std::cout << ")";
+                if (semicolon) { std::cout << ";"; }
             }
             // Normal Variable
             else 

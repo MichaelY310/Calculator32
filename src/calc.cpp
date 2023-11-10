@@ -73,7 +73,7 @@ int main() {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-        ParserB::print(root.get());
+        ParserB::print_no_semicolon(root.get());
         std::cout << std::endl;
 
         // Calculate

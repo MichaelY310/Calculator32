@@ -59,6 +59,10 @@ def foo(x, y) {
 if (result != null) {
     print result;
 }
+
+def p() { print a; }
+p();
+def p() {}
     )";
 
 
