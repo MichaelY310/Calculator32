@@ -27,7 +27,7 @@ public:
     }
 
     DataType type;
-
+    bool isreturn = false;
     std::shared_ptr<Function> function;
     union {
         double doubleValue;

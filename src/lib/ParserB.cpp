@@ -576,8 +576,9 @@ std::string ParserB::calculate(Node* root, Result& result)
         result.function = std::make_shared<Function>();
         result.function->m_ParameterNames = functionDefineNode->parameterNames;
         result.function->m_FunctionFlows = std::move(functionDefineNode->flows);
-        result.function->m_CaptureScope = Scope(ScopeStack.top());
         setVariable(functionDefineNode->functionName, result);
+
+        result.function->m_CaptureScope = Scope(ScopeStack.top());
         return "";
     }
     // While
@@ -596,9 +597,9 @@ std::string ParserB::calculate(Node* root, Result& result)
             // execute flows
             for (int i=0; i < (int)whileNode->flows.size(); i++)
             {
-                Result flowResult;
-                std::string errorMessageFlow = calculate(whileNode->flows[i].get(), flowResult);
-                if (errorMessageFlow != "") { return errorMessageFlow; }            
+                std::string errorMessageFlow = calculate(whileNode->flows[i].get(), result);
+                if (errorMessageFlow != "") { return errorMessageFlow; }  
+                if (whileNode->flows[i].get()->value.type == TokenType::RETURN) { return ""; }          
             }
         }
         return "";
@@ -620,9 +621,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 // execute flows
                 for (int i=0; i < (int)ifNode->flowGroups[conditionIndex].size(); i++)
                 {
-                    Result flowResult;
-                    std::string errorMessageFlow = calculate(ifNode->flowGroups[conditionIndex][i].get(), flowResult);
-                    if (errorMessageFlow != "") { return errorMessageFlow; }            
+                    std::string errorMessageFlow = calculate(ifNode->flowGroups[conditionIndex][i].get(), result);
+                    if (errorMessageFlow != "") { return errorMessageFlow; }
+                    if (ifNode->flowGroups[conditionIndex][i].get()->value.type == TokenType::RETURN) { 
+                        return ""; 
+                    }
                 }
                 return "";
             }
@@ -634,9 +637,9 @@ std::string ParserB::calculate(Node* root, Result& result)
         {
             for (int i=0; i < (int)ifNode->flowGroups[ifNode->flowGroups.size()-1].size(); i++)
             {
-                Result flowResult;
-                std::string errorMessageFlow = calculate(ifNode->flowGroups[ifNode->flowGroups.size()-1][i].get(), flowResult);
-                if (errorMessageFlow != "") { return errorMessageFlow; }            
+                std::string errorMessageFlow = calculate(ifNode->flowGroups[ifNode->flowGroups.size()-1][i].get(), result);
+                if (errorMessageFlow != "") { return errorMessageFlow; }  
+                if (ifNode->flowGroups[ifNode->flowGroups.size()-1][i].get()->value.type == TokenType::RETURN) { return ""; }          
             }
             return "";
         }
@@ -657,6 +660,7 @@ std::string ParserB::calculate(Node* root, Result& result)
     {
         ReturnNode* returnNode = dynamic_cast<ReturnNode*>(root);
         std::string errorMessageFlow = calculate(returnNode->content.get(), result);
+        result.isreturn = true;
         if (errorMessageFlow != "") { return errorMessageFlow; }            
     }
 
@@ -703,10 +707,12 @@ std::string ParserB::calculate(Node* root, Result& result)
         // variable
         else if (expressionNode->value.type == TokenType::VARIABLE)
         {
+            // uninitialized
             if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
             {
                 return "Runtime error: unknown identifier " + expressionNode->value.content;
             }
+
             // Function Call
             if (expressionNode->children.size() != 0)
             {
@@ -715,7 +721,6 @@ std::string ParserB::calculate(Node* root, Result& result)
                 {
                     return "Runtime error: not a function.";
                 }
-
 
                 Result functionResult;
                 getVariable(expressionNode->value.content, functionResult);
@@ -739,12 +744,14 @@ std::string ParserB::calculate(Node* root, Result& result)
                 {
                     Result parameterResult;
                     calculate(expressionNode->children[i].get(), parameterResult);
+                    std::cout << 114514 << std::endl;
                     setVariable(function->m_ParameterNames[i-1], parameterResult);
+                    std::cout << 114514 << std::endl;
                 }
                 for (int i=0; i < (int)function->m_FunctionFlows.size(); i++)
                 {
                     calculate(function->m_FunctionFlows[i].get(), result);
-                    if (function->m_FunctionFlows[i]->value.type == TokenType::RETURN)
+                    if (result.isreturn)
                     {
                         ScopeStack.pop();
                         return "";
@@ -1125,6 +1132,7 @@ void ParserB::printValue(Result& value)
     {
         std::cout << (value.type == DataType::FUNCTION) << std::endl;
         std::cout << (value.type == DataType::NUL) << std::endl;
+        std::cout << (value.type == DataType::UNINITIALIZED) << std::endl;
         std::cout << "There is something wrong PrintValue" << std::endl;
     }
 }
@@ -1215,7 +1223,8 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     }
     else 
     {
-        std::cout << (result.type == DataType::NUL) << std::endl;
+        // std::cout << (result.type == DataType::NUL) << std::endl;
+        // std::cout << (result.type == DataType::UNINITIALIZED) << std::endl;
         std::cout << "There is a problem getVariable" << std::endl;
     }
 }
