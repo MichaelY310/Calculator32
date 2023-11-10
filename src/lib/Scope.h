@@ -20,6 +20,19 @@ public:
         variableBoolMap(other.variableBoolMap), variableFunctionMap(other.variableFunctionMap) 
     {}
 
+        // Copy assignment operator
+    Scope& operator=(const Scope& other) {
+        if (this != &other) {
+            // Implement the assignment logic here
+            // Be sure to handle any dynamic resources properly
+            variableTypeMap = other.variableTypeMap;
+            variableDoubleMap = other.variableDoubleMap;
+            variableBoolMap = other.variableBoolMap;
+            variableFunctionMap = other.variableFunctionMap;
+        }
+        return *this;
+    }
+
     void OverwriteBy(Scope& other)
     {
         for (std::pair<std::string, DataType> kv : other.variableTypeMap)
@@ -29,6 +42,10 @@ public:
             variableTypeMap[variableName] = other.variableTypeMap[variableName];
 
             if (other.variableTypeMap[variableName] == DataType::NUL)
+            {
+
+            }
+            else if (other.variableTypeMap[variableName] == DataType::UNINITIALIZED)
             {
 
             }
