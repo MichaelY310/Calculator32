@@ -1060,9 +1060,11 @@ void ParserB::print(Node* root, int indent, bool semicolon)
     {
         ReturnNode* returnRoot = dynamic_cast<ReturnNode*>(root);
 
-        std::cout << "return ";
+        std::cout << "return";
         if (returnRoot->content != nullptr) {
-            print(returnRoot->content.get());
+            std::cout << " ";
+            print(returnRoot->content.get(), 0, false);
+            std::cout << ";";
         }
         else {
             std::cout << ";";

@@ -34,7 +34,9 @@ def p() {
     return;
 }
 p();
-def p() {}
+def p() {
+    return null;
+}
     )";
 
 #endif
