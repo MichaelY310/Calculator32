@@ -38,9 +38,9 @@ def p() {}
     )";
 
 #endif
-    std::cout << "===================" << std::endl;
-    std::cout << input << std::endl;
-    std::cout << "===================" << std::endl;
+    // std::cout << "===================" << std::endl;
+    // std::cout << input << std::endl;
+    // std::cout << "===================" << std::endl;
     std::vector<Token> TokenVector;
     std::pair<int, int> errorPair = Token::GenTokenVector(input, TokenVector);
 
