@@ -283,16 +283,24 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
         else if (tokenVector[start].type == TokenType::RETURN)
         {
             std::unique_ptr<ReturnNode> node = std::make_unique<ReturnNode>(tokenVector[start]);
-            int printIndex = start;
+            int returnIndex = start;
             start += 1;
-            while (tokenVector[start].line == tokenVector[printIndex].line && start <= rightBound)
+            while (tokenVector[start].line == tokenVector[returnIndex].line && start <= rightBound)
             {
                 start += 1;
             }
-            auto errorResult = MakeExpressionTree(tokenVector, printIndex + 1, start - 1, node->content);
-            if (errorResult.first.first != -1) 
+            // there can be nothing following "return"
+            if (returnIndex + 1 <= start - 2)
             {
-                return errorResult;
+                auto errorResult = MakeExpressionTree(tokenVector, returnIndex + 1, start - 1, node->content);
+                if (errorResult.first.first != -1) 
+                {
+                    return errorResult;
+                }
+            }
+            else 
+            {
+                node->content = nullptr;
             }
             nodes.push_back(std::move(node));
         }
@@ -658,9 +666,19 @@ std::string ParserB::calculate(Node* root, Result& result)
     else if (root->value.type == TokenType::RETURN)
     {
         ReturnNode* returnNode = dynamic_cast<ReturnNode*>(root);
-        std::string errorMessageFlow = calculate(returnNode->content.get(), result);
-        result.isreturn = true;
-        if (errorMessageFlow != "") { return errorMessageFlow; }            
+        if (returnNode->content != nullptr)
+        {
+            std::string errorMessageFlow = calculate(returnNode->content.get(), result);
+            result.isreturn = true;
+            if (errorMessageFlow != "") { return errorMessageFlow; }            
+        } 
+        else
+        {
+            returnNode->content = std::make_unique<ExpressionNode>(Token(TokenType::NUL, "null", -1, -1, -1));
+            std::string errorMessageFlow = calculate(returnNode->content.get(), result);
+            result.isreturn = true;
+            if (errorMessageFlow != "") { return errorMessageFlow; }      
+        }
     }
 
     // Expression
@@ -1043,7 +1061,12 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         ReturnNode* returnRoot = dynamic_cast<ReturnNode*>(root);
 
         std::cout << "return ";
-        print(returnRoot->content.get());
+        if (returnRoot->content != nullptr) {
+            print(returnRoot->content.get());
+        }
+        else {
+            std::cout << ";";
+        }
     }
 
     // ExpressionNode

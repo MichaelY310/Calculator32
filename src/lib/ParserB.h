@@ -48,7 +48,7 @@ public:
 
 
     
-void print_no_semicolon(Node* root, int indent=0)
+static void print_no_semicolon(Node* root, int indent=0)
 {
     for (int i=0; i<indent; i++) { std::cout << "    "; }
 

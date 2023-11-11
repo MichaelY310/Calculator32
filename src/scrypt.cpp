@@ -60,9 +60,11 @@ if (result != null) {
     print result;
 }
 
-def p() { print a; }
-p();
-def p() {}
+def p() { 
+    print 114514; 
+    return;
+}
+print p();
     )";
 
 

@@ -29,7 +29,10 @@ if (result != null) {
     print result;
 }
 
-def p() { print a; }
+def p() { 
+    print a; 
+    return;
+}
 p();
 def p() {}
     )";
