@@ -37,8 +37,13 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
     int start = leftBound;
     while (start < rightBound)
     {
+        if (tokenVector[start].type == TokenType::SEMICOLON)
+        {
+            start += 1;
+        }
+
         // std::cout << start << std::endl;
-        if (tokenVector[start].type == TokenType::DEF)
+        else if (tokenVector[start].type == TokenType::DEF)
         {
             std::unique_ptr<FunctionDefineNode> node = std::make_unique<FunctionDefineNode>(tokenVector[start]);
 
@@ -279,16 +284,24 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
         else if (tokenVector[start].type == TokenType::RETURN)
         {
             std::unique_ptr<ReturnNode> node = std::make_unique<ReturnNode>(tokenVector[start]);
-            int printIndex = start;
+            int returnIndex = start;
             start += 1;
-            while (tokenVector[start].line == tokenVector[printIndex].line && start <= rightBound)
+            while (tokenVector[start].line == tokenVector[returnIndex].line && start <= rightBound)
             {
                 start += 1;
             }
-            auto errorResult = MakeExpressionTree(tokenVector, printIndex + 1, start - 1, node->content);
-            if (errorResult.first.first != -1) 
+            // there can be nothing following "return"
+            if (returnIndex + 1 <= start - 2)
             {
-                return errorResult;
+                auto errorResult = MakeExpressionTree(tokenVector, returnIndex + 1, start - 1, node->content);
+                if (errorResult.first.first != -1) 
+                {
+                    return errorResult;
+                }
+            }
+            else 
+            {
+                node->content = nullptr;
             }
             nodes.push_back(std::move(node));
         }
@@ -401,6 +414,12 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
 
 std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node)
 { 
+
+    if (expression[rightBound].type == TokenType::SEMICOLON)
+    {
+        rightBound -= 1;
+    }
+
     if (leftBound > rightBound) {
 #if DEBUG
     std::cout << "1  no expression  " << std::endl;
@@ -531,6 +550,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
             // add parameter values into children
             // parameter values are seperated by comma. Remember to skip parenthesis.
             int left = leftParenthesisIndex + 1;
+
             while (left <= rightParenthesisIndex-1)
             {
                 std::unique_ptr<ExpressionNode> parameterNode = std::make_unique<ExpressionNode>();
@@ -540,7 +560,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     // Skip parenthesis  e.g. add(add(1, 2), 3)
                     if (expression[right].type == TokenType::LEFT_PARENTHESIS)
                     {
-                        int right = findRightParenthesisNoError(expression, right+1, rightParenthesisIndex-1);
+                        right = findRightParenthesisNoError(expression, right+1, rightParenthesisIndex-1);
                         if (right > rightParenthesisIndex-1)
                         {
                             return { { expression[right].line, expression[right].index }, expression[right].content };  
@@ -548,9 +568,11 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     }
                     right += 1;
                 }
+
                 MakeExpressionTree(expression, left, right-1, parameterNode);
                 node->children.push_back(std::move(parameterNode));
                 left = right + 1;
+
             }
         }
         // array
@@ -669,10 +691,11 @@ std::string ParserB::calculate(Node* root, Result& result)
         FunctionDefineNode* functionDefineNode = dynamic_cast<FunctionDefineNode*>(root);
         Result result;
         result.type = DataType::FUNCTION;
-        result.function = new Function();
+        result.function = std::make_shared<Function>();
         result.function->m_ParameterNames = functionDefineNode->parameterNames;
         result.function->m_FunctionFlows = std::move(functionDefineNode->flows);
         setVariable(functionDefineNode->functionName, result);
+        result.function->setScope(ScopeStack.top());
         return "";
     }
     // While
@@ -691,9 +714,9 @@ std::string ParserB::calculate(Node* root, Result& result)
             // execute flows
             for (int i=0; i < (int)whileNode->flows.size(); i++)
             {
-                Result flowResult;
-                std::string errorMessageFlow = calculate(whileNode->flows[i].get(), flowResult);
-                if (errorMessageFlow != "") { return errorMessageFlow; }            
+                std::string errorMessageFlow = calculate(whileNode->flows[i].get(), result);
+                if (errorMessageFlow != "") { return errorMessageFlow; }  
+                if (whileNode->flows[i].get()->value.type == TokenType::RETURN) { return ""; }          
             }
         }
         return "";
@@ -715,9 +738,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 // execute flows
                 for (int i=0; i < (int)ifNode->flowGroups[conditionIndex].size(); i++)
                 {
-                    Result flowResult;
-                    std::string errorMessageFlow = calculate(ifNode->flowGroups[conditionIndex][i].get(), flowResult);
-                    if (errorMessageFlow != "") { return errorMessageFlow; }            
+                    std::string errorMessageFlow = calculate(ifNode->flowGroups[conditionIndex][i].get(), result);
+                    if (errorMessageFlow != "") { return errorMessageFlow; }
+                    if (ifNode->flowGroups[conditionIndex][i].get()->value.type == TokenType::RETURN) { 
+                        return ""; 
+                    }
                 }
                 return "";
             }
@@ -729,9 +754,9 @@ std::string ParserB::calculate(Node* root, Result& result)
         {
             for (int i=0; i < (int)ifNode->flowGroups[ifNode->flowGroups.size()-1].size(); i++)
             {
-                Result flowResult;
-                std::string errorMessageFlow = calculate(ifNode->flowGroups[ifNode->flowGroups.size()-1][i].get(), flowResult);
-                if (errorMessageFlow != "") { return errorMessageFlow; }            
+                std::string errorMessageFlow = calculate(ifNode->flowGroups[ifNode->flowGroups.size()-1][i].get(), result);
+                if (errorMessageFlow != "") { return errorMessageFlow; }  
+                if (ifNode->flowGroups[ifNode->flowGroups.size()-1][i].get()->value.type == TokenType::RETURN) { return ""; }          
             }
             return "";
         }
@@ -744,7 +769,6 @@ std::string ParserB::calculate(Node* root, Result& result)
         Result flowResult;
         std::string errorMessageFlow = calculate(printNode->content.get(), flowResult);
         if (errorMessageFlow != "") { return errorMessageFlow; }            
-        // std::cout << flowResult << std::endl;
         ParserB::printValue(flowResult);
         std::cout << std::endl;
     }
@@ -752,8 +776,19 @@ std::string ParserB::calculate(Node* root, Result& result)
     else if (root->value.type == TokenType::RETURN)
     {
         ReturnNode* returnNode = dynamic_cast<ReturnNode*>(root);
-        std::string errorMessageFlow = calculate(returnNode->content.get(), result);
-        if (errorMessageFlow != "") { return errorMessageFlow; }            
+        if (returnNode->content != nullptr)
+        {
+            std::string errorMessageFlow = calculate(returnNode->content.get(), result);
+            result.isreturn = true;
+            if (errorMessageFlow != "") { return errorMessageFlow; }            
+        } 
+        else
+        {
+            returnNode->content = std::make_unique<ExpressionNode>(Token(TokenType::NUL, "null", -1, -1, -1));
+            std::string errorMessageFlow = calculate(returnNode->content.get(), result);
+            result.isreturn = true;
+            if (errorMessageFlow != "") { return errorMessageFlow; }      
+        }
     }
 
     // Expression
@@ -799,10 +834,12 @@ std::string ParserB::calculate(Node* root, Result& result)
         // variable
         else if (expressionNode->value.type == TokenType::VARIABLE)
         {
+            // uninitialized
             if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
             {
                 return "Runtime error: unknown identifier " + expressionNode->value.content;
             }
+
             // Function Call
             if (expressionNode->children.size() != 0)
             {
@@ -811,9 +848,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 {
                     return "Runtime error: not a function.";
                 }
+
+                // get the function stored in the first child
                 Result functionResult;
-                getVariable(expressionNode->value.content, functionResult);
-                Function*& function = functionResult.function;
+                calculate(expressionNode->children[0].get(), functionResult);
+                std::shared_ptr<Function> function = functionResult.function;
                 
                 // Parameters don't match
                 if (function->m_ParameterNames.size() != expressionNode->children.size()-1)
@@ -824,22 +863,28 @@ std::string ParserB::calculate(Node* root, Result& result)
                 // execute the function
                 // 1. create a new scope
                 Scope localScope(ScopeStack.top());
+                // Overwrite the localscope with the captured scope
+                localScope.OverwriteBy(function->m_CaptureScope);
+
                 ScopeStack.push(localScope); 
                 // 2. set parameter values
-                for (int i=1; i < (int)expressionNode->children.size(); i++)
+                for (int i = 1; i < (int)expressionNode->children.size(); i++)
                 {
                     Result parameterResult;
                     calculate(expressionNode->children[i].get(), parameterResult);
                     setVariable(function->m_ParameterNames[i-1], parameterResult);
                 }
+                // 3. Execute flows
                 for (int i=0; i < (int)function->m_FunctionFlows.size(); i++)
                 {
                     calculate(function->m_FunctionFlows[i].get(), result);
-                    if (function->m_FunctionFlows[i]->value.type == TokenType::RETURN)
+                    if (result.isreturn)
                     {
-                        break;
+                        ScopeStack.pop();
+                        return "";
                     }
                 }
+                result.type = DataType::NUL;
                 ScopeStack.pop();
             }
             else 
@@ -860,11 +905,7 @@ std::string ParserB::calculate(Node* root, Result& result)
             if (expressionNode->children[0].get()->value.type != TokenType::VARIABLE)
             { return "Runtime error: invalid assignee."; }
 
-
             setVariable(expressionNode->children[0]->value.content, result);
-            // std::cout << expressionNode->children[0]->value.content << std::endl;
-            // std::cout << expressionNode->children[0]->value.content << std::endl;
-            // std::cout << expressionNode->children[0]->value.content << std::endl;
 
             return "";
         }
@@ -972,7 +1013,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 result.type = DataType::BOOL;
                 // ==
                 if (expressionNode->value.type == TokenType::EQUALITY) {
-                    if (result1.type != result2.type)
+                    if (result1.type == DataType::NUL && result2.type == DataType::NUL)
+                    {
+                        result.boolValue = true;
+                    }
+                    else if (result1.type != result2.type)
                     {
                         result.boolValue = false;
                     }
@@ -988,7 +1033,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 }
                 // !=
                 else if (expressionNode->value.type == TokenType::INEQUALITY) {
-                    if (result1.type != result2.type)
+                    if (result1.type == DataType::NUL && result2.type == DataType::NUL)
+                    {
+                        result.boolValue = false;
+                    }
+                    else if (result1.type != result2.type)
                     {
                         result.boolValue = true;
                     }
@@ -1011,7 +1060,7 @@ std::string ParserB::calculate(Node* root, Result& result)
 }
 
 
-void ParserB::print(Node* root, int indent)
+void ParserB::print(Node* root, int indent, bool semicolon)
 {
     for (int i=0; i<indent; i++) { std::cout << "    "; }
     // Def
@@ -1047,7 +1096,7 @@ void ParserB::print(Node* root, int indent)
         WhileNode* whileRoot = dynamic_cast<WhileNode*>(root);
 
         std::cout << "while ";
-        print(whileRoot->condition.get(), 0);
+        print(whileRoot->condition.get(), 0, false);
         std::cout << " {" << std::endl;
         for (int i=0;i < (int)whileRoot->flows.size(); i++)
         {
@@ -1064,7 +1113,7 @@ void ParserB::print(Node* root, int indent)
 
         // if
         std::cout << "if ";
-        print(ifRoot->conditions[0].get(), 0);
+        print(ifRoot->conditions[0].get(), 0, false);
         std::cout << " {" << std::endl;
         for (int i=0 ; i < (int)ifRoot->flowGroups[0].size(); i++)
         {
@@ -1080,7 +1129,7 @@ void ParserB::print(Node* root, int indent)
             std::cout << std::endl;
             for (int i=0; i<indent; i++) { std::cout << "    "; }
             std::cout << "else if ";
-            print(ifRoot->conditions[conditionIndex].get(), 0);
+            print(ifRoot->conditions[conditionIndex].get(), 0, false);
             std::cout << " {" << std::endl;
             for (int i=0; i < (int)ifRoot->flowGroups[conditionIndex].size(); i++)
             {
@@ -1112,15 +1161,23 @@ void ParserB::print(Node* root, int indent)
         PrintNode* printRoot = dynamic_cast<PrintNode*>(root);
 
         std::cout << "print ";
-        print(printRoot->content.get());
+        print(printRoot->content.get(), 0, false);
+        std::cout << ";";
     }
     // Return
     else if (root->value.type == TokenType::RETURN)
     {
         ReturnNode* returnRoot = dynamic_cast<ReturnNode*>(root);
 
-        std::cout << "return ";
-        print(returnRoot->content.get());
+        std::cout << "return";
+        if (returnRoot->content != nullptr) {
+            std::cout << " ";
+            print(returnRoot->content.get(), 0, false);
+            std::cout << ";";
+        }
+        else {
+            std::cout << ";";
+        }
     }
     // Array
     else if (root->value.type == TokenType::ARRAY)
@@ -1167,17 +1224,18 @@ void ParserB::print(Node* root, int indent)
             // Function Call
             if (expressionNode->children.size() != 0)
             {
-                print(expressionNode->children[0].get());
+                print(expressionNode->children[0].get(), 0, false);
                 std::cout << "(";
                 for (int i = 1; i < (int)expressionNode->children.size(); i++)
                 {
-                    print(expressionNode->children[i].get());
+                    print(expressionNode->children[i].get(), 0, false);
                     if (i != (int)expressionNode->children.size() - 1) 
                     {
                         std::cout << ", ";
                     }
                 }
                 std::cout << ")";
+                if (semicolon) { std::cout << ";"; }
             }
             // Array 
             else if (expressionNode->ArrayLookUp == true) {
@@ -1202,20 +1260,26 @@ void ParserB::print(Node* root, int indent)
             std::cout << "(";
             for (int i = 0; i < (int)expressionNode->children.size(); i++)
             {
-                print(expressionNode->children[i].get());
+                print(expressionNode->children[i].get(), 0, false);
                 if (i != (int)expressionNode->children.size() - 1)
                 {
                     std::cout << " " << expressionNode->value.content << " ";
                 }
             }
             std::cout << ")";
+            if (semicolon) { std::cout << ";"; }
         }
     }
 }
 
 void ParserB::printValue(Result& value)
 {
-    if (value.type == DataType::BOOL)
+    if (value.type == DataType::NUL)
+    {
+        std::cout << "null";
+    }
+
+    else if (value.type == DataType::BOOL)
     {
         if (value.boolValue == 0) { std::cout << "false"; }
         else                      { std::cout << "true"; }
@@ -1228,6 +1292,9 @@ void ParserB::printValue(Result& value)
 
     else
     {
+        std::cout << (value.type == DataType::FUNCTION) << std::endl;
+        std::cout << (value.type == DataType::NUL) << std::endl;
+        std::cout << (value.type == DataType::UNINITIALIZED) << std::endl;
         std::cout << "There is something wrong PrintValue" << std::endl;
     }
 }
@@ -1288,7 +1355,7 @@ void ParserB::setupExpression(std::vector<Token>& expression)
     {
         Token token = expression[i];
         // handle new variable
-        if (token.type == TokenType::VARIABLE)
+        if (variableTypeMap.find(token.content) == variableTypeMap.end() && token.type == TokenType::VARIABLE)
         {
             variableTypeMap[token.content] = DataType::UNINITIALIZED;
         }
@@ -1301,7 +1368,11 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     auto& variableBoolMap = ScopeStack.top().variableBoolMap;
     auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
     result.type = variableTypeMap[variableName];
-    if (result.type == DataType::DOUBLE)
+    if (result.type == DataType::NUL)
+    {
+        
+    }
+    else if (result.type == DataType::DOUBLE)
     {
         result.doubleValue = variableDoubleMap[variableName];
     }
@@ -1311,10 +1382,12 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     }        
     else if (result.type == DataType::FUNCTION)
     {
-        result.function = variableFunctionMap[variableName].get();
+        result.function = variableFunctionMap[variableName];
     }
     else 
     {
+        // std::cout << (result.type == DataType::NUL) << std::endl;
+        // std::cout << (result.type == DataType::UNINITIALIZED) << std::endl;
         std::cout << "There is a problem getVariable" << std::endl;
     }
 }
@@ -1324,8 +1397,13 @@ void ParserB::setVariable(std::string& variableName, Result& result) {
     auto& variableDoubleMap = ScopeStack.top().variableDoubleMap;
     auto& variableBoolMap = ScopeStack.top().variableBoolMap;
     auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
+
     variableTypeMap[variableName] = result.type;
-    if (result.type == DataType::DOUBLE)
+    if (result.type == DataType::NUL)
+    {
+
+    }
+    else if (result.type == DataType::DOUBLE)
     {
         variableDoubleMap[variableName] = result.doubleValue;
     }
@@ -1335,24 +1413,7 @@ void ParserB::setVariable(std::string& variableName, Result& result) {
     }        
     else if (result.type == DataType::FUNCTION)
     {
-        // Function* function = result.function;
-
-        // std::shared_ptr<Function> function2 = std::make_shared<Function>();
-        // function2.reset(result.function); 
-
-        // std::cout << (int)function->m_ParameterNames.size() << std::endl;
-        // for (int i=0; i < (int)function->m_ParameterNames.size(); i++)
-        // {
-        // std::cout << function->m_ParameterNames[0] << std::endl;
-        // }
-
-        
-        // std::cout << ScopeStack.size() << std::endl;
-        // variableFunctionMap[variableName] = std::make_shared<Function>();
-        // variableFunctionMap[variableName].reset(result.function);
-
-        // result.function = variableFunctionMap[variableName].get();
-        // variableFunctionMap[variableName].reset();
+        variableFunctionMap[variableName] = result.function;
     }
     else
     {

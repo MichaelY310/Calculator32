@@ -41,6 +41,8 @@ int main() {
         expressions.push_back(s);
     }
 
+
+    ParserB::ScopeStack.push(Scope());
     int lineCount = 0;
     for (std::string expression : expressions)
     {
@@ -71,23 +73,20 @@ int main() {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-        ParserB::print(root.get());
+        ParserB::print_no_semicolon(root.get());
         std::cout << std::endl;
 
         // Calculate
         Result result;
-        std::map<std::string, DataType> originalVariableTypeMap(ParserB::variableTypeMap);
-        std::map<std::string, double> originalVariableDoubleMap(ParserB::variableDoubleMap);
-        std::map<std::string, bool> originalVariableBoolMap(ParserB::variableBoolMap);
+        Scope originalScope = Scope(ParserB::ScopeStack.top());
 
         std::string errorMessage = ParserB::calculate(root.get(), result);
 
         if (errorMessage.length() != 0)
         {
             std::cout << errorMessage << std::endl;
-            ParserB::variableTypeMap.swap(originalVariableTypeMap);
-            ParserB::variableDoubleMap.swap(originalVariableDoubleMap);
-            ParserB::variableBoolMap.swap(originalVariableBoolMap);
+            ParserB::ScopeStack.pop();
+            ParserB::ScopeStack.push(originalScope);
 
             continue;
         }
