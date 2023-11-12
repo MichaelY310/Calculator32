@@ -5,17 +5,63 @@
 #include <iostream>
 #include <cmath>
 
+
 enum class TokenType {
-    none,
-    number,
-    plus,
-    minus,
-    multiply,
-    divide,
-    leftParenthesis,
-    rightParenthesis,
-    end,
-    error
+    NONE,               //
+    NUL,               // function return type
+    RETURN,
+    VARIABLE,           // a b c
+    NUMBER,             // 1 2 3
+
+    LEFT_PARENTHESIS,    // (
+    RIGHT_PARENTHESIS,   // )
+    LEFT_BRACKET,    // [
+    RIGHT_BRACKET,   // ]
+
+    MULTIPLY,           // *
+    DIVIDE,             // /
+    MOD,                // %
+
+    PLUS,               // +
+    MINUS,              // -
+
+    SMALLER,            // <
+    BIGGER,             // >
+    SMALLER_EQUAL,      // <=
+    BIGGER_EQUAL,       // >=
+
+    EQUALITY,           // ==
+    INEQUALITY,         // !=
+
+    AND,                // &
+
+    EXCLUSIVE_OR,       // ^
+
+    INCLUSIVE_OR,       // |
+
+    ASSIGNMENT,         // =
+
+    END,                // END
+    ERROR,              // ERROR
+
+
+    COMMA,              // ,
+    SEMICOLON,          // ;
+
+
+
+
+    LEFT_BRACE,       // {
+    RIGHT_BRACE,      // }
+    TRUE,           
+    FALSE,
+    WHILE,
+    IF,
+    ELSE,
+    PRINT,
+    DEF,
+
+    ARRAY
 };
 
 class Token {
@@ -29,7 +75,7 @@ public:
     }
 
 public:
-    static std::vector<Token> GenTokenVector(const std::string input);  // returns a vector of tokens created from a string.
+    static std::pair<int, int> GenTokenVector(const std::string& input, std::vector<Token>& res);  // returns a vector of tokens created from a string.
     static void printLexer(std::vector<Token> TokenVector);
     static void printLexer(const std::string input);
      
