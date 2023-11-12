@@ -1,10 +1,8 @@
 #include "ParserB.h"
 
 // Initialize static member variables
-// std::stack<Scope> ParserB::ScopeStack = {};
-// ParserB::ScopeStack.push(Scope());
-
-std::stack<Scope> ParserB::ScopeStack = std::stack<Scope>();
+std::stack<Scope*> ParserB::ScopeStack;
+std::vector<std::shared_ptr<Function>> ParserB::functionStorage;
 
 std::map<TokenType, int> ParserB::hierarchyMap = {
     {TokenType::NUL ,          0}, // null
@@ -572,7 +570,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
 
 std::string ParserB::calculate(Node* root, Result& result)
 {
-    auto& variableTypeMap = ScopeStack.top().variableTypeMap;
+    auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
 
     // Def
     if (root->value.type == TokenType::DEF)
@@ -585,7 +583,8 @@ std::string ParserB::calculate(Node* root, Result& result)
         result.function->m_ParameterNames = functionDefineNode->parameterNames;
         result.function->m_FunctionFlows = std::move(functionDefineNode->flows);
         setVariable(functionDefineNode->functionName, result);
-        result.function->setScope(ScopeStack.top());
+        result.function->setScope(*ScopeStack.top());
+        functionStorage.push_back(result.function);
         return "";
     }
     // While
@@ -752,9 +751,9 @@ std::string ParserB::calculate(Node* root, Result& result)
 
                 // execute the function
                 // 1. create a new scope
-                Scope localScope(ScopeStack.top());
+                Scope* localScope = new Scope(*ScopeStack.top());
                 // Overwrite the localscope with the captured scope
-                localScope.OverwriteBy(function->m_CaptureScope);
+                localScope->OverwriteBy(*(function->m_CaptureScope));
 
                 ScopeStack.push(localScope); 
                 // 2. set parameter values
@@ -771,11 +770,13 @@ std::string ParserB::calculate(Node* root, Result& result)
                     if (result.isreturn)
                     {
                         ScopeStack.pop();
+                        delete localScope;
                         return "";
                     }
                 }
                 result.type = DataType::NUL;
                 ScopeStack.pop();
+                delete localScope;
             }
             else 
             {
@@ -1213,7 +1214,7 @@ int ParserB::findRightBraceNoError(std::vector<Token> expression, int leftBound,
 // void ParserB::setupExpression(std::vector<Token>& expression, int leftBound, int rightBound, )
 void ParserB::setupExpression(std::vector<Token>& expression)
 {
-    auto& variableTypeMap = ScopeStack.top().variableTypeMap;
+    auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
     
     for (int i = 0; i < (int)expression.size()-1; i++)
     {
@@ -1227,10 +1228,10 @@ void ParserB::setupExpression(std::vector<Token>& expression)
 }
 
 void ParserB::getVariable(std::string& variableName, Result& result) {
-    auto& variableTypeMap = ScopeStack.top().variableTypeMap;
-    auto& variableDoubleMap = ScopeStack.top().variableDoubleMap;
-    auto& variableBoolMap = ScopeStack.top().variableBoolMap;
-    auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
+    auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
+    auto& variableDoubleMap = ScopeStack.top()->variableDoubleMap;
+    auto& variableBoolMap = ScopeStack.top()->variableBoolMap;
+    auto& variableFunctionMap = ScopeStack.top()->variableFunctionMap;
     result.type = variableTypeMap[variableName];
     if (result.type == DataType::NUL)
     {
@@ -1257,10 +1258,10 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
 }
 
 void ParserB::setVariable(std::string& variableName, Result& result) {
-    auto& variableTypeMap = ScopeStack.top().variableTypeMap;
-    auto& variableDoubleMap = ScopeStack.top().variableDoubleMap;
-    auto& variableBoolMap = ScopeStack.top().variableBoolMap;
-    auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
+    auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
+    auto& variableDoubleMap = ScopeStack.top()->variableDoubleMap;
+    auto& variableBoolMap = ScopeStack.top()->variableBoolMap;
+    auto& variableFunctionMap = ScopeStack.top()->variableFunctionMap;
 
     variableTypeMap[variableName] = result.type;
     if (result.type == DataType::NUL)

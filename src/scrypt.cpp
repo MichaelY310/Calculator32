@@ -32,17 +32,10 @@ int main() {
 // print steps)";  
 
 
-
 //     std::string input = R"(
-// def add(a) {
-//     if (a <= 1) { 
-//         return a;
-//     }
-//     return a * add(a-1);
-// }
-
-// print add(5);
-//     )";
+// def foo(x, y) {
+// })"
+// ;
 
 
     std::string input = R"(
@@ -65,6 +58,16 @@ def p() {
     return;
 }
 print p();
+
+
+def add(a) {
+    if (a <= 1) { 
+        return a;
+    }
+    return a * add(a-1);
+}
+
+print add(5);
     )";
 
 
@@ -84,7 +87,8 @@ print p();
 
     // Parser
     // Add the global Scope
-    ParserB::ScopeStack.push(Scope());
+    Scope* globalScope = new Scope();
+    ParserB::ScopeStack.push(globalScope);
     ParserB::setupExpression(TokenVector);
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
@@ -113,5 +117,9 @@ print p();
             exit(3);
         }
     }
+
+    // std::cout << ParserB::functionStorage.size() << std::endl;
+    ParserB::clean();
+    delete globalScope;
     return 0;
 }

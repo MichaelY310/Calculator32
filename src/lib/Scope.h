@@ -20,6 +20,14 @@ public:
         variableBoolMap(other.variableBoolMap), variableFunctionMap(other.variableFunctionMap) 
     {}
 
+    ~Scope()
+    {
+        for (auto& pair : variableFunctionMap) {
+            pair.second.reset();
+        }
+        // std::cout << "Scope is deleted" << std::endl;
+    }
+
         // Copy assignment operator
     Scope& operator=(const Scope& other) {
         if (this != &other) {
