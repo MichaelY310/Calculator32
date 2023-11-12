@@ -31,6 +31,8 @@ public:
     Token value;
 };
 
+
+
 // An operation expression node should always have 2 children
 // A function call expression: Node1: function. Node2, 3...: parameters. 
 // A function call expression must have a variable token and children.size() != 0
@@ -38,12 +40,33 @@ class ExpressionNode : public Node
 {
 public:
     ExpressionNode() : Node(), children() {}
-    ExpressionNode(Token token) : Node(token), children() {}
+    ExpressionNode(Token token) : Node(token){}
     virtual ~ExpressionNode() = default;
 
+    bool ArrayLookUp = false;
+    int index = -1;
     std::vector<std::unique_ptr<ExpressionNode>> children;
 };
 
+class ArrayNode : public Node
+{
+    public:
+    ArrayNode() : Node(),  ArrayContent() {};
+    ArrayNode(Token token) : Node(token),  ArrayContent() {};
+    virtual ~ArrayNode() = default;
+
+    std::vector<std::unique_ptr<Node>> ArrayContent;  // stored all elements in array
+};
+
+// class LookUpNode : public Node
+// {
+//     public:
+//     LookUpNode() : Node(){};
+//     LookUpNode(Token token) : Node(token){};
+//     virtual ~LookUpNode() = default;
+
+//     int index; // lookup index
+// };
 
 class WhileNode : public Node
 {
@@ -152,6 +175,7 @@ class ParserB
 public:
     static std::pair<std::pair<int, int>, std::string> HandleTokenVector(std::vector<Token> tokenVector, int leftBound, int rightBound, std::vector<std::unique_ptr<Node>>& nodes);
     static std::pair<std::pair<int, int>, std::string> MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node);
+    static std::pair<std::pair<int, int>, std::string> HandleArray(std::vector<Token> tokenVector, int leftBound, int rightBound,std::unique_ptr<ArrayNode>& node);
     static std::string calculate(Node* root, Result& result);
     static void print(Node* root, int indent = 0);
     static void printValue(Result& result);

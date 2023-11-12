@@ -99,20 +99,19 @@ print 1
         std::cout << "Syntax error on line " << errorPair.first << " column " << errorPair.second << "." << std::endl;
         exit(1);
     }
-    Token::printLexer(TokenVector);
+    // Token::printLexer(TokenVector);
+    std::vector<std::unique_ptr<Node>> flows;
+    std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
+    if (errorResult.first.first != -1) 
+    {
+        std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
+        exit(2);
+    }
 
-    // std::vector<std::unique_ptr<Node>> flows;
-    // std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
-    // if (errorResult.first.first != -1) 
-    // {
-    //     std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
-    //     exit(2);
-    // }
-
-    // for (int i=0; i < (int)flows.size(); i++)
-    // {
-    //     ParserB::print(flows[i].get());
-    //     std::cout << std::endl;
-    // }
+    for (int i=0; i < (int)flows.size(); i++)
+    {
+        ParserB::print(flows[i].get());
+        std::cout << std::endl;
+    }
     return 0;
 }
