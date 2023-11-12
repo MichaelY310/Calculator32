@@ -49,7 +49,7 @@ public:
 
     static void clean()
     {
-        for (int i=0; i<functionStorage.size(); i++)
+        for (int i=0; i < (int)functionStorage.size(); i++)
         {
             delete functionStorage[i]->m_CaptureScope;
         }

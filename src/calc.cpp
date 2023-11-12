@@ -42,7 +42,8 @@ int main() {
     }
 
 
-    ParserB::ScopeStack.push(Scope());
+    Scope* globalScope = new Scope();
+    ParserB::ScopeStack.push(globalScope);
     int lineCount = 0;
     for (std::string expression : expressions)
     {
@@ -78,7 +79,7 @@ int main() {
 
         // Calculate
         Result result;
-        Scope originalScope = Scope(ParserB::ScopeStack.top());
+        Scope* originalScope = new Scope(*(ParserB::ScopeStack.top()));
 
         std::string errorMessage = ParserB::calculate(root.get(), result);
 
@@ -92,6 +93,10 @@ int main() {
         }
         ParserB::printValue(result);
         std::cout << std::endl;
+        delete originalScope;
     }
+
+    ParserB::clean();
+    delete globalScope;
     return 0;
 }
