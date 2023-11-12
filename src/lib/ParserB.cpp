@@ -371,7 +371,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
         return { { tokenVector[rightBracket].line, tokenVector[rightBracket].index }, tokenVector[rightBracket].content };  
     }
 
-    for (size_t index = leftBracket + 1; index < rightBracket; index++) {
+    for (int index = leftBracket + 1; index < rightBracket; index++) {
         int commaIndex = index;
         while (commaIndex < rightBracket) { 
 
@@ -1188,7 +1188,7 @@ void ParserB::print(Node* root, int indent, bool semicolon)
             std::cout << "(" << ArrayRoot->value.content << " = ";
         }
         std::cout << "[";
-        for(int i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
+        for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
             print(ArrayRoot->ArrayContent[i].get());
             if (i+1 < ArrayRoot->ArrayContent.size()) {
                 std::cout << ", ";
