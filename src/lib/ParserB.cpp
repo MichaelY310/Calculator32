@@ -1182,21 +1182,20 @@ void ParserB::print(Node* root, int indent, bool semicolon)
     // Array
     else if (root->value.type == TokenType::ARRAY)
     {
-
         ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
         if ( ArrayRoot->value.content != "") {
             std::cout << "(" << ArrayRoot->value.content << " = ";
         }
         std::cout << "[";
         for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
-            print(ArrayRoot->ArrayContent[i].get());
+            print(ArrayRoot->ArrayContent[i].get(), 0, false);
             if (i+1 < ArrayRoot->ArrayContent.size()) {
                 std::cout << ", ";
             }
         }
         std::cout << "]";
         if ( ArrayRoot->value.content != "") {
-            std::cout << ")";
+            std::cout << ");";
         }
     }
     // ExpressionNode
