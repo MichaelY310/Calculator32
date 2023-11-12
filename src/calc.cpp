@@ -26,7 +26,7 @@ int main() {
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
     // std::string input = "1==false";
     // std::string input = "(1 == 2)";
-    std::string input = "x = 42\nx % 2 != 0";
+    std::string input = "((6 + (4 / ((1 + 2) - 3))) + 8)\n(z = ((32 * awol) >= 5))\n(((88 + 7) < (4 * true)) & (5 >= 2))";
 #endif
 
 
@@ -85,18 +85,23 @@ int main() {
 
         if (errorMessage.length() != 0)
         {
+            // Error
             std::cout << errorMessage << std::endl;
+
+            delete ParserB::ScopeStack.top();
             ParserB::ScopeStack.pop();
             ParserB::ScopeStack.push(originalScope);
-
-            continue;
         }
-        ParserB::printValue(result);
-        std::cout << std::endl;
-        delete originalScope;
+        else
+        {
+            // No Error
+            ParserB::printValue(result);
+            std::cout << std::endl;
+            delete originalScope;
+        }
     }
 
     ParserB::clean();
-    delete globalScope;
+    delete ParserB::ScopeStack.top();
     return 0;
 }
