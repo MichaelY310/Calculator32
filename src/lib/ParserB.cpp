@@ -390,6 +390,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
     // [ not found
     if (leftBracket== rightBound)
     {
+        std::cout << "1" << std::endl;
         return { { tokenVector[leftBracket].line, tokenVector[leftBracket].index }, tokenVector[leftBracket].content };
     }
     // find ]
@@ -398,6 +399,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
 
     if (rightBracket > rightBound)
     {
+        std::cout << "2" << std::endl;
         return { { tokenVector[rightBracket].line, tokenVector[rightBracket].index }, tokenVector[rightBracket].content };  
     }
 
