@@ -384,11 +384,10 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
     // error check
     while (leftBracket < rightBound)
     {
-        std::cout << tokenVector[leftBracket].content << " ";
+        std::cout << tokenVector[leftBracket].content << std::endl;
         if (tokenVector[leftBracket].type == TokenType::LEFT_BRACKET) { break; }
         leftBracket += 1;
     }
-    std::cout << endl;
     // [ not found
     if (leftBracket== rightBound)
     {
