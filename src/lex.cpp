@@ -1,7 +1,6 @@
-#include "lib/Lexer.h"
+
 #include "lib/Lexer.h"
 int main() {
-#if DEBUG == 0
 #if DEBUG == 0
     std::string input = "";
     std::string line;
@@ -47,20 +46,10 @@ int main() {
     int errorLine = errorPair.first;
     int errorIndex = errorPair.second;
     if (errorLine != -1)
-    std::vector<Token> TokenVector;
-    std::pair<int, int> errorPair = Token::GenTokenVector(input, TokenVector);
-
-    int errorLine = errorPair.first;
-    int errorIndex = errorPair.second;
-    if (errorLine != -1)
     {
-        std::cout << "Syntax error on line " << errorLine << " column " << errorIndex << "." << std::endl;
-        exit(1);
         std::cout << "Syntax error on line " << errorLine << " column " << errorIndex << "." << std::endl;
         exit(1);
     }
     Token::printLexer(TokenVector);
-
-
     return 0;
 }
