@@ -16,7 +16,6 @@
 #include "ASTNode.h"
 
 
-
 class Result {
 public:
     DataType type;
@@ -33,6 +32,7 @@ class ParserB
 public:
     static std::pair<std::pair<int, int>, std::string> HandleTokenVector(std::vector<Token> tokenVector, int leftBound, int rightBound, std::vector<std::unique_ptr<Node>>& nodes);
     static std::pair<std::pair<int, int>, std::string> MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node);
+    static std::pair<std::pair<int, int>, std::string> HandleArray(std::vector<Token> tokenVector, int leftBound, int rightBound,std::unique_ptr<ArrayNode>& node);
     static std::string calculate(Node* root, Result& result);
     static void print(Node* root, int indent = 0, bool semicolon = true);
     static void printValue(Result& result);

@@ -15,8 +15,8 @@ enum class TokenType {
 
     LEFT_PARENTHESIS,    // (
     RIGHT_PARENTHESIS,   // )
-    LEFT_BRACKET,    // (
-    RIGHT_BRACKET,   // )
+    LEFT_BRACKET,    // [
+    RIGHT_BRACKET,   // ]
 
     MULTIPLY,           // *
     DIVIDE,             // /
@@ -60,6 +60,8 @@ enum class TokenType {
     ELSE,
     PRINT,
     DEF,
+
+    ARRAY
 };
 
 class Token {

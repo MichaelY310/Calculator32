@@ -52,7 +52,6 @@ def p() {
         exit(1);
     }
     // Token::printLexer(TokenVector);
-
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
     if (errorResult.first.first != -1) 
@@ -66,5 +65,5 @@ def p() {
         ParserB::print(flows[i].get());
         std::cout << std::endl;
     }
-    return 0;
+    return 0; 
 }

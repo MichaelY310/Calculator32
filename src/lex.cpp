@@ -1,3 +1,4 @@
+
 #include "lib/Lexer.h"
 int main() {
 #if DEBUG == 0
