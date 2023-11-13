@@ -8,62 +8,85 @@
 #include <map>
 #include <memory>
 #include <stack>
-class Node
-{
-public:
-    Node() : value(Token(TokenType::NONE, "", -1, -1, -1)) {}
-    Node(Token token) : value(token) {}
-    virtual ~Node() = default;
 
-    Token value;
-};
 
-class Function
-{
-public:
-    Function() = default;
-};
+class Function;
 
 class Scope
 {
 public:
     Scope()
     : variableFunctionMap()
-    {}
+    {
+        std::cout << "scope is created" << std::endl;
+    }
+
+    ~Scope()
+    {
+        for (auto& pair : variableFunctionMap) {
+            pair.second.reset();
+        }
+        std::cout << "Scope is deleted" << std::endl;
+    }
+
+    Scope(const Scope& other)
+    : variableFunctionMap(other.variableFunctionMap) 
+    {
+        std::cout << "scope copied" << std::endl;
+    }
+
+    Scope& operator=(const Scope& other) {
+        if (this != &other) {
+            variableFunctionMap = other.variableFunctionMap;
+        }
+        return *this;
+    }
 
     std::map<std::string, std::shared_ptr<Function>> variableFunctionMap;
 };
 
-class Result 
+
+class Function
 {
 public:
-    ~Result() {
+    Function()
+    {
+        std::cout << "Function is created" << std::endl;
+    };
+
+    ~Function()
+    {
+        // for (auto& pair : m_CaptureScope.variableFunctionMap) {
+        //     pair.second.reset();
+        // }
+        // delete m_CaptureScope;
+        std::cout << "Function is deleted" << std::endl;
     }
 
-    Function* function;
+    Scope* m_CaptureScope;
 };
 
 
-int main() {
+static std::stack<Scope*> ScopeStack;
 
-    std::stack<Scope> ScopeStack = std::stack<Scope>();
-    ScopeStack.push(Scope());
-    auto& variableFunctionMap = ScopeStack.top().variableFunctionMap;
+int main() {    
+    // Add a Function inside globalScope
+    Scope* globalScope = new Scope();
+    ScopeStack.push(globalScope);
 
-    // // std::map<std::string, std::shared_ptr<Function>> variableFunctionMap = std::map<std::string, std::shared_ptr<Function>>();
+    std::shared_ptr<Function> function = std::make_shared<Function>();
+    globalScope->variableFunctionMap["add"] = function;
+    // map 里面有一个pointer指向function
 
-    // Result result = Result();
-    // result.function = new Function();
+    function->m_CaptureScope = new Scope(*globalScope);
+    // function 里面有一个pointer指向 scope, scope 里有个 map, map 里面有一个 pointer 指向 function
 
-    // // variableFunctionMap["add"] = std::make_shared<Function>();
-    // // variableFunctionMap["add"].reset(result.function);
-    // std::shared_ptr<Function> p = std::make_shared<Function>();
-    // p.reset(result.function);
+    delete function->m_CaptureScope;
+    std::cout << "1111" << std::endl;
+    delete globalScope;
+    std::cout << "2222" << std::endl;
 
-    Result result = Result();
-    result.function = new Function();
-    variableFunctionMap["add"] = std::make_shared<Function>();
-    variableFunctionMap["add"].reset(result.function);
+
 
     return 0;
 }
