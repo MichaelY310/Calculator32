@@ -270,8 +270,11 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             std::unique_ptr<PrintNode> node = std::make_unique<PrintNode>(tokenVector[start]);
             int printIndex = start;
             start += 1;
-            while (tokenVector[start].line == tokenVector[printIndex].line && start <= rightBound)
-            {
+            // while (tokenVector[start].line == tokenVector[printIndex].line && start <= rightBound)
+            // {
+            //     start += 1;
+            // }
+            while (tokenVector[start].type != TokenType::SEMICOLON){
                 start += 1;
             }
 
@@ -384,15 +387,13 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
     // error check
     while (leftBracket < rightBound)
     {
-        // std::cout << tokenVector[leftBracket].content << std::endl;
+
         if (tokenVector[leftBracket].type == TokenType::LEFT_BRACKET) { break; }
         leftBracket += 1;
     }
     // [ not found
     if (leftBracket== rightBound)
     {
-        // std::cout << "leftBound: " << leftBound << std::endl;
-        // std::cout << "1" << std::endl;
         return { { tokenVector[leftBracket].line, tokenVector[leftBracket].index }, tokenVector[leftBracket].content };
     }
     // find ]
