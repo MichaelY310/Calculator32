@@ -43,8 +43,17 @@ public:
     static int findRightBracketNoError(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightBraceNoError(std::vector<Token> expression, int leftBound, int rightBound);
 
-    static std::stack<Scope> ScopeStack;
+    static std::stack<Scope*> ScopeStack;
     static std::map<TokenType, int> hierarchyMap;
+    static std::vector<std::shared_ptr<Function>> functionStorage;
+
+    static void clean()
+    {
+        for (int i=0; i < (int)functionStorage.size(); i++)
+        {
+            delete functionStorage[i]->m_CaptureScope;
+        }
+    }
 
 
     
