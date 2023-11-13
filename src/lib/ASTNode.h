@@ -31,6 +31,16 @@ public:
 };
 
 
+class ArrayNode : public Node
+{
+    public:
+    ArrayNode() : Node(),  ArrayContent() {};
+    ArrayNode(Token token) : Node(token),  ArrayContent() {};
+    virtual ~ArrayNode() = default;
+
+    std::vector<std::unique_ptr<Node>> ArrayContent;  // stored all elements in array
+};
+
 class WhileNode : public Node
 {
 public:
@@ -58,11 +68,12 @@ public:
 class PrintNode : public Node
 {
 public:
-    PrintNode() : Node(), content(std::make_unique<ExpressionNode>()) {}
-    PrintNode(Token token) : Node(token), content(std::make_unique<ExpressionNode>()) {}
+    PrintNode() : Node(), content(std::make_unique<ExpressionNode>()), content2(nullptr) {}
+    PrintNode(Token token) : Node(token), content(std::make_unique<ExpressionNode>()), content2(nullptr) {}
     virtual ~PrintNode() = default;
 
     std::unique_ptr<ExpressionNode> content;
+    std::unique_ptr<ArrayNode> content2;
 };
 
 class ReturnNode : public Node
@@ -87,12 +98,3 @@ public:
     std::vector<std::unique_ptr<Node>> flows;
 };
 
-class ArrayNode : public Node
-{
-    public:
-    ArrayNode() : Node(),  ArrayContent() {};
-    ArrayNode(Token token) : Node(token),  ArrayContent() {};
-    virtual ~ArrayNode() = default;
-
-    std::vector<std::unique_ptr<Node>> ArrayContent;  // stored all elements in array
-};

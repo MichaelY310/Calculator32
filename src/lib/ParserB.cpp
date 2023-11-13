@@ -274,7 +274,19 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             {
                 start += 1;
             }
-            auto errorResult = MakeExpressionTree(tokenVector, printIndex + 1, start - 1, node->content);
+
+            std::pair<std::pair<int, int>, std::string> errorResult;            
+            if (printIndex + 1 <= start-1 && tokenVector[printIndex+1].type == TokenType::LEFT_BRACKET) 
+            {
+                node->content2 = std::make_unique<ArrayNode>(tokenVector[printIndex+1]);
+                errorResult = HandleArray(tokenVector, printIndex + 1, start -1, node->content2);
+                
+            }
+            else 
+            {
+                errorResult = MakeExpressionTree(tokenVector, printIndex + 1, start - 1, node->content);
+            }
+
             if (errorResult.first.first != -1) 
             {
                 return errorResult;
@@ -305,13 +317,29 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             }
             nodes.push_back(std::move(node));
         }
+        // only array without any assignment
+        else if (tokenVector[start].type == TokenType::LEFT_BRACKET) 
+        {
+            std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[start]);
+            int beginIndex = start;
+            start += 1;
+            while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
+            {
+                start += 1;
+            }
+            auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node); 
+            if (errorResult.first.first != -1) 
+            {
+                return errorResult;
+            }     
+            nodes.push_back(std::move(node));
+        }
         else
         {
             bool arrayExist = false; // distinguished whether it is array   
             int beginIndex = start;
             start += 1;
     
-
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
                 start += 1;
@@ -380,7 +408,6 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
             }
             commaIndex += 1;
         }
-    
         // Case 1: when the element is single token ex. true, 1
         if (commaIndex == index + 1) {
             std::unique_ptr<ExpressionNode> curr = std::make_unique<ExpressionNode>(tokenVector[index]);
@@ -575,7 +602,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
 
             }
         }
-        // array
+        // array lookup
         else if (topIndex+1 <= rightBound && expression[topIndex+1].type == TokenType::LEFT_BRACKET)
         {
             if (topIndex+3 <= rightBound && expression[topIndex+3].type == TokenType::RIGHT_BRACKET) { // make sure it is correct lookup format
@@ -673,6 +700,11 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         // get rid of the parenthesis pair
         return MakeExpressionTree(expression, topIndex+1, rightIndex-1, node);
     }
+    // else if (expression[topIndex].type == TokenType::LEFT_BRACKET)
+    // {
+    //     std::unique_ptr<ArrayNode> curr = std::make_unique<ArrayNode>(expression[topIndex]);
+    //     auto errorMessage = HandleArray(expression, leftBound)
+    // }
     // case 8 ERROR
 #if DEBUG
     std::cout << "3   " << std::endl;
@@ -1161,7 +1193,12 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         PrintNode* printRoot = dynamic_cast<PrintNode*>(root);
 
         std::cout << "print ";
-        print(printRoot->content.get(), 0, false);
+        if (printRoot->content2 != nullptr) {
+            print(printRoot->content2.get(), 0, false);
+        }
+        else {
+            print(printRoot->content.get(), 0, false);
+        }
         std::cout << ";";
     }
     // Return
@@ -1197,6 +1234,19 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         if ( ArrayRoot->value.content != "") {
             std::cout << ");";
         }
+    }
+    // only Array without assignment
+    else if (root->value.type == TokenType::LEFT_BRACKET){
+        ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
+        std::cout << "[";
+        for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
+            print(ArrayRoot->ArrayContent[i].get(), 0, false);
+            if (i+1 < ArrayRoot->ArrayContent.size()) {
+                std::cout << ", ";
+            }
+        }
+        if (semicolon == false) { std::cout << "]"; }
+        else { std::cout << "];"; }
     }
     // ExpressionNode
     else 
