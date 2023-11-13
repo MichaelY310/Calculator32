@@ -38,6 +38,9 @@ class ArrayNode : public Node
     ArrayNode(Token token) : Node(token),  ArrayContent() {};
     virtual ~ArrayNode() = default;
 
+    bool lookUp = false;
+    std::string lookUpStr = "";
+    int lookUpIndex = -1;
     std::vector<std::unique_ptr<Node>> ArrayContent;  // stored all elements in array
 };
 

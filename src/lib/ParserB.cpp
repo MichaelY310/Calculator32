@@ -394,9 +394,28 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
     }
     // find ]
     int rightBracket = ParserB::findRightBraceNoError(tokenVector, leftBracket + 1, rightBound);
+    
+
     if (rightBracket > rightBound)
     {
         return { { tokenVector[rightBracket].line, tokenVector[rightBracket].index }, tokenVector[rightBracket].content };  
+    }
+
+    if (rightBracket + 1 <= rightBound && tokenVector[rightBracket + 1].type== TokenType::LEFT_BRACKET) {
+        node->lookUp = true;
+        if (rightBracket + 3 <= rightBound) {
+            if (tokenVector[rightBracket + 2].type == TokenType::NUMBER)
+            {
+                node->lookUpIndex = tokenVector[rightBracket + 2].value;
+            }
+            else 
+            {
+                node->lookUpStr = tokenVector[rightBracket + 2].content;
+            }
+        }
+        else {
+            std::cout << "ERROR4" <<  std::endl;
+        }
     }
 
     for (int index = leftBracket + 1; index < rightBracket; index++) {
@@ -1243,6 +1262,16 @@ void ParserB::print(Node* root, int indent, bool semicolon)
             print(ArrayRoot->ArrayContent[i].get(), 0, false);
             if (i+1 < ArrayRoot->ArrayContent.size()) {
                 std::cout << ", ";
+            }
+        }
+        // check if there is lookup
+        if (ArrayRoot->lookUp == true) 
+        {
+            if (ArrayRoot->lookUpIndex != -1) {
+                std::cout << "][" << ArrayRoot->lookUpIndex;
+            }
+            else {
+                std::cout << "][" << ArrayRoot->lookUpStr;
             }
         }
         if (semicolon == false) { std::cout << "]"; }
