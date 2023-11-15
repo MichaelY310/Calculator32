@@ -45,6 +45,7 @@ int main() {
     Scope* globalScope = new Scope();
     ParserB::ScopeStack.push(globalScope);
     int lineCount = 0;
+    lineCount = lineCount + 1 -1;
     for (std::string expression : expressions)
     {
 
