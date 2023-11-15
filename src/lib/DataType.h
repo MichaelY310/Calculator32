@@ -8,4 +8,6 @@ enum class DataType
     BOOL,
     DOUBLE,
     FUNCTION,
+    ARRAY,
+    SUBARRAY
 };

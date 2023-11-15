@@ -1,0 +1,5 @@
+def foo(x, y) {
+  return null;
+}
+
+print foo(7, 8);

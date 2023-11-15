@@ -66,23 +66,28 @@ int main() {
 
         // ParserB
         ParserB::setupExpression(TokenVector);
-        std::unique_ptr<ExpressionNode> root;
-        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
+        // std::unique_ptr<ExpressionNode> root;
+        // std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
 
+        std::vector<std::unique_ptr<Node>> flows;
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
+
+        
         if (errorResult.first.first != -1) 
         {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-        ParserB::print_no_semicolon(root.get());
-        std::cout << std::endl;
+
+        // ParserB::print_no_semicolon(flows[0].get());
+        // ParserB::print(flows[0].get(), 0, false);
+        // std::cout << std::endl;
 
         // Calculate
         Result result;
         Scope* originalScope = new Scope(*(ParserB::ScopeStack.top()));
 
-        std::string errorMessage = ParserB::calculate(root.get(), result);
-
+        std::string errorMessage = ParserB::calculate(flows[0].get(), result);
         if (errorMessage.length() != 0)
         {
             // Error
@@ -92,13 +97,13 @@ int main() {
             ParserB::ScopeStack.pop();
             ParserB::ScopeStack.push(originalScope);
         }
-        else
-        {
-            // No Error
-            ParserB::printValue(result);
-            std::cout << std::endl;
-            delete originalScope;
-        }
+        // else
+        // {
+        //     // No Error
+        //     ParserB::printValue(result);
+        //     std::cout << std::endl;
+        //     delete originalScope;
+        // }
     }
 
     ParserB::clean();

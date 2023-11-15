@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include "DataType.h"
+#include "ASTNode.h"
 
 class Function;
 
@@ -11,13 +12,13 @@ class Scope
 public:
     Scope()
     : variableTypeMap(), variableDoubleMap(), variableBoolMap()
-    , variableFunctionMap()
+    , variableFunctionMap(), variableArrayMap()
     {}
 
     // Copy constructor
     Scope(const Scope& other)
     : variableTypeMap(other.variableTypeMap), variableDoubleMap(other.variableDoubleMap),
-        variableBoolMap(other.variableBoolMap), variableFunctionMap(other.variableFunctionMap) 
+        variableBoolMap(other.variableBoolMap), variableFunctionMap(other.variableFunctionMap), variableArrayMap(other.variableArrayMap)
     {}
 
     ~Scope()
@@ -116,4 +117,5 @@ public:
     std::map<std::string, double> variableDoubleMap;
     std::map<std::string, bool> variableBoolMap;
     std::map<std::string, std::shared_ptr<Function>> variableFunctionMap;
+    std::map<std::string, std::shared_ptr<Node>> variableArrayMap;
 };

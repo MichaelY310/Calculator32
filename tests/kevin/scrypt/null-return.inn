@@ -1,0 +1,15 @@
+def foo(){}
+def bar(){return;}
+def
+baz
+(
+)
+{
+return
+null
+;
+}
+
+print foo();
+print bar();
+print baz();
