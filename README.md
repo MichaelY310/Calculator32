@@ -1,20 +1,4 @@
 # Calculator32
-
-there are two main functions that helps build an calculator by taking a S expression
-
-# lex.cpp
-Turn the input string into a token vector and print their attributes
-
-# parse.cpp
-Turn the input string into a tree and then calculate the result of the expression.
-
-
-> William Lin
-> 
-> Torry Tong
-> 
-> Michael Yang
-
 This project is temporarity a calculator, and final goal is to making a lightweight script coding language.
 
 We have all of the functions with main() functions in /src/ folder, with other classes that designed as helper (i.e. without main functions) in /src/lib/ folder.
@@ -24,20 +8,28 @@ there are three main functions help with different functions needed for the calc
 ## lex.cpp
 Complie with Lexer.cpp, with lexer in Lexer.cpp. Set -DDEBUG=1 for debugging and -DDEBUG=0 otherwise.
 
+g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 lex.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
+
 This program takes an input stringstream, and then turn the input string into a token vector and print their attributes.
 
 ## calc.cpp
 Compile with Lexer.cpp, ParserB.cpp, with lexer in Lexer.cpp and parser for infix expression in ParserB.cpp. Set -DDEBUG=1 for debugging and -DDEBUG=0 otherwise.
+
+g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 calc.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
 
 This program supports interactive infix input lines, taking a line of input each time and print the infix expression with parenthesis and result.
 
 ## format.cpp
 Complie with Lexer.cpp and ParserB.cpp, with lexer in Lexer.cpp and parser in Parser.cpp. Set -DDEBUG=1 for debugging and -DDEBUG=0 otherwise.
 
+g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 format.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
+
 This program takes an input stringstream, and then turn the input string into a tree. It will print the input as its standard format.
 
 ## scrypt.cpp
 Complie with Lexer.cpp and ParserB.cpp, with lexer in Lexer.cpp and parser in Parser.cpp. Set -DDEBUG=1 for debugging and -DDEBUG=0 otherwise.
+
+g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 scrypt.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
 
 This program takes an input stringstream and execute expressions and statements.
 
