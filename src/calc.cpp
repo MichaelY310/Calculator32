@@ -80,7 +80,7 @@ int main() {
             continue;
         }
 
-        // ParserB::print_no_semicolon(flows[0].get());
+        ParserB::print_no_semicolon(flows[0].get());
         // ParserB::print(flows[0].get(), 0, false);
         // std::cout << std::endl;
 
