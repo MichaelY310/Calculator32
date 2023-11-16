@@ -415,6 +415,13 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
         }
         else {
             std::cout << "ERROR4" <<  std::endl;
+            // node = std::make_unique<ExpressionNode>(expression[topIndex]);
+            // int rightB = findRightBracketNoError( expression, topIndex+2, rightBound);
+            // std::unique_ptr<ExpressionNode> cur =  std::make_unique<ExpressionNode>();
+            // auto error = MakeExpressionTree(expression, topIndex+2, rightB-1, cur);
+            // node->children.push_back(std::move(cur));
+            // node->ArrayLookUp = true;
+            // node->value.type = TokenType::ARRAY;
         }
     }
 
@@ -635,7 +642,16 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                 node->ArrayLookUp = true;
             }
             else {
-                std::cout << "ERROR3" << std::endl;
+                node = std::make_unique<ExpressionNode>(expression[topIndex]);
+                int rightB = findRightBracketNoError( expression, topIndex+2, rightBound);
+                std::unique_ptr<ExpressionNode> cur =  std::make_unique<ExpressionNode>();
+                auto error = MakeExpressionTree(expression, topIndex+2, rightB-1, cur);
+                node->children.push_back(std::move(cur));
+                node->ArrayLookUp = true;
+                node->value.type = TokenType::VARIABLE;
+                // if (node->value.type == TokenType::VARIABLE){
+                //     std::cout << node->value.content << " " <<node->children[0]->value.content << std::endl;
+                // }
             }
         }
         // variable
@@ -679,6 +695,10 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         std::pair<std::pair<int, int>, std::string> errorResult1 = MakeExpressionTree(expression, leftBound, topIndex-1, node1);
         if (errorResult1.first.first != -1) { return errorResult1; }
         node->children.push_back(std::move(node1));
+        // if (node->children[0]->value.type == TokenType::VARIABLE) {
+        //         std::cout << ": " << std::endl;
+        // }
+        
 
         // on the right
         std::unique_ptr<ExpressionNode> node2;
@@ -912,8 +932,47 @@ std::string ParserB::calculate(Node* root, Result& result)
                 result.arrayValue->ArrayContent.push_back(element);
             }
         }
-        result.type = DataType::ARRAY;
-        setVariable(Array->value.content, result);
+        if (Array->lookUp == true) 
+        {
+            // x[1+2] x[1>=2]
+            if (Array->lookUpStr == "" && Array->lookUpIndex == -1) 
+            {   
+                Result lookupResult;
+                calculate(Array->ArrayContent[0].get(), lookupResult);
+                if (lookupResult.type == DataType::DOUBLE) {Array->lookUpIndex = lookupResult.doubleValue; }
+                else {return "Runtime error: index is not a number.";}
+            }
+            if (Array->lookUpStr != ""){ return "Runtime error: index is not a number."; }
+            double a,b;
+            b = std::modf(Array->lookUpIndex,&a);
+
+            if (b!= 0) { return "Runtime error: index is not an integer."; }
+            // if (variableTypeMap.at(Array->value.content) != DataType::ARRAY) { return "Runtime error: not an array."; }
+            int I = result.arrayValue->ArrayContent.size();
+            if (Array->lookUpIndex< 0 || Array->lookUpIndex >= I ) { return "Runtime error: index out of bounds."; }
+
+            if (result.arrayValue->ArrayContent[Array->lookUpIndex]->value.type == TokenType::NUMBER) 
+            {
+                result.doubleValue = result.arrayValue->ArrayContent[Array->lookUpIndex]->value.value;
+                result.type = DataType::DOUBLE;
+            }
+            else if (result.arrayValue->ArrayContent[Array->lookUpIndex]->value.type == TokenType::TRUE ||
+                    result.arrayValue->ArrayContent[Array->lookUpIndex]->value.type == TokenType::FALSE)
+            {   
+                result.boolValue = result.arrayValue->ArrayContent[Array->lookUpIndex]->value.value;
+                result.type = DataType::BOOL;    
+            }
+            else 
+            {
+                result.arrayValue = result.arrayValue->ArrayContent[Array->lookUpIndex];
+                result.type = DataType::ARRAY;
+            }
+            
+        }
+        else {
+            result.type = DataType::ARRAY;
+            setVariable(Array->value.content, result);
+        }
     }
 
     // Expression
@@ -1017,6 +1076,14 @@ std::string ParserB::calculate(Node* root, Result& result)
             // Array lookup
             else if (expressionNode->ArrayLookUp == true)
             {
+                // x[1+2] x[1>=2]
+                if (expressionNode->lookUpStr == "" && expressionNode->index == -1) 
+                {   
+                    Result lookupResult;
+                    calculate(expressionNode->children[0].get(), lookupResult);
+                    if (lookupResult.type == DataType::DOUBLE) {expressionNode->index = lookupResult.doubleValue; }
+                    else {return "Runtime error: index is not a number.";}
+                }
                 if (expressionNode->lookUpStr != ""){ return "Runtime error: index is not a number."; }
                 double a,b;
                 b = std::modf(expressionNode->index,&a);
@@ -1400,7 +1467,7 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         else if (expressionNode->value.type == TokenType::VARIABLE)
         {
             // Function Call
-            if (expressionNode->children.size() != 0)
+            if (expressionNode->children.size() != 0 && expressionNode->ArrayLookUp != true)
             {
                 print(expressionNode->children[0].get(), 0, false);
                 std::cout << "(";
@@ -1417,7 +1484,15 @@ void ParserB::print(Node* root, int indent, bool semicolon)
             }
             // Array 
             else if (expressionNode->ArrayLookUp == true) {
-                std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
+                if (expressionNode->children.size()!= 0) {
+                    std::cout << expressionNode->value.content << "[";
+                    print(expressionNode->children[0].get(), 0, false);
+                    std::cout << "]";
+                }
+                else
+                {
+                    std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
+                }
             }
 
             // Normal Variable

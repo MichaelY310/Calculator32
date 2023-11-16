@@ -236,7 +236,7 @@ static void print_no_semicolon(Node* root, int indent=0)
         else if (expressionNode->value.type == TokenType::VARIABLE)
         {
             // Function Call
-            if (expressionNode->children.size() != 0)
+            if (expressionNode->children.size() != 0 && expressionNode->ArrayLookUp == false)
             {
                 print(expressionNode->children[0].get(), 0, false);
                 std::cout << "(";
@@ -251,7 +251,15 @@ static void print_no_semicolon(Node* root, int indent=0)
                 std::cout << ")";
             }
             else if (expressionNode->ArrayLookUp == true) {
-                std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
+                if (expressionNode->children.size()!= 0) {
+                    std::cout << expressionNode->value.content << "[";
+                    print(expressionNode->children[0].get(), 0, false);
+                    std::cout << "]";
+                }
+                else
+                {
+                    std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
+                }
             }
             // Normal Variable
             else 
