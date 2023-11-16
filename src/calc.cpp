@@ -72,7 +72,10 @@ int main() {
 
         std::vector<std::unique_ptr<Node>> flows;
         // std::cout << TokenVector.at(TokenVector.size()-2).content << std::endl;
-        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
+        TokenVector.pop_back();
+        TokenVector.push_back(Token(TokenType::SEMICOLON, ";", 0, 0 ));
+        
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size(), flows);
 
         
         if (errorResult.first.first != -1) 
