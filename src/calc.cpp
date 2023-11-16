@@ -99,13 +99,13 @@ int main() {
             ParserB::ScopeStack.pop();
             ParserB::ScopeStack.push(originalScope);
         }
-        // else
-        // {
-        //     // No Error
-        //     ParserB::printValue(result);
-        //     std::cout << std::endl;
-        //     delete originalScope;
-        // }
+        else
+        {
+            // No Error
+            ParserB::printValue(result);
+            std::cout << std::endl;
+            delete originalScope;
+        }
     }
 
     ParserB::clean();

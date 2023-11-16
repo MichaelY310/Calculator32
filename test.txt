@@ -1,11 +1,10 @@
 array = [true, 2, 1+1+1, 4, [5]];
-print array[2];
-print array;
+
 
 arref = array;
 temp  = arref[1];
 arref[1] = 0 - arref[3];
 arref[3] = 0 - temp;
-print array;
+
 
 
