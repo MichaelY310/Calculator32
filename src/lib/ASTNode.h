@@ -8,11 +8,22 @@
 class Node
 {
 public:
-    Node() : value(Token(TokenType::NONE, "", -1, -1, -1)) {}
-    Node(Token token) : value(token) {}
+    Node() : value(Token(TokenType::NONE, "", -1, -1, -1)) , ArrayContent(){}
+    Node(Token token) : value(token),  ArrayContent() {}
+    // Node(Node * copy) : value(copy->value), lookUp(copy->lookUp), lookUpStr(copy->lookUpStr),
+    // lookUpIndex(copy->lookUpIndex) {
+    //     for (ele : copy->ArrayContent) {
+    //         this->ArrayContent.push_back(ele);
+    //     }
+    // }
     virtual ~Node() = default;
 
     Token value;
+    bool lookUp = false;
+    std::string lookUpStr = "";
+    int lookUpIndex = -1;
+    std::vector<std::shared_ptr<Node>> ArrayContent;
+    bool subArray = false;
 };
 
 // An operation expression node should always have 2 children
@@ -27,6 +38,7 @@ public:
     
     bool ArrayLookUp = false;
     int index = -1;
+    // std::string lookUpStr = "";
     std::vector<std::unique_ptr<ExpressionNode>> children;
 };
 
@@ -34,14 +46,14 @@ public:
 class ArrayNode : public Node
 {
     public:
-    ArrayNode() : Node(),  ArrayContent() {};
-    ArrayNode(Token token) : Node(token),  ArrayContent() {};
+    ArrayNode() : Node() {};
+    ArrayNode(Token token) : Node(token) {};
     virtual ~ArrayNode() = default;
 
-    bool lookUp = false;
-    std::string lookUpStr = "";
-    int lookUpIndex = -1;
-    std::vector<std::unique_ptr<Node>> ArrayContent;  // stored all elements in array
+    // bool lookUp = false;
+    // std::string lookUpStr = "";
+    // int lookUpIndex = -1;
+    // std::vector<std::shared_ptr<Node>> ArrayContent;  // stored all elements in array
 };
 
 class WhileNode : public Node

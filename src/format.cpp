@@ -63,6 +63,18 @@ def p() {
     for (int i=0; i < (int)flows.size(); i++)
     {
         ParserB::print(flows[i].get());
+        // if (flows[i].get()->value.type == TokenType::ARRAY) {
+        //     ArrayNode* Array = dynamic_cast<ArrayNode*>(flows[i].get());
+        //     if (Array->ArrayContent[2]->value.type == TokenType::NUMBER) {
+        //         std::cout << "yes" << std::endl;
+        //     }
+        //     std::cout << Array->ArrayContent[2]->value << std::endl;
+        // }
+        // if (flows[i].get()->value.type == TokenType::VARIABLE) {
+        //     std::cout << flows[i].get()->value.content << std::endl;
+        // }
+
+
         std::cout << std::endl;
     }
     return 0; 

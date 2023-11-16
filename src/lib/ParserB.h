@@ -18,9 +18,13 @@
 
 class Result {
 public:
+    // Result(std::shared_ptr<ArrayNode> Array){
+
+    // }
     DataType type;
     bool isreturn = false;
     std::shared_ptr<Function> function;
+    std::shared_ptr<Node> arrayValue;
     union {
         double doubleValue;
         bool boolValue;
@@ -37,8 +41,8 @@ public:
     static void print(Node* root, int indent = 0, bool semicolon = true);
     static void printValue(Result& result);
     static void setupExpression(std::vector<Token>& expression);
-    static void getVariable(std::string& variableName, Result& result);
-    static void setVariable(std::string& variableName, Result& result);
+    static void getVariable(std::string& variableName, Result& result, int index = -1);
+    static void setVariable(std::string& variableName, Result& result, int index = -1);
     static int findRightParenthesisNoError(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightBracketNoError(std::vector<Token> expression, int leftBound, int rightBound);
     static int findRightBraceNoError(std::vector<Token> expression, int leftBound, int rightBound);
@@ -169,6 +173,47 @@ static void print_no_semicolon(Node* root, int indent=0)
         std::cout << "return ";
         print(returnRoot->content.get());
     }
+    // Array
+    else if (root->value.type == TokenType::ARRAY)
+    {
+        ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
+        if ( ArrayRoot->value.content != "") {
+            std::cout << "(" << ArrayRoot->value.content << " = ";
+        }
+        std::cout << "[";
+        for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
+            print(ArrayRoot->ArrayContent[i].get(), 0, false);
+            if (i+1 < ArrayRoot->ArrayContent.size()) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]";
+        if ( ArrayRoot->value.content != "") {
+            std::cout << ")";
+        }
+    }
+    // only Array without assignment
+    else if (root->value.type == TokenType::LEFT_BRACKET){
+        ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
+        std::cout << "[";
+        for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
+            print(ArrayRoot->ArrayContent[i].get(), 0, false);
+            if (i+1 < ArrayRoot->ArrayContent.size()) {
+                std::cout << ", ";
+            }
+        }
+        // check if there is lookup
+        if (ArrayRoot->lookUp == true) 
+        {
+            if (ArrayRoot->lookUpIndex != -1) {
+                std::cout << "][" << ArrayRoot->lookUpIndex;
+            }
+            else {
+                std::cout << "][" << ArrayRoot->lookUpStr;
+            }
+        }
+        std::cout << "]"; 
+    }
 
     // ExpressionNode
     else 
@@ -204,6 +249,9 @@ static void print_no_semicolon(Node* root, int indent=0)
                     }
                 }
                 std::cout << ")";
+            }
+            else if (expressionNode->ArrayLookUp == true) {
+                std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
             }
             // Normal Variable
             else 

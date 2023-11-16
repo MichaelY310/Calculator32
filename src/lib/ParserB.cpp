@@ -268,10 +268,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             std::unique_ptr<PrintNode> node = std::make_unique<PrintNode>(tokenVector[start]);
             int printIndex = start;
             start += 1;
-            // while (tokenVector[start].line == tokenVector[printIndex].line && start <= rightBound)
-            // {
-            //     start += 1;
-            // }
+
             while (tokenVector[start].type != TokenType::SEMICOLON){
                 start += 1;
             }
@@ -629,7 +626,12 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         {
             if (topIndex+3 <= rightBound && expression[topIndex+3].type == TokenType::RIGHT_BRACKET) { // make sure it is correct lookup format
                 node = std::make_unique<ExpressionNode>(expression[topIndex]);
-                node->index = expression[topIndex+2].value;
+                if (expression[topIndex+2].type== TokenType::NUMBER){
+                    node->index = expression[topIndex+2].value;
+                }
+                else {
+                    node->lookUpStr = expression[topIndex+2].content;
+                }
                 node->ArrayLookUp = true;
             }
             else {
@@ -737,6 +739,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
 std::string ParserB::calculate(Node* root, Result& result)
 {
     auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
+    auto& variableArrayMap = ScopeStack.top()->variableArrayMap;
 
     // Def
     if (root->value.type == TokenType::DEF)
@@ -822,8 +825,14 @@ std::string ParserB::calculate(Node* root, Result& result)
     {
         PrintNode* printNode = dynamic_cast<PrintNode*>(root);
         Result flowResult;
-        std::string errorMessageFlow = calculate(printNode->content.get(), flowResult);
-        if (errorMessageFlow != "") { return errorMessageFlow; }            
+        std::string errorMessageFlow; 
+        if (printNode->content2 != nullptr) {
+            errorMessageFlow = calculate(printNode->content2.get(), flowResult);
+        }
+        else {
+            errorMessageFlow = calculate(printNode->content.get(), flowResult);
+        }
+        if (errorMessageFlow != "") { return errorMessageFlow; }           
         ParserB::printValue(flowResult);
         std::cout << std::endl;
     }
@@ -844,6 +853,67 @@ std::string ParserB::calculate(Node* root, Result& result)
             result.isreturn = true;
             if (errorMessageFlow != "") { return errorMessageFlow; }      
         }
+    }
+
+    // Array
+    else if (root->value.type == TokenType::ARRAY || root->value.type == TokenType::LEFT_BRACKET) // may cause memory leak check again !!!!
+    {
+        ArrayNode * Array = dynamic_cast<ArrayNode*>(root);
+        result.type = DataType::ARRAY;
+        result.arrayValue = std::make_shared<ArrayNode>(Array->value);
+        result.arrayValue->lookUp = Array->lookUp;
+        result.arrayValue->lookUpStr = Array->lookUpStr;
+        result.arrayValue->lookUpIndex = Array->lookUpIndex;
+        for (auto element : Array->ArrayContent){
+
+            // std::cout << element->value.content << " " << element->value.value <<std::endl;
+            if (element->value.type == TokenType::NUMBER)
+            {
+                result.arrayValue->ArrayContent.push_back(element);
+            }
+
+            else if (element->value.type == TokenType::FALSE || element->value.type == TokenType::TRUE)\
+            {
+                result.arrayValue->ArrayContent.push_back(element);
+            }
+
+            else if (element->value.type == TokenType::LEFT_BRACKET)
+            {
+                std::cout << "running" <<std::endl;
+                Result arrayResult;
+                std::string errorMessage;
+                errorMessage = calculate (element.get(), arrayResult);
+                if (errorMessage != "") { return errorMessage; } 
+                result.arrayValue->ArrayContent.push_back(element);
+
+            }
+            else if (element->value.type == TokenType::NUL)
+            {
+                result.arrayValue->ArrayContent.push_back(element);
+            }
+            else if (element->value.type == TokenType::ARRAY)
+            {
+                Result arrayResult;
+                std::string errorMessage;
+                errorMessage = calculate (element.get(), arrayResult);
+                element->subArray = true;
+                result.arrayValue->ArrayContent.push_back(element);
+            }
+            // + - * / % ...
+            else 
+            {
+                Result NumberResult;
+                std::string errorMessage;
+                calculate (element.get(), NumberResult);
+                if (errorMessage != "") {return errorMessage;} 
+                element->value.value = NumberResult.doubleValue;
+                element->value.type = TokenType::NUMBER;
+                
+                result.arrayValue->ArrayContent.push_back(element);
+            }
+        }
+        result.type = DataType::ARRAY;
+        setVariable(Array->value.content, result);
     }
 
     // Expression
@@ -944,6 +1014,26 @@ std::string ParserB::calculate(Node* root, Result& result)
                 ScopeStack.pop();
                 delete localScope;
             }
+            // Array lookup
+            else if (expressionNode->ArrayLookUp == true)
+            {
+                if (expressionNode->lookUpStr != ""){ return "Runtime error: index is not a number."; }
+                double a,b;
+                b = std::modf(expressionNode->index,&a);
+
+                if (b!= 0) { return "Runtime error: index is not an integer."; }
+                if (variableTypeMap.at(expressionNode->value.content) != DataType::ARRAY) { return "Runtime error: not an array."; }
+                int I = variableArrayMap.at(expressionNode->value.content)->ArrayContent.size();
+                if (expressionNode->index < 0 || expressionNode->index >= I ) { return "Runtime error: index out of bounds."; }
+
+                getVariable(expressionNode->value.content, result, expressionNode->index);
+                // std::cout << "running: " << expressionNode->index<<" "<< result.doubleValue << std::endl;
+            }
+            // Array
+            else if (variableTypeMap.at(expressionNode->value.content) == DataType::ARRAY && expressionNode->ArrayLookUp == false) 
+            {   
+                getVariable(expressionNode->value.content, result);
+            }
             else 
             {
                 getVariable(expressionNode->value.content, result);
@@ -962,7 +1052,9 @@ std::string ParserB::calculate(Node* root, Result& result)
             if (expressionNode->children[0].get()->value.type != TokenType::VARIABLE)
             { return "Runtime error: invalid assignee."; }
 
-            setVariable(expressionNode->children[0]->value.content, result);
+            if (expressionNode->children[0]->index!= -1) {setVariable(expressionNode->children[0]->value.content, result, expressionNode->children[0]->index);}
+            else {setVariable(expressionNode->children[0]->value.content, result);}
+            
 
             return "";
         }
@@ -972,6 +1064,7 @@ std::string ParserB::calculate(Node* root, Result& result)
             // variable for operation is uninitialaized
             Result result1;
             Result result2;
+            
             std::string errorMessage1 = calculate(expressionNode->children[0].get(), result1);
             if (errorMessage1 != "") { return errorMessage1; }
             std::string errorMessage2 = calculate(expressionNode->children[1].get(), result2);
@@ -996,6 +1089,7 @@ std::string ParserB::calculate(Node* root, Result& result)
                 }
                 else if (expressionNode->value.type == TokenType::MINUS) {
                     result.doubleValue = result1.doubleValue - result2.doubleValue; 
+                    // std::cout << "Here: " << result.doubleValue << std::endl;
                 }
                 else if (expressionNode->value.type == TokenType::MULTIPLY) { 
                     result.doubleValue = result1.doubleValue * result2.doubleValue; 
@@ -1358,6 +1452,9 @@ void ParserB::print(Node* root, int indent, bool semicolon)
 
 void ParserB::printValue(Result& value)
 {
+
+    // if (value.print == false) {return;}
+
     if (value.type == DataType::NUL)
     {
         std::cout << "null";
@@ -1372,6 +1469,40 @@ void ParserB::printValue(Result& value)
     else if (value.type == DataType::DOUBLE)
     {
         std::cout << value.doubleValue;
+    }
+
+    else if (value.type == DataType::ARRAY)
+    {
+        std::cout << "[";
+        for (size_t i = 0; i < value.arrayValue->ArrayContent.size(); i++) 
+        { 
+            if (value.arrayValue->ArrayContent[i]->value.type == TokenType::NUMBER)
+            {
+            
+                std::cout << value.arrayValue->ArrayContent[i]->value.value;
+            }
+            else if (value.arrayValue->ArrayContent[i]->value.type == TokenType::ARRAY)
+            {   
+
+
+                Result curr;
+                curr.type = DataType::ARRAY;
+    
+                curr.arrayValue = value.arrayValue->ArrayContent.at(i);
+                // curr.arrayValue->value.type = ;
+                
+                printValue(curr);
+                // std::cout << "[5]";
+            }
+            else{
+                // std::cout << 3 << std::endl;
+                std::cout << value.arrayValue->ArrayContent[i]->value.content;
+            }
+            if (i+1<value.arrayValue->ArrayContent.size()) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]";
     }
 
     else
@@ -1446,12 +1577,49 @@ void ParserB::setupExpression(std::vector<Token>& expression)
     }
 }
 
-void ParserB::getVariable(std::string& variableName, Result& result) {
+void ParserB::getVariable(std::string& variableName, Result& result, int index) {
     auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
     auto& variableDoubleMap = ScopeStack.top()->variableDoubleMap;
     auto& variableBoolMap = ScopeStack.top()->variableBoolMap;
     auto& variableFunctionMap = ScopeStack.top()->variableFunctionMap;
+    auto& variableArrayMap = ScopeStack.top()->variableArrayMap;
     result.type = variableTypeMap[variableName];
+
+    if (index != -1)
+    {
+        if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::NUMBER)
+        {
+            result.type = DataType::DOUBLE;
+            result.doubleValue =  variableArrayMap[variableName]->ArrayContent.at(index)->value.value;
+        }
+        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::TRUE || 
+                variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::FALSE)
+        {
+            result.type = DataType::BOOL;
+            result.boolValue = variableArrayMap[variableName]->ArrayContent.at(index)->value.value;
+        }
+        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::ARRAY || 
+                variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::LEFT_BRACKET)
+        {
+            result.type = DataType::ARRAY;
+
+            result.arrayValue = std::make_unique<ArrayNode>(variableArrayMap[variableName]->ArrayContent.at(index)->value);
+            result.arrayValue->lookUp = variableArrayMap[variableName]->ArrayContent.at(index)->lookUp;
+            result.arrayValue->lookUpStr = variableArrayMap[variableName]->ArrayContent.at(index)->lookUpStr;
+            result.arrayValue->lookUpIndex = variableArrayMap[variableName]->ArrayContent.at(index)->lookUpIndex;
+            for (auto element : variableArrayMap[variableName]->ArrayContent.at(index)->ArrayContent){
+                result.arrayValue->ArrayContent.push_back(element);
+            }
+        }
+        return;
+    }
+
+    if (variableTypeMap.at(variableName) == DataType::ARRAY)
+    {
+        result.arrayValue = variableArrayMap[variableName];
+        return;
+    }
+
     if (result.type == DataType::NUL)
     {
         
@@ -1468,6 +1636,10 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     {
         result.function = variableFunctionMap[variableName];
     }
+    else if (result.type == DataType::ARRAY)
+    {
+        result.arrayValue = variableArrayMap[variableName];
+    }
     else 
     {
         // std::cout << (result.type == DataType::NUL) << std::endl;
@@ -1476,11 +1648,43 @@ void ParserB::getVariable(std::string& variableName, Result& result) {
     }
 }
 
-void ParserB::setVariable(std::string& variableName, Result& result) {
+void ParserB::setVariable(std::string& variableName, Result& result, int index) {
     auto& variableTypeMap = ScopeStack.top()->variableTypeMap;
     auto& variableDoubleMap = ScopeStack.top()->variableDoubleMap;
     auto& variableBoolMap = ScopeStack.top()->variableBoolMap;
     auto& variableFunctionMap = ScopeStack.top()->variableFunctionMap;
+    auto& variableArrayMap =  ScopeStack.top()->variableArrayMap;
+
+    if (index != -1) {
+        if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::NUMBER)
+        {
+            // result.type = DataType::DOUBLE;
+            variableArrayMap[variableName]->ArrayContent.at(index)->value.value = result.doubleValue;
+        }
+        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::TRUE || 
+                variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::FALSE)
+        {
+            // result.type = DataType::BOOL;
+            variableArrayMap[variableName]->ArrayContent.at(index)->value.value = result.boolValue;
+        }
+        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::ARRAY || 
+                variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::LEFT_BRACKET)
+        {
+            result.type = DataType::ARRAY;
+
+            // result.arrayValue = std::make_unique<ArrayNode>(variableArrayMap[variableName]->ArrayContent.at(index)->value);
+            // result.arrayValue->lookUp = variableArrayMap[variableName]->ArrayContent.at(index)->lookUp;
+            // result.arrayValue->lookUpStr = variableArrayMap[variableName]->ArrayContent.at(index)->lookUpStr;
+            // result.arrayValue->lookUpIndex = variableArrayMap[variableName]->ArrayContent.at(index)->lookUpIndex;
+            // for (auto element : variableArrayMap[variableName]->ArrayContent.at(index)->ArrayContent){
+            //     result.arrayValue->ArrayContent.push_back(element);
+            // }
+
+            variableArrayMap[variableName]->ArrayContent.at(index) = result.arrayValue;
+
+        }
+        return;
+    }
 
     variableTypeMap[variableName] = result.type;
     if (result.type == DataType::NUL)
@@ -1498,6 +1702,14 @@ void ParserB::setVariable(std::string& variableName, Result& result) {
     else if (result.type == DataType::FUNCTION)
     {
         variableFunctionMap[variableName] = result.function;
+    }
+    else if (result.type == DataType::ARRAY)
+    {   
+        // std::cout << variableName<<" yes: " << result.arrayValue->value.content << std::endl;
+        variableArrayMap[variableName] = result.arrayValue;
+        //  if (variableName == "arref") {
+        //     variableArrayMap[variableName]->ArrayContent.at(1)->value.value = -1;
+        // }
     }
     else
     {
