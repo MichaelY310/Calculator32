@@ -71,6 +71,7 @@ int main() {
         // std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
 
         std::vector<std::unique_ptr<Node>> flows;
+        // std::cout << TokenVector.at(TokenVector.size()-2).content << std::endl;
         std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
 
         
@@ -82,7 +83,7 @@ int main() {
 
         ParserB::print_no_semicolon(flows[0].get());
         // ParserB::print(flows[0].get(), 0, false);
-        // std::cout << std::endl;
+        std::cout << std::endl;
 
         // Calculate
         Result result;
