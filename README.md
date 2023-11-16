@@ -42,6 +42,8 @@ Checkpoint 2: Added support for variables, assignment operation, and infix expre
 
 Checkpoint 3: Added support for Bool values, ordered comparisons, logic operations, mod operation, equality comparisons, while/if/print statements. S expression dumped.
 
+Checkpoint 4: Added support for Functions and Arrays.
+
 
 > William Lin
 > 
