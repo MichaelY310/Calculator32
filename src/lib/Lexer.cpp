@@ -154,7 +154,7 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             {
                 if ( i + 1 < len && input.at(i+1) == '='){
                     res.emplace_back(TokenType::EQUALITY,"==", line, index, -1);
-                    i++;
+                    i++; 
                     index++;
                 }
                 else{

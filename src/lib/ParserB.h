@@ -36,7 +36,7 @@ class ParserB
 public:
     static std::pair<std::pair<int, int>, std::string> HandleTokenVector(std::vector<Token> tokenVector, int leftBound, int rightBound, std::vector<std::unique_ptr<Node>>& nodes);
     static std::pair<std::pair<int, int>, std::string> MakeExpressionTree(std::vector<Token> expression, int leftBound, int rightBound, std::unique_ptr<ExpressionNode>& node);
-    static std::pair<std::pair<int, int>, std::string> HandleArray(std::vector<Token> tokenVector, int leftBound, int rightBound,std::unique_ptr<ArrayNode>& node);
+    static std::pair<std::pair<int, int>, std::string> HandleArray(std::vector<Token> tokenVector, int leftBound, int rightBound,std::unique_ptr<ArrayNode>& node , int index = -1);
     static std::string calculate(Node* root, Result& result);
     static void print(Node* root, int indent = 0, bool semicolon = true);
     static void printValue(Result& result);
@@ -193,7 +193,7 @@ static void print_no_semicolon(Node* root, int indent=0)
         }
     }
     // only Array without assignment
-    else if (root->value.type == TokenType::LEFT_BRACKET){
+    else if (root->value.type == TokenType::LEFT_BRACKET && root->EqualityIndex == -1){
         ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
         std::cout << "[";
         for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
@@ -215,6 +215,29 @@ static void print_no_semicolon(Node* root, int indent=0)
         std::cout << "]"; 
     }
 
+    else if (root->EqualityIndex != -1) 
+    {
+        ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
+        std::cout << "(";
+        if (ArrayRoot->ArrayContent[0]->ArrayContent.size()==0) {
+            std::cout << ArrayRoot->ArrayContent[0]->value.content;
+        }
+        else 
+        {
+            print(ArrayRoot->ArrayContent[0].get());
+        }
+        std::cout <<" " <<ArrayRoot->value.content << " ";
+        if (ArrayRoot->ArrayContent[1]->ArrayContent.size()==0) {
+
+            std::cout << ArrayRoot->ArrayContent[1]->value.content;
+        }
+        else 
+        {
+            print(ArrayRoot->ArrayContent[1].get());
+        }
+        std::cout << ")";
+        // std::cout << "yes" << std::endl;
+    }
     // ExpressionNode
     else 
     {

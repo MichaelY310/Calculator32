@@ -18,11 +18,13 @@ public:
     // }
     virtual ~Node() = default;
 
+    
     Token value;
     bool lookUp = false;
     std::string lookUpStr = "";
     int lookUpIndex = -1;
     std::vector<std::shared_ptr<Node>> ArrayContent;
+    int EqualityIndex = -1;
     bool subArray = false;
 };
 
@@ -46,7 +48,7 @@ public:
 class ArrayNode : public Node
 {
     public:
-    ArrayNode() : Node() {};
+    ArrayNode() : Node(){};
     ArrayNode(Token token) : Node(token) {};
     virtual ~ArrayNode() = default;
 

@@ -318,18 +318,27 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
         // only array without any assignment
         else if (tokenVector[start].type == TokenType::LEFT_BRACKET) 
         {
+            int EqualityIndex = -1;
             std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[start]);
             int beginIndex = start;
             start += 1;
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
+                if (tokenVector[start].content ==  "==" || tokenVector[start].content == "!=" ) {
+
+                    EqualityIndex = start;
+                }
                 start += 1;
             }
-            auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node); 
+
+            auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node, EqualityIndex); 
             if (errorResult.first.first != -1) 
             {
                 return errorResult;
             }     
+            if (EqualityIndex!=-1){
+                node->EqualityIndex = EqualityIndex;
+            }
             nodes.push_back(std::move(node));
         }
         else
@@ -337,21 +346,37 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             bool arrayExist = false; // distinguished whether it is array   
             int beginIndex = start;
             start += 1;
+            int EqualityIndex = -1;
     
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
-                start += 1;
-                if (tokenVector[start].type == TokenType::LEFT_BRACKET) {
-                    if (tokenVector[start-1].type != TokenType::VARIABLE){     //check whether it is creating a new array
+                if (tokenVector[beginIndex].type == TokenType::LEFT_BRACKET){
+                    if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
                         arrayExist = true;
                     }
                 }
+                if (tokenVector[start].type == TokenType::LEFT_BRACKET) {
+                    if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
+                        arrayExist = true;
+                    }
+                }
+
+                if (tokenVector[start].content ==  "==" || tokenVector[start].content == "!=" ) {
+                    // std::cout << "yes" << std::endl;
+                    EqualityIndex = start;
+                }
+                start += 1;
             }
             if (arrayExist) 
             {
+                // std::cout << EqualityIndex << beginIndex << start-2<< std::endl;
                 tokenVector[beginIndex].type = TokenType::ARRAY;
                 std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[beginIndex]);
-                auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node); 
+                auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node, EqualityIndex); 
+                if (EqualityIndex!=-1){
+                    node->EqualityIndex = EqualityIndex;
+                }
+                // std::cout << "yes1" << std::endl;
                 if (errorResult.first.first != -1) 
                 {
                     return errorResult;
@@ -372,7 +397,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
     return { { -1, -1 }, "" };
 }
 
-std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Token> tokenVector, int leftBound, int rightBound, std::unique_ptr<ArrayNode>& node)
+std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Token> tokenVector, int leftBound, int rightBound, std::unique_ptr<ArrayNode>& node,  int index)
 {
     if (leftBound > rightBound) {
         std::cout << "ERROR1" << std::endl;
@@ -423,6 +448,45 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
             // node->ArrayLookUp = true;
             // node->value.type = TokenType::ARRAY;
         }
+    }
+
+    if (index!=-1)
+    {
+        node = std::make_unique<ArrayNode>(tokenVector[index]);
+
+        // on the left
+        if (tokenVector[index-1].type == TokenType::RIGHT_BRACKET) 
+        {
+            std::unique_ptr<ArrayNode> node1 = std::make_unique<ArrayNode>();
+            std::pair<std::pair<int, int>, std::string> errorResult1 = HandleArray(tokenVector, leftBound, index-1, node1);
+            if (errorResult1.first.first != -1) { return errorResult1; }
+            node1->value.type = TokenType::ARRAY;
+            node->ArrayContent.push_back(std::move(node1));
+        }
+        else 
+        {
+            std::unique_ptr<ArrayNode> node1 = std::make_unique<ArrayNode>(tokenVector[index-1]);
+            node1->value.type = TokenType::VARIABLE;
+            node->ArrayContent.push_back(std::move(node1));
+        }
+
+        // on the right
+        if (tokenVector[index+1].type == TokenType::LEFT_BRACKET) 
+        {
+            std::unique_ptr<ArrayNode> node2 = std::make_unique<ArrayNode>();
+            std::pair<std::pair<int, int>, std::string> errorResult2 = HandleArray(tokenVector, index+1, rightBound, node2);
+            if (errorResult2.first.first != -1) { return errorResult2; }
+            node2->value.type = TokenType::ARRAY;
+            node->ArrayContent.push_back(std::move(node2));
+        }
+        else 
+        {
+            std::unique_ptr<ArrayNode> node2 = std::make_unique<ArrayNode>(tokenVector[index+1]);
+            node2->value.type = TokenType::VARIABLE;
+            node->ArrayContent.push_back(std::move(node2));
+        }
+
+        return { { -1, -1 }, "" };
     }
 
     for (int index = leftBracket + 1; index < rightBracket; index++) {
@@ -551,7 +615,6 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         } 
     }
 
-
     // case 0 null
     if (expression[topIndex].type == TokenType::NUL)
     {
@@ -677,7 +740,6 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
     else if (expression[topIndex].type == TokenType::ASSIGNMENT)
     {
         node = std::make_unique<ExpressionNode>(expression[topIndex]);
-
         // check assignment ERROR
         // Error 1. Nothing before =   e.g =8
         if (topIndex == leftBound)
@@ -726,10 +788,13 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         node->children.push_back(std::move(node1));
 
         // on the right
+        std::pair<std::pair<int, int>, std::string> errorResult2;
         std::unique_ptr<ExpressionNode> node2;
-        std::pair<std::pair<int, int>, std::string> errorResult2 = MakeExpressionTree(expression, topIndex+1, rightBound, node2);
+        errorResult2 = MakeExpressionTree(expression, topIndex+1, rightBound, node2);
         if (errorResult2.first.first != -1) { return errorResult2; }
         node->children.push_back(std::move(node2));
+
+        
         
         return { { -1, -1 }, "" };
     }
@@ -874,6 +939,31 @@ std::string ParserB::calculate(Node* root, Result& result)
             if (errorMessageFlow != "") { return errorMessageFlow; }      
         }
     }
+    // Equality
+    else if (root->EqualityIndex != -1)
+    {
+        ArrayNode * Array = dynamic_cast<ArrayNode*>(root);
+        if(Array->ArrayContent[0]->value.type == TokenType::VARIABLE)
+        {
+            if (variableTypeMap.at(Array->ArrayContent[0]->value.content) == DataType::ARRAY){
+                if(variableArrayMap.at(Array->ArrayContent[0]->value.content)->ArrayContent.size() !=  Array->ArrayContent[0]->ArrayContent.size()){
+                    result.type = DataType::BOOL;
+                    result.boolValue = 0;
+                }
+            }
+        }
+        else 
+        {
+            if (variableTypeMap.at(Array->ArrayContent[1]->value.content) == DataType::ARRAY){
+                if(variableArrayMap.at(Array->ArrayContent[1]->value.content)->ArrayContent.size() !=  Array->ArrayContent[1]->ArrayContent.size()){
+                    result.type = DataType::BOOL;
+                    result.boolValue = 0;
+                }
+            }
+        }
+        
+        return "";
+    }
 
     // Array
     else if (root->value.type == TokenType::ARRAY || root->value.type == TokenType::LEFT_BRACKET) // may cause memory leak check again !!!!
@@ -918,6 +1008,31 @@ std::string ParserB::calculate(Node* root, Result& result)
                 errorMessage = calculate (element.get(), arrayResult);
                 element->subArray = true;
                 result.arrayValue->ArrayContent.push_back(element);
+            }
+            else if (element->value.type == TokenType::VARIABLE)
+            {
+                Result arrayResult;
+                std::string errorMessage;
+                errorMessage = calculate (element.get(), arrayResult);
+                if (arrayResult.type == DataType::DOUBLE) {
+                    element->value.value = arrayResult.doubleValue;
+                    element->value.type = TokenType::NUMBER;
+                    result.arrayValue->ArrayContent.push_back(element);
+                }
+                else if (arrayResult.type == DataType::NUL){
+                    
+                    element->value.type = TokenType::NUL;
+                    result.arrayValue->ArrayContent.push_back(element);
+                }
+                else if (arrayResult.type == DataType::BOOL){
+                    element->value.type = TokenType::TRUE;
+                    element->value.value = arrayResult.boolValue;
+                }
+                else if (arrayResult.type == DataType::ARRAY){
+                    element->value.type = TokenType::ARRAY;
+                    element = arrayResult.arrayValue;
+                    result.arrayValue->ArrayContent.push_back(element);
+                }
             }
             // + - * / % ...
             else 
@@ -1231,6 +1346,7 @@ std::string ParserB::calculate(Node* root, Result& result)
                 result.type = DataType::BOOL;
                 // ==
                 if (expressionNode->value.type == TokenType::EQUALITY) {
+
                     if (result1.type == DataType::NUL && result2.type == DataType::NUL)
                     {
                         result.boolValue = true;
@@ -1238,6 +1354,33 @@ std::string ParserB::calculate(Node* root, Result& result)
                     else if (result1.type != result2.type)
                     {
                         result.boolValue = false;
+                    }
+                    else if (result1.type == DataType::ARRAY && result2.type == DataType::ARRAY)
+                    {
+                        if (result1.arrayValue->ArrayContent.size()==result2.arrayValue->ArrayContent.size()){
+                            for (size_t i = 0; i < result1.arrayValue->ArrayContent.size(); i++){
+                                // if (result1.arrayValue->ArrayContent.at(i)->value.type != result2.arrayValue->ArrayContent.at(i)->value.type 
+                                // ||  result1.arrayValue->ArrayContent.at(i)->value.value != result2.arrayValue->ArrayContent.at(i)->value.value)
+                                // {
+                                //     result.boolValue = false;
+                                //     return "";
+                                // }
+                                if (result1.arrayValue->ArrayContent.at(i)->value.type== TokenType::NUMBER) {
+                                    if (result1.arrayValue->ArrayContent.at(i)->value.value != result2.arrayValue->ArrayContent.at(i)->value.value){
+                                        result.boolValue = false;
+                                        return "";
+                                    }
+                                }
+                                if (result1.arrayValue->ArrayContent.at(i)->value.type== TokenType::TRUE || result1.arrayValue->ArrayContent.at(i)->value.type== TokenType::FALSE){
+                                    if (result1.arrayValue->ArrayContent.at(i)->value.value != result2.arrayValue->ArrayContent.at(i)->value.value){
+                                        result.boolValue = false;
+                                        return "";
+                                    }
+                                }
+                            }
+                            result.boolValue = true;
+                        }
+                        else {result.boolValue = false;}
                     }
                     else
                     {
@@ -1258,6 +1401,21 @@ std::string ParserB::calculate(Node* root, Result& result)
                     else if (result1.type != result2.type)
                     {
                         result.boolValue = true;
+                    }
+                    else if (result1.type == DataType::ARRAY && result2.type == DataType::ARRAY)
+                    {
+                        if (result1.arrayValue->ArrayContent.size()==result2.arrayValue->ArrayContent.size()){
+                            for (size_t i = 0; i < result1.arrayValue->ArrayContent.size(); i++){
+                                if (result1.arrayValue->ArrayContent.at(i)->value.type == result2.arrayValue->ArrayContent.at(i)->value.type 
+                                &&  result1.arrayValue->ArrayContent.at(i)->value.value == result2.arrayValue->ArrayContent.at(i)->value.value)
+                                {
+                                    result.boolValue = false;
+                                    return "";
+                                }
+                            }
+                            result.boolValue = true;
+                        }
+                        else {result.boolValue = true;}
                     }
                     else
                     {
@@ -1422,7 +1580,8 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         }
     }
     // only Array without assignment
-    else if (root->value.type == TokenType::LEFT_BRACKET){
+    else if (root->value.type == TokenType::LEFT_BRACKET && root->EqualityIndex == -1 ){
+        // std::cout << "r" << std::endl;
         ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
         std::cout << "[";
         for(size_t i = 0; i < ArrayRoot->ArrayContent.size(); i++) {
@@ -1443,6 +1602,29 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         }
         if (semicolon == false) { std::cout << "]"; }
         else { std::cout << "];"; }
+    }
+    else if (root->EqualityIndex != -1) 
+    {
+        ArrayNode * ArrayRoot = dynamic_cast<ArrayNode*>(root);
+        std::cout << "(";
+        if (ArrayRoot->ArrayContent[0]->ArrayContent.size()==0) {
+            std::cout << ArrayRoot->ArrayContent[0]->value.content;
+        }
+        else 
+        {
+            print(ArrayRoot->ArrayContent[0].get());
+        }
+        std::cout <<" " <<ArrayRoot->value.content << " ";
+        if (ArrayRoot->ArrayContent[1]->ArrayContent.size()==0) {
+
+            std::cout << ArrayRoot->ArrayContent[1]->value.content;
+        }
+        else 
+        {
+            print(ArrayRoot->ArrayContent[1].get());
+        }
+        std::cout << ")";
+        // std::cout << "yes" << std::endl;
     }
     // ExpressionNode
     else 
@@ -1551,6 +1733,7 @@ void ParserB::printValue(Result& value)
         std::cout << "[";
         for (size_t i = 0; i < value.arrayValue->ArrayContent.size(); i++) 
         { 
+            // std::cout << value.arrayValue->ArrayContent.size() <<std::endl;
             if (value.arrayValue->ArrayContent[i]->value.type == TokenType::NUMBER)
             {
             
@@ -1568,6 +1751,10 @@ void ParserB::printValue(Result& value)
                 
                 printValue(curr);
                 // std::cout << "[5]";
+            }
+            else if (value.arrayValue->ArrayContent[i]->value.type == TokenType::NUL)
+            {
+                std::cout <<"null";
             }
             else{
                 // std::cout << 3 << std::endl;
@@ -1595,8 +1782,8 @@ int ParserB::findRightParenthesisNoError(std::vector<Token> expression, int left
     int balance = 1;
     int p = leftBound;
     while (p <= rightBound) {
-        if (expression[p].type == TokenType::LEFT_PARENTHESIS) { balance += 1; }
-        else if (expression[p].type == TokenType::RIGHT_PARENTHESIS) { balance -= 1; }
+        if (expression[p].type == TokenType::LEFT_PARENTHESIS || expression[p].type == TokenType::LEFT_BRACKET) { balance += 1; }
+        else if (expression[p].type == TokenType::RIGHT_PARENTHESIS || expression[p].type == TokenType::RIGHT_BRACKET) { balance -= 1; }
 
         if (balance == 0) { break; }
         p += 1;
@@ -1686,6 +1873,10 @@ void ParserB::getVariable(std::string& variableName, Result& result, int index) 
                 result.arrayValue->ArrayContent.push_back(element);
             }
         }
+        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::NUL)
+        {
+            result.type = DataType::NUL;
+        }
         return;
     }
 
@@ -1731,21 +1922,26 @@ void ParserB::setVariable(std::string& variableName, Result& result, int index) 
     auto& variableArrayMap =  ScopeStack.top()->variableArrayMap;
 
     if (index != -1) {
-        if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::NUMBER)
+        // if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::NUMBER)
+        if (result.type == DataType::DOUBLE)
         {
+            variableArrayMap[variableName]->ArrayContent.at(index)->value.type = TokenType::NUMBER;
             // result.type = DataType::DOUBLE;
             variableArrayMap[variableName]->ArrayContent.at(index)->value.value = result.doubleValue;
         }
-        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::TRUE || 
-                variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::FALSE)
+        // else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::TRUE || 
+        //         variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::FALSE)
+        else if (result.type == DataType::BOOL)
         {
             // result.type = DataType::BOOL;
+            variableArrayMap[variableName]->ArrayContent.at(index)->value.type = TokenType::TRUE;
             variableArrayMap[variableName]->ArrayContent.at(index)->value.value = result.boolValue;
         }
-        else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::ARRAY || 
-                variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::LEFT_BRACKET)
+        // else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::ARRAY || 
+        //         variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::LEFT_BRACKET)
+        else if (result.type == DataType::ARRAY)
         {
-            result.type = DataType::ARRAY;
+            // result.type = DataType::ARRAY;
 
             // result.arrayValue = std::make_unique<ArrayNode>(variableArrayMap[variableName]->ArrayContent.at(index)->value);
             // result.arrayValue->lookUp = variableArrayMap[variableName]->ArrayContent.at(index)->lookUp;
@@ -1758,10 +1954,19 @@ void ParserB::setVariable(std::string& variableName, Result& result, int index) 
             variableArrayMap[variableName]->ArrayContent.at(index) = result.arrayValue;
 
         }
+        // else if (variableArrayMap[variableName]->ArrayContent.at(index)->value.type == TokenType::NUL)
+        else if (result.type == DataType::NUL)
+        {
+            // result.type = DataType::NUL;
+            variableArrayMap[variableName]->ArrayContent.at(index)->value.type = TokenType::NUL;
+
+            variableArrayMap[variableName]->ArrayContent.at(index)->value.content = "null";
+        }
         return;
     }
 
     variableTypeMap[variableName] = result.type;
+    
     if (result.type == DataType::NUL)
     {
 
