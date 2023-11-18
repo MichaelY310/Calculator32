@@ -319,8 +319,8 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
         else if (tokenVector[start].type == TokenType::LEFT_BRACKET) 
         {
             int EqualityIndex = -1;
-            std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[start]);
             int beginIndex = start;
+            int AssignmentIndex = -1;
             start += 1;
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
@@ -328,9 +328,48 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
 
                     EqualityIndex = start;
                 }
+                if (tokenVector[start].content ==  "=") {
+                    AssignmentIndex = start;
+                }
                 start += 1;
             }
+            if (AssignmentIndex != -1) 
+            {
+                std::unique_ptr<ExpressionNode> node = std::make_unique<ExpressionNode>(tokenVector[AssignmentIndex]);
+                std::unique_ptr<ArrayNode> node1 = std::make_unique<ArrayNode>();
+                // std::cout << "r: " << AssignmentIndex << beginIndex << std::endl;
+                auto errorResult1 = HandleArray(tokenVector, beginIndex, AssignmentIndex-1, node1);
+                if (errorResult1.first.first != -1) 
+                {
+                    return errorResult1;
+                }
+                node->children2.push_back(std::move(node1));
+    
+                if (tokenVector[AssignmentIndex+1].type != TokenType::LEFT_BRACKET) {
+                    std::unique_ptr<ExpressionNode> node2 = std::make_unique<ExpressionNode>();
+                    auto errorResult2 = MakeExpressionTree(tokenVector, AssignmentIndex+1, start-1, node2);
+                    if (errorResult1.first.first != -1) 
+                    {
+                        return errorResult1;
+                    }
+                    node->children2.push_back(std::move(node2));
+                }
+                else {
+                    std::unique_ptr<ArrayNode> node2 = std::make_unique<ArrayNode>();
+                    auto errorResult2 = HandleArray(tokenVector, AssignmentIndex+1, start-1, node2);
+                    if (errorResult1.first.first != -1) 
+                    {
+                        return errorResult1;
+                    }
+                    node2->value.type = TokenType::ARRAY;
+                    node->children2.push_back(std::move(node2));
+                }
+    
+                nodes.push_back(std::move(node));
+                return { { -1, -1 }, "" };
+            }
 
+            std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[beginIndex]);
             auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node, EqualityIndex); 
             if (errorResult.first.first != -1) 
             {
@@ -350,16 +389,16 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
     
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
-                if (tokenVector[beginIndex].type == TokenType::LEFT_BRACKET){
+                if (tokenVector[start].type == TokenType::LEFT_BRACKET){
                     if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
                         arrayExist = true;
                     }
                 }
-                if (tokenVector[start].type == TokenType::LEFT_BRACKET) {
-                    if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
-                        arrayExist = true;
-                    }
-                }
+                // if (tokenVector[start].type == TokenType::LEFT_BRACKET) {
+                //     if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
+                //         arrayExist = true;
+                //     }
+                // }
 
                 if (tokenVector[start].content ==  "==" || tokenVector[start].content == "!=" ) {
                     // std::cout << "yes" << std::endl;
@@ -367,6 +406,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
                 }
                 start += 1;
             }
+
             if (arrayExist) 
             {
                 // std::cout << EqualityIndex << beginIndex << start-2<< std::endl;
@@ -425,9 +465,9 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
         std::cout << "2" << std::endl;
         return { { tokenVector[rightBracket].line, tokenVector[rightBracket].index }, tokenVector[rightBracket].content };  
     }
-
     if (rightBracket + 1 <= rightBound && tokenVector[rightBracket + 1].type== TokenType::LEFT_BRACKET) {
         node->lookUp = true;
+        node->value.type = TokenType::ARRAY;
         if (rightBracket + 3 <= rightBound) {
             if (tokenVector[rightBracket + 2].type == TokenType::NUMBER)
             {
@@ -1226,6 +1266,13 @@ std::string ParserB::calculate(Node* root, Result& result)
         // =
         else if (expressionNode->value.type == TokenType::ASSIGNMENT)
         {
+            if (expressionNode->children2.size()!= 0) 
+            {
+                std::string errorMessage = calculate(expressionNode->children2[1].get(), result);
+                if (errorMessage != "") { return errorMessage; }
+                return "";
+            }
+
             // the last child must be a number or an initialized variable
             std::string errorMessage = calculate(expressionNode->children[1].get(), result);
             if (errorMessage != "") { return errorMessage; }
@@ -1697,6 +1744,14 @@ void ParserB::print(Node* root, int indent, bool semicolon)
             {
                 print(expressionNode->children[i].get(), 0, false);
                 if (i != (int)expressionNode->children.size() - 1)
+                {
+                    std::cout << " " << expressionNode->value.content << " ";
+                }
+            }
+            for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+            {
+                print(expressionNode->children2[i].get(), 0, false);
+                if (i != (int)expressionNode->children2.size() - 1)
                 {
                     std::cout << " " << expressionNode->value.content << " ";
                 }

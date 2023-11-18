@@ -42,6 +42,7 @@ public:
     int index = -1;
     // std::string lookUpStr = "";
     std::vector<std::unique_ptr<ExpressionNode>> children;
+    std::vector<std::unique_ptr<Node>> children2;
 };
 
 

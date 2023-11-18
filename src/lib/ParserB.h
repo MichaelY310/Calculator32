@@ -308,6 +308,14 @@ static void print_no_semicolon(Node* root, int indent=0)
                     std::cout << " " << expressionNode->value.content << " ";
                 }
             }
+            for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+            {
+                print(expressionNode->children2[i].get(), 0, false);
+                if (i != (int)expressionNode->children2.size() - 1)
+                {
+                    std::cout << " " << expressionNode->value.content << " ";
+                }
+            }
             std::cout << ")";
         }
     }
