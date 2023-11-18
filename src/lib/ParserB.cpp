@@ -394,6 +394,12 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
                 if (tokenVector[start].type == TokenType::LEFT_BRACKET){
+                    if (tokenVector[start-1].type == TokenType::TRUE || tokenVector[start-1].type == TokenType::FALSE){
+                        tokenVector[start-1].type = TokenType::VARIABLE;
+                        // variableTypeMap[tokenVector[start-1].content] = DataType::UNINITIALIZED;
+                        start+= 1; 
+                        continue;
+                    }
                     if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
                         arrayExist = true;
                     }
@@ -413,7 +419,6 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
 
             if (arrayExist) 
             {
-                // std::cout << EqualityIndex << beginIndex << start-2<< std::endl;
                 tokenVector[beginIndex].type = TokenType::ARRAY;
                 std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[beginIndex]);
                 auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node, EqualityIndex); 
@@ -793,7 +798,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
     }
     // case 5 =
     else if (expression[topIndex].type == TokenType::ASSIGNMENT)
-    {
+    {  
         node = std::make_unique<ExpressionNode>(expression[topIndex]);
         // check assignment ERROR
         // Error 1. Nothing before =   e.g =8
@@ -804,16 +809,14 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
             return { { expression[topIndex+1].line, expression[topIndex+1].index }, expression[topIndex+1].content }; 
         // Error 3. What is before = is not a variable      e.g 1=1
         // Handled in runtime
-        // if (expression[topIndex-1].type != TokenType::VARIABLE)
-        //     return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
+        
         // on the left
         std::unique_ptr<ExpressionNode> node1;
+        // std::cout << "::" << expression[leftBound].content <<std::endl;
         std::pair<std::pair<int, int>, std::string> errorResult1 = MakeExpressionTree(expression, leftBound, topIndex-1, node1);
         if (errorResult1.first.first != -1) { return errorResult1; }
         node->children.push_back(std::move(node1));
-        // if (node->children[0]->value.type == TokenType::VARIABLE) {
-        //         std::cout << ": " << std::endl;
-        // }
+
         
 
         // on the right
@@ -1045,7 +1048,6 @@ std::string ParserB::calculate(Node* root, Result& result)
 
             else if (element->value.type == TokenType::LEFT_BRACKET)
             {
-                std::cout << "running" <<std::endl;
                 Result arrayResult;
                 std::string errorMessage;
                 errorMessage = calculate (element.get(), arrayResult);
@@ -1189,15 +1191,21 @@ std::string ParserB::calculate(Node* root, Result& result)
         // variable
         else if (expressionNode->value.type == TokenType::VARIABLE)
         {
+            
             // uninitialized
-            if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
-            {
-                return "Runtime error: unknown identifier " + expressionNode->value.content;
+            if (variableTypeMap.find(expressionNode->value.content) == variableTypeMap.end() && expressionNode->value.content == "true"){
+                 variableTypeMap[expressionNode->value.content] = DataType::UNINITIALIZED;
             }
+            
+            
 
             // Function Call
             if (expressionNode->children.size() != 0)
             {
+                if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
+                {
+                    return "Runtime error: unknown identifier " + expressionNode->value.content;
+                }
                 // variable is not a function
                 if (variableTypeMap.at(expressionNode->value.content) != DataType::FUNCTION)
                 {
@@ -1245,11 +1253,20 @@ std::string ParserB::calculate(Node* root, Result& result)
                 delete localScope;
             }
             // Array lookup
-            else if (expressionNode->ArrayLookUp == true)
+            if (expressionNode->ArrayLookUp == true)
             {
+                if (variableTypeMap.at(expressionNode->value.content) != DataType::ARRAY) { return "Runtime error: not an array."; }
+
                 if (expressionNode->LookUpForm == false) {
                     return "Runtime error: index is not a number.";
                 }
+
+                if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
+                {
+                    return "Runtime error: unknown identifier " + expressionNode->value.content;
+                }
+
+                
                 // x[1+2] x[1>=2]
                 if (expressionNode->lookUpStr == "" && expressionNode->index == -1) 
                 {   
@@ -1275,7 +1292,7 @@ std::string ParserB::calculate(Node* root, Result& result)
                 b = std::modf(expressionNode->index,&a);
 
                 if (b!= 0) { return "Runtime error: index is not an integer."; }
-                if (variableTypeMap.at(expressionNode->value.content) != DataType::ARRAY) { return "Runtime error: not an array."; }
+        
                 int I = variableArrayMap.at(expressionNode->value.content)->ArrayContent.size();
                 if (expressionNode->index < 0 || expressionNode->index >= I ) { return "Runtime error: index out of bounds."; }
 
@@ -1285,10 +1302,18 @@ std::string ParserB::calculate(Node* root, Result& result)
             // Array
             else if (variableTypeMap.at(expressionNode->value.content) == DataType::ARRAY && expressionNode->ArrayLookUp == false) 
             {   
+                if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
+                {
+                    return "Runtime error: unknown identifier " + expressionNode->value.content;
+                }
                 getVariable(expressionNode->value.content, result);
             }
             else 
             {
+                if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
+                {
+                    return "Runtime error: unknown identifier " + expressionNode->value.content;
+                }
                 getVariable(expressionNode->value.content, result);
             }
             return "";
