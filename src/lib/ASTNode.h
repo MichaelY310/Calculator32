@@ -22,7 +22,7 @@ public:
     Token value;
     bool lookUp = false;
     std::string lookUpStr = "";
-    int lookUpIndex = -1;
+    double lookUpIndex = -1;
     std::vector<std::shared_ptr<Node>> ArrayContent;
     int EqualityIndex = -1;
     bool subArray = false;
@@ -31,6 +31,7 @@ public:
 // An operation expression node should always have 2 children
 // A function call expression: Node1: function. Node2, 3...: parameters. 
 // A function call expression must have a variable token and children.size() != 0
+
 class ExpressionNode : public Node
 {
 public:
@@ -39,25 +40,27 @@ public:
     virtual ~ExpressionNode() = default;
     
     bool ArrayLookUp = false;
-    int index = -1;
+    bool LookUpForm = true;
+    double index = -1;
     // std::string lookUpStr = "";
     std::vector<std::unique_ptr<ExpressionNode>> children;
     std::vector<std::unique_ptr<Node>> children2;
 };
 
-
 class ArrayNode : public Node
 {
     public:
-    ArrayNode() : Node(){};
-    ArrayNode(Token token) : Node(token) {};
+    ArrayNode() : Node(), LookUpNode(){};
+    ArrayNode(Token token) : Node(token), LookUpNode() {};
     virtual ~ArrayNode() = default;
+    std::vector<std::unique_ptr<ExpressionNode>> LookUpNode;
 
     // bool lookUp = false;
     // std::string lookUpStr = "";
     // int lookUpIndex = -1;
     // std::vector<std::shared_ptr<Node>> ArrayContent;  // stored all elements in array
 };
+
 
 class WhileNode : public Node
 {

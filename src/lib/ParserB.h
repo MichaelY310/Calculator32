@@ -205,7 +205,12 @@ static void print_no_semicolon(Node* root, int indent=0)
         // check if there is lookup
         if (ArrayRoot->lookUp == true) 
         {
-            if (ArrayRoot->lookUpIndex != -1) {
+            if (ArrayRoot->LookUpNode.size()!=0) {
+                // std::cout << "RUN" <<std::endl;
+                std::cout << "][";
+                print(ArrayRoot->LookUpNode.at(0).get(), 0 , false);
+            }
+            else if (ArrayRoot->lookUpIndex != -1) {
                 std::cout << "][" << ArrayRoot->lookUpIndex;
             }
             else {
@@ -279,9 +284,16 @@ static void print_no_semicolon(Node* root, int indent=0)
                     print(expressionNode->children[0].get(), 0, false);
                     std::cout << "]";
                 }
-                else
+                else if (expressionNode->index!=-1)
                 {
                     std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
+                }
+                else if (expressionNode->lookUpStr != "") 
+                {
+                    std::cout << expressionNode->value.content << "[" << expressionNode->lookUpStr << "]";
+                }
+                else {
+                    std::cout << "ERROR" << std::endl;
                 }
             }
             // Normal Variable

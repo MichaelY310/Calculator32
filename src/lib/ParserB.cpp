@@ -325,7 +325,10 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
                 if (tokenVector[start].content ==  "==" || tokenVector[start].content == "!=" ) {
-
+                    if (tokenVector[start-1].content != "]"){
+                        start += 1;
+                        continue;
+                    }
                     EqualityIndex = start;
                 }
                 if (tokenVector[start].content ==  "=") {
@@ -369,7 +372,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
                 nodes.push_back(std::move(node));
                 return { { -1, -1 }, "" };
             }
-
+            // std::cout << "t" <<std::endl;
             std::unique_ptr<ArrayNode> node = std::make_unique<ArrayNode>(tokenVector[beginIndex]);
             auto errorResult = HandleArray(tokenVector, beginIndex, start - 1, node, EqualityIndex); 
             if (errorResult.first.first != -1) 
@@ -468,15 +471,23 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
     }
     if (rightBracket + 1 <= rightBound && tokenVector[rightBracket + 1].type== TokenType::LEFT_BRACKET) {
         node->lookUp = true;
-        // node->value.type = TokenType::ARRAY;
         if (rightBracket + 3 <= rightBound) {
-            if (tokenVector[rightBracket + 2].type == TokenType::NUMBER)
-            {
-                node->lookUpIndex = tokenVector[rightBracket + 2].value;
+            if (tokenVector[rightBracket+3].type == TokenType::RIGHT_BRACKET) {
+                if (tokenVector[rightBracket + 2].type == TokenType::NUMBER)
+                {
+                    node->lookUpIndex = tokenVector[rightBracket + 2].value;
+                }
+                else 
+                {
+                    node->lookUpStr = tokenVector[rightBracket + 2].content;
+                }
             }
-            else 
-            {
-                node->lookUpStr = tokenVector[rightBracket + 2].content;
+            else {
+                // std::cout << "Ru" <<std::endl;
+
+                std::unique_ptr<ExpressionNode> cur =  std::make_unique<ExpressionNode>();
+                auto error = MakeExpressionTree(tokenVector, rightBracket+2, rightBound-1, cur);
+                node->LookUpNode.push_back(std::move(cur));
             }
         }
         else {
@@ -742,6 +753,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     node->index = expression[topIndex+2].value;
                 }
                 else {
+                    // std::cout << "e: " <<  expression[topIndex+2].content<<std::endl;
                     node->lookUpStr = expression[topIndex+2].content;
                 }
                 node->ArrayLookUp = true;
@@ -753,6 +765,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                 auto error = MakeExpressionTree(expression, topIndex+2, rightB-1, cur);
                 node->children.push_back(std::move(cur));
                 node->ArrayLookUp = true;
+                node->LookUpForm = false;
                 node->value.type = TokenType::VARIABLE;
                 // if (node->value.type == TokenType::VARIABLE){
                 //     std::cout << node->value.content << " " <<node->children[0]->value.content << std::endl;
@@ -793,7 +806,6 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         // Handled in runtime
         // if (expression[topIndex-1].type != TokenType::VARIABLE)
         //     return { { expression[topIndex].line, expression[topIndex].index }, expression[topIndex].content };  
-
         // on the left
         std::unique_ptr<ExpressionNode> node1;
         std::pair<std::pair<int, int>, std::string> errorResult1 = MakeExpressionTree(expression, leftBound, topIndex-1, node1);
@@ -1016,6 +1028,8 @@ std::string ParserB::calculate(Node* root, Result& result)
         result.arrayValue->lookUp = Array->lookUp;
         result.arrayValue->lookUpStr = Array->lookUpStr;
         result.arrayValue->lookUpIndex = Array->lookUpIndex;
+        
+        
         for (auto element : Array->ArrayContent){
 
             // std::cout << element->value.content << " " << element->value.value <<std::endl;
@@ -1092,14 +1106,14 @@ std::string ParserB::calculate(Node* root, Result& result)
         if (Array->lookUp == true) 
         {
             // x[1+2] x[1>=2]
-            if (Array->lookUpStr == "" && Array->lookUpIndex == -1) 
+            if (Array->lookUpStr == "" && Array->lookUpIndex == -1 && Array->LookUpNode.size()==0) 
             {   
                 Result lookupResult;
                 calculate(Array->ArrayContent[0].get(), lookupResult);
                 if (lookupResult.type == DataType::DOUBLE) {Array->lookUpIndex = lookupResult.doubleValue; }
                 else {return "Runtime error: index is not a number.";}
             }
-            if (Array->lookUpStr != ""){ return "Runtime error: index is not a number."; }
+            if (Array->lookUpStr != "" || Array->LookUpNode.size()!=0){ return "Runtime error: index is not a number."; }
             double a,b;
             b = std::modf(Array->lookUpIndex,&a);
 
@@ -1233,6 +1247,9 @@ std::string ParserB::calculate(Node* root, Result& result)
             // Array lookup
             else if (expressionNode->ArrayLookUp == true)
             {
+                if (expressionNode->LookUpForm == false) {
+                    return "Runtime error: index is not a number.";
+                }
                 // x[1+2] x[1>=2]
                 if (expressionNode->lookUpStr == "" && expressionNode->index == -1) 
                 {   
@@ -1241,8 +1258,20 @@ std::string ParserB::calculate(Node* root, Result& result)
                     if (lookupResult.type == DataType::DOUBLE) {expressionNode->index = lookupResult.doubleValue; }
                     else {return "Runtime error: index is not a number.";}
                 }
-                if (expressionNode->lookUpStr != ""){ return "Runtime error: index is not a number."; }
                 double a,b;
+                if (expressionNode->lookUpStr != "")
+                { 
+                    if (variableTypeMap.at(expressionNode->lookUpStr) == DataType::UNINITIALIZED)
+                    {
+                        return "Runtime error: index is not a number."; 
+                    }
+                    getVariable (expressionNode->lookUpStr, result);
+                    if (result.type !=DataType::DOUBLE) { return "Runtime error: index is not a number.";}
+                    double a,b;
+                    b = std::modf(result.doubleValue,&a);
+                    if (b!= 0) { return "Runtime error: index is not an integer."; }
+                    return ""; 
+                }
                 b = std::modf(expressionNode->index,&a);
 
                 if (b!= 0) { return "Runtime error: index is not an integer."; }
@@ -1268,6 +1297,7 @@ std::string ParserB::calculate(Node* root, Result& result)
         // =
         else if (expressionNode->value.type == TokenType::ASSIGNMENT)
         {
+            
             if (expressionNode->children2.size()!= 0) 
             {
                 std::string errorMessage = calculate(expressionNode->children2[1].get(), result);
@@ -1282,9 +1312,15 @@ std::string ParserB::calculate(Node* root, Result& result)
             // the first child must be a variable
             if (expressionNode->children[0].get()->value.type != TokenType::VARIABLE)
             { return "Runtime error: invalid assignee."; }
-
+            if (expressionNode->children[0]->LookUpForm == false) {return "Runtime error: index is not a number.";}
+            if (expressionNode->children[0]->ArrayLookUp == true) 
+            {
+                errorMessage = calculate(expressionNode->children[0].get(), result);
+                if (errorMessage != "") { return errorMessage; }
+            }
             if (expressionNode->children[0]->index!= -1) {setVariable(expressionNode->children[0]->value.content, result, expressionNode->children[0]->index);}
             else {setVariable(expressionNode->children[0]->value.content, result);}
+
             
 
             return "";
@@ -1642,7 +1678,12 @@ void ParserB::print(Node* root, int indent, bool semicolon)
         // check if there is lookup
         if (ArrayRoot->lookUp == true) 
         {
-            if (ArrayRoot->lookUpIndex != -1) {
+            if (ArrayRoot->LookUpNode.size()!=0) {
+                // std::cout << "RUN" <<std::endl;
+                std::cout << "][";
+                print(ArrayRoot->LookUpNode.at(0).get(), 0 , false);
+            }
+            else if (ArrayRoot->lookUpIndex != -1) {
                 std::cout << "][" << ArrayRoot->lookUpIndex;
             }
             else {
@@ -1720,9 +1761,13 @@ void ParserB::print(Node* root, int indent, bool semicolon)
                     print(expressionNode->children[0].get(), 0, false);
                     std::cout << "]";
                 }
-                else
+                else if (expressionNode->index!=-1)
                 {
                     std::cout << expressionNode->value.content << "[" << expressionNode->index << "]";
+                }
+                else if (expressionNode->lookUpStr != "") 
+                {
+                    std::cout << expressionNode->value.content << "[" << expressionNode->lookUpStr << "]";
                 }
             }
 
