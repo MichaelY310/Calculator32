@@ -1313,9 +1313,11 @@ std::string ParserB::calculate(Node* root, Result& result)
             if (expressionNode->children[0].get()->value.type != TokenType::VARIABLE)
             { return "Runtime error: invalid assignee."; }
             if (expressionNode->children[0]->LookUpForm == false) {return "Runtime error: index is not a number.";}
+            Result result2;
             if (expressionNode->children[0]->ArrayLookUp == true) 
             {
-                errorMessage = calculate(expressionNode->children[0].get(), result);
+                // std::cout << "running"  << expressionNode->value.content <<std::endl;
+                errorMessage = calculate(expressionNode->children[0].get(), result2);
                 if (errorMessage != "") { return errorMessage; }
             }
             if (expressionNode->children[0]->index!= -1) {setVariable(expressionNode->children[0]->value.content, result, expressionNode->children[0]->index);}
