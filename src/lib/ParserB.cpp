@@ -343,6 +343,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
                 {
                     return errorResult1;
                 }
+                node1->value.type = TokenType::LEFT_BRACKET;
                 node->children2.push_back(std::move(node1));
     
                 if (tokenVector[AssignmentIndex+1].type != TokenType::LEFT_BRACKET) {
@@ -467,7 +468,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
     }
     if (rightBracket + 1 <= rightBound && tokenVector[rightBracket + 1].type== TokenType::LEFT_BRACKET) {
         node->lookUp = true;
-        node->value.type = TokenType::ARRAY;
+        // node->value.type = TokenType::ARRAY;
         if (rightBracket + 3 <= rightBound) {
             if (tokenVector[rightBracket + 2].type == TokenType::NUMBER)
             {
@@ -488,6 +489,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleArray(std::vector<Tok
             // node->ArrayLookUp = true;
             // node->value.type = TokenType::ARRAY;
         }
+        // return { { -1, -1 }, "" };
     }
 
     if (index!=-1)
