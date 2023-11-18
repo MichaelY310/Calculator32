@@ -296,12 +296,12 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             std::unique_ptr<ReturnNode> node = std::make_unique<ReturnNode>(tokenVector[start]);
             int returnIndex = start;
             start += 1;
-            while (tokenVector[start].line == tokenVector[returnIndex].line && start <= rightBound)
+            while (tokenVector[start].type !=TokenType::SEMICOLON)
             {
                 start += 1;
             }
             // there can be nothing following "return"
-            if (returnIndex + 1 <= start - 2)
+            if (returnIndex + 1 <= start - 1)
             {
                 auto errorResult = MakeExpressionTree(tokenVector, returnIndex + 1, start - 1, node->content);
                 if (errorResult.first.first != -1) 
@@ -404,11 +404,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
                         arrayExist = true;
                     }
                 }
-                // if (tokenVector[start].type == TokenType::LEFT_BRACKET) {
-                //     if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
-                //         arrayExist = true;
-                //     }
-                // }
+
 
                 if (tokenVector[start].content ==  "==" || tokenVector[start].content == "!=" ) {
                     // std::cout << "yes" << std::endl;
@@ -770,7 +766,9 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                 auto error = MakeExpressionTree(expression, topIndex+2, rightB-1, cur);
                 node->children.push_back(std::move(cur));
                 node->ArrayLookUp = true;
-                if (node->children[0]->value.type == TokenType::BIGGER_EQUAL ||node->children[0]->value.type == TokenType::SMALLER_EQUAL || node->children[0]->value.type == TokenType::EQUALITY || node->children[0]->value.type == TokenType::INEQUALITY){node->LookUpForm = false;}
+                if (node->children[0]->value.type == TokenType::BIGGER_EQUAL ||node->children[0]->value.type == TokenType::SMALLER_EQUAL 
+                || node->children[0]->value.type == TokenType::EQUALITY || node->children[0]->value.type == TokenType::INEQUALITY)
+                {node->LookUpForm = false;}
                 node->value.type = TokenType::VARIABLE;
                 // if (node->value.type == TokenType::VARIABLE){
                 //     std::cout << node->value.content << " " <<node->children[0]->value.content << std::endl;
@@ -1191,14 +1189,6 @@ std::string ParserB::calculate(Node* root, Result& result)
         // variable
         else if (expressionNode->value.type == TokenType::VARIABLE)
         {
-            
-            // uninitialized
-            if (variableTypeMap.find(expressionNode->value.content) == variableTypeMap.end() && expressionNode->value.content == "true"){
-                 variableTypeMap[expressionNode->value.content] = DataType::UNINITIALIZED;
-            }
-            
-            
-
             // Function Call
             if (expressionNode->children.size() != 0 && expressionNode->ArrayLookUp == false)
             {
@@ -1252,6 +1242,11 @@ std::string ParserB::calculate(Node* root, Result& result)
                 ScopeStack.pop();
                 delete localScope;
             }
+            // uninitialized
+            if (variableTypeMap.find(expressionNode->value.content) == variableTypeMap.end() && expressionNode->value.content == "true"){
+                 variableTypeMap[expressionNode->value.content] = DataType::UNINITIALIZED;
+            }
+            
             // Array lookup
             if (expressionNode->ArrayLookUp == true)
             {

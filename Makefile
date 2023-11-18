@@ -3,13 +3,16 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra --std=c++17
 DEBUG = -g -O0
-all: Format Calc
+all: Format Calc Scrypt
 
 Format:	format.o ParserB.o Lexer.o
 	g++ -std=c++17 -Wall -Wextra -Werror $^  -o Format
 
 Calc: Calc.o ParserB.o Lexer.o
 	g++ -std=c++17 -Wall -Wextra -Werror $^  -o Calc
+
+Scrypt: Scrypt.o ParserB.o Lexer.o 
+	g++ -std=c++17 -Wall -Wextra -Werror $^  -o Scrypt
 
 Calc.o: src/calc.cpp
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
@@ -19,9 +22,10 @@ Lexer.o: src/lib/Lexer.cpp
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 format.o: src/format.cpp
 	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
-
+Scrypt.o: src/scrypt.cpp
+	$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
 clean:
-	rm	-f *.o	Format Calc
+	rm	-f *.o	Format Calc Scrypt
 
 # Format:	format.o
 # 	g++	-std=c++17	-Wall	-Wextra	-Werror	format.o	-o	Format
