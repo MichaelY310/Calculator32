@@ -770,7 +770,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                 auto error = MakeExpressionTree(expression, topIndex+2, rightB-1, cur);
                 node->children.push_back(std::move(cur));
                 node->ArrayLookUp = true;
-                node->LookUpForm = false;
+                if (node->children[0]->value.type == TokenType::BIGGER_EQUAL ||node->children[0]->value.type == TokenType::SMALLER_EQUAL || node->children[0]->value.type == TokenType::EQUALITY || node->children[0]->value.type == TokenType::INEQUALITY){node->LookUpForm = false;}
                 node->value.type = TokenType::VARIABLE;
                 // if (node->value.type == TokenType::VARIABLE){
                 //     std::cout << node->value.content << " " <<node->children[0]->value.content << std::endl;
@@ -1200,7 +1200,7 @@ std::string ParserB::calculate(Node* root, Result& result)
             
 
             // Function Call
-            if (expressionNode->children.size() != 0)
+            if (expressionNode->children.size() != 0 && expressionNode->ArrayLookUp == false)
             {
                 if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
                 {
