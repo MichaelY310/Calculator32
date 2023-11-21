@@ -64,7 +64,6 @@ public:
 static void print_no_semicolon(Node* root, int indent=0)
 {
     for (int i=0; i<indent; i++) { std::cout << "    "; }
-
     // Def
     if (root->value.type == TokenType::DEF)
     {
@@ -247,7 +246,6 @@ static void print_no_semicolon(Node* root, int indent=0)
     else 
     {
         ExpressionNode* expressionNode = dynamic_cast<ExpressionNode*>(root);
-
         if (expressionNode->value.type == TokenType::NUL)
         {
             std::cout << "null";
@@ -277,6 +275,26 @@ static void print_no_semicolon(Node* root, int indent=0)
                     }
                 }
                 std::cout << ")";
+            }
+            // len() pop() push()
+            else if (expressionNode->children2.size() != 0 && expressionNode->ArrayLookUp == false)
+            {
+                // len()
+                if (expressionNode->value.content == "len") 
+                {
+                    std::cout << "len(";
+                    if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
+                    {
+                        std::cout << expressionNode->children2[0]->value.content;
+                    }
+                    else 
+                    {
+                        print_no_semicolon(expressionNode->children2[0].get(), 0);
+                    }
+                    
+                    std::cout << ")";
+                }
+
             }
             else if (expressionNode->ArrayLookUp == true) {
                 if (expressionNode->children.size()!= 0) {

@@ -3,12 +3,12 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra --std=c++17
 DEBUG = -g -O0
-all: Format Calc Scrypt
+all: Format Calc Scrypt 
 
-Format:	format.o ParserB.o Lexer.o
+Format:	format.o ParserB.o Lexer.o 
 	g++ -std=c++17 -Wall -Wextra -Werror $^  -o Format
 
-Calc: Calc.o ParserB.o Lexer.o
+Calc: Calc.o ParserB.o Lexer.o 
 	g++ -std=c++17 -Wall -Wextra -Werror $^  -o Calc
 
 Scrypt: Scrypt.o ParserB.o Lexer.o 
