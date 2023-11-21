@@ -294,6 +294,21 @@ static void print_no_semicolon(Node* root, int indent=0)
                     
                     std::cout << ")";
                 }
+                // pop()
+                else if (expressionNode->value.content == "pop") 
+                {
+                    std::cout << "pop(";
+                    if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
+                    {
+                        std::cout << expressionNode->children2[0]->value.content;
+                    }
+                    else 
+                    {
+                        print(expressionNode->children2[0].get(), 0, false);
+                    }
+            
+                    std::cout << ")";
+                }
 
             }
             else if (expressionNode->ArrayLookUp == true) {

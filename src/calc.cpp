@@ -74,8 +74,9 @@ int main() {
         // std::cout << TokenVector.at(TokenVector.size()-2).content << std::endl;
         TokenVector.pop_back();
         TokenVector.push_back(Token(TokenType::SEMICOLON, ";", 0, 0 ));
+        TokenVector.push_back(Token(TokenType::END, "", 0, 0 ));
         
-        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size(), flows);
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
 
         
         if (errorResult.first.first != -1) 
@@ -83,7 +84,6 @@ int main() {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-
         ParserB::print_no_semicolon(flows[0].get());
         // ParserB::print(flows[0].get(), 0, false);
         std::cout << std::endl;

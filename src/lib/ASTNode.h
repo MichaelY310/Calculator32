@@ -42,6 +42,7 @@ public:
     bool ArrayLookUp = false;
     bool LookUpForm = true;
     double index = -1;
+    // bool WrongArgu = false;
     // std::string lookUpStr = ""
     std::vector<std::unique_ptr<ExpressionNode>> children;
     std::vector<std::unique_ptr<Node>> children2;
