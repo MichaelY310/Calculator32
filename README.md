@@ -1,5 +1,5 @@
 # Calculator32
-Overview
+## Overview
 
 Calculator32 is an ongoing project with the temporary goal of functioning as a calculator, with the ultimate aim of evolving into a lightweight script coding language. The project is structured into several main functions, each residing in the /src/ folder, with additional helper classes located in the /src/lib/ folder.
 
@@ -7,7 +7,9 @@ Calculator32 is an ongoing project with the temporary goal of functioning as a c
 
 To compile the lexing component, use the following command:
 
+```
 g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 lex.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
+```
 
 This program takes an input stringstream, processes the input string into a token vector, and prints their attributes. Add -DDEBUG=1 for debugging and -DDEBUG=0 otherwise.
 
