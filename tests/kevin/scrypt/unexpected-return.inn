@@ -1,5 +1,0 @@
-def baz(arg) {
-  print[arg];
-}
-
-return baz(42);

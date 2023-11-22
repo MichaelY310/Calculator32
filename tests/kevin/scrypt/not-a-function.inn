@@ -1,6 +1,0 @@
-def foo(x) {
-  print x == x;
-}
-
-foo = 1492;
-print foo(99);

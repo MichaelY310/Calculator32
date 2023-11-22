@@ -1,5 +1,0 @@
-array = [0, 1, 2, 3, 4, 5, 6, 7]
-array[8.000]
-array[2.000] = array[12 - 13.0]
-array[0-0.5*2] = 12
-array[14] = array[0] + array[1] + array[2]
