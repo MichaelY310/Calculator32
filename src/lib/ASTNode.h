@@ -26,6 +26,7 @@ public:
     std::vector<std::shared_ptr<Node>> ArrayContent;
     int EqualityIndex = -1;
     bool subArray = false;
+    bool IsFunction = false;
 };
 
 // An operation expression node should always have 2 children

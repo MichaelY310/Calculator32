@@ -13,5 +13,3 @@ pop(x, 42)
 pop(x)
 pop()
 pop(x)
-
-
