@@ -17,7 +17,9 @@ This program takes an input stringstream, processes the input string into a toke
 
 Compile the calculator component with the following command:
 
+```
 g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 calc.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
+```
 
 This program supports interactive infix input lines. It processes a line of input, prints the infix expression with parentheses, and displays the result.
 
@@ -25,7 +27,9 @@ This program supports interactive infix input lines. It processes a line of inpu
 
 Compile the formatting component with:
 
+```
 g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 format.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
+```
 
 This program takes an input stringstream, processes the input string into a tree, and prints the input in its standard format.
 
@@ -33,7 +37,9 @@ This program takes an input stringstream, processes the input string into a tree
 
 Compile the script execution component with:
 
+```
 g++ -Wall -Wextra -Werror -std=c++17 -DDEBUG=1 scrypt.cpp -o main lib/Lexer.cpp lib/ParserB.cpp
+```
 
 This program takes an input stringstream and executes expressions and statements.
 
