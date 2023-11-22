@@ -707,32 +707,45 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     int leftParen = topIndex+1;
                     int rightParen = findRightParenthesisNoError(expression, leftParen+1, rightBound);
                     std::vector<std::unique_ptr<Node>> Flows;
-                    // bool Havebracket = false;
-                    // bool HaveComma = false
-                    // for (size_t i = leftParen; i < rightParen; i++) {
-                    //     if (expression[i].type == TokenType::LEFT_BRACKET)
-                    //     {
-                    //         Havebracket = true;
-                    //     }
-                    //     if (expression[i].type == TokenType::COMMA)
-                    //     {
-                    //         HaveComma = true;
-                    //     }
-                    // }
-                    // if (Havebracket == false && HaveComma == true) 
-                    // {
-                    //     node->WrongArgu = true;
-                    //     std::unique_ptr<Node> node1 = std::make_unique<Node>(); 
-                    //     node->children2.push_back(std::move(Flows[0]));
-                    // }
-                    // else 
-                    // {
-                    auto errorMessage = ParserB::HandleTokenVector(expression, leftParen+1, rightParen-1, Flows);
-                    // std::cout << "running" <<std::endl;
-                    if (errorMessage.first.first != -1) {
-                        return errorMessage;
+                    
+                    int left = leftParen + 1;
+                    int rightP = -1;
+                    while (left <= rightParen-1)
+                    {
+                        std::unique_ptr<ExpressionNode> parameterNode = std::make_unique<ExpressionNode>();
+                        int right = left;
+                        while (right <= rightParen-1 && expression[right].type != TokenType::COMMA)
+                        {
+                            // Skip parenthesis  e.g. add(add(1, 2), 3)
+                            if (expression[right].type == TokenType::LEFT_BRACKET)
+                            {
+                                rightP = findRightBracketNoError(expression, right+1, rightParen-1);
+                                if (rightP > rightParen-1)
+                                {
+                                    return { { expression[right].line, expression[right].index }, expression[right].content };  
+                                }
+                                auto errorMessage = ParserB::HandleTokenVector(expression, right , rightP, Flows);
+                                if (errorMessage.first.first != -1) {
+                                    return errorMessage;
+                                }
+                                node->children2.push_back(std::move(Flows[0])); 
+                                right = rightP + 1;
+                                left = right + 1;
+                            }
+                            right += 1;
+                        }
+
+                        MakeExpressionTree(expression, left, right-1, parameterNode); 
+                        node->children2.push_back(std::move(parameterNode));
+                        left = right + 1;
                     }
-                    node->children2.push_back(std::move(Flows[0]));   
+
+                    // auto errorMessage = ParserB::HandleTokenVector(expression, leftParen+1, rightParen-1, Flows);
+                    // // std::cout << "running" <<std::endl;
+                    // if (errorMessage.first.first != -1) {
+                    //     return errorMessage;
+                    // }
+                    // node->children2.push_back(std::move(Flows[0]));   
                     // }           
                 }
                 else if (expression[topIndex].content == "pop" )
@@ -749,7 +762,47 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                 }
                 else if (expression[topIndex].content == "push" )
                 {
+                    node = std::make_unique<ExpressionNode>(expression[topIndex]);
+                    int leftParen = topIndex+1;
+                    int rightParen = findRightParenthesisNoError(expression, leftParen+1, rightBound);
+                    std::vector<std::unique_ptr<Node>> Flows;
                     
+
+                    int left = leftParen + 1;
+                    int rightP = -1;
+                    while (left <= rightParen-1)
+                    {
+                        std::unique_ptr<ExpressionNode> parameterNode = std::make_unique<ExpressionNode>();
+                        int right = left;
+                        bool a = true;
+                        while (right <= rightParen-1 && expression[right].type != TokenType::COMMA)
+                        {
+                            // // Skip parenthesis  e.g. add(add(1, 2), 3)
+                            // if (expression[right].type == TokenType::LEFT_BRACKET)
+                            // {
+                            //     rightP = findRightBracketNoError(expression, right+1, rightParen-1);
+                            //     if (rightP > rightParen-1)
+                            //     {
+                            //         return { { expression[right].line, expression[right].index }, expression[right].content };  
+                            //     }
+                            //     auto errorMessage = ParserB::HandleTokenVector(expression, right , rightP, Flows);
+                            //     if (errorMessage.first.first != -1) {
+                            //         return errorMessage;
+                            //     }
+                            //     a = false;
+                            //     node->children2.push_back(std::move(Flows[0])); 
+                            //     right = rightP + 1;
+                            // }
+                            right += 1;
+                        }
+                        if (expression[right].type == TokenType::LEFT_BRACKET)
+                    
+
+                        MakeExpressionTree(expression, left, right-1, parameterNode); 
+                        node->children2.push_back(std::move(parameterNode));
+            
+                        left = right + 1;
+                    }
                 }
             }     
             else {
@@ -1044,6 +1097,9 @@ std::string ParserB::calculate(Node* root, Result& result)
     // Return
     else if (root->value.type == TokenType::RETURN)
     {
+        if (ScopeStack.size() ==1 ) {
+            return "Runtime error: unexpected return.";
+        }
         ReturnNode* returnNode = dynamic_cast<ReturnNode*>(root);
         if (returnNode->content != nullptr)
         {
@@ -1345,6 +1401,15 @@ std::string ParserB::calculate(Node* root, Result& result)
                         result.doubleValue = result1.arrayValue->ArrayContent[result1.arrayValue->ArrayContent.size()-1]->value.value;
                         variableArrayMap[expressionNode->children2[0]->value.content]->ArrayContent.pop_back();
                     }   
+                }
+                else if (expressionNode->value.content == "push")
+                {
+                    result.type = DataType::NUL;
+                    if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array.";}
+                    Result result1;
+                    getVariable (expressionNode->children2[0]->value.content, result1);
+                    variableArrayMap[expressionNode->children2[0]->value.content]->ArrayContent.push_back(std::move(expressionNode->children2[1]));
+
                 }
                 return "";
             }
@@ -1892,7 +1957,16 @@ void ParserB::print(Node* root, int indent, bool semicolon)
                     std::cout << "len(";
                     if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
                     {
-                        std::cout << expressionNode->children2[0]->value.content;
+                        // std::cout << expressionNode->children2[0]->value.content << ", ";
+                        // std::cout << expressionNode->children2[1]->value.content;
+                        for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+                        {
+                            std::cout << expressionNode->children2[i]->value.content;
+                            if (i != (int)expressionNode->children2.size() - 1) 
+                            {
+                                std::cout << ", ";
+                            }
+                        }
                     }
                     else 
                     {
@@ -1913,6 +1987,30 @@ void ParserB::print(Node* root, int indent, bool semicolon)
                     else 
                     {
                         print(expressionNode->children2[0].get(), 0, false);
+                    }
+                    
+                    if (semicolon == true) {std::cout << ");";}
+                    else                   {std::cout << ")";}
+                }
+                // push()
+                else if (expressionNode->value.content == "push")
+                {
+                    std::cout << "push(";
+
+                    for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+                    {
+                        if (expressionNode->children2[i]->value.type == TokenType::VARIABLE) 
+                        {
+                            std::cout << expressionNode->children2[i]->value.content;
+                        }
+                        else 
+                        {
+                            print(expressionNode->children2[0].get(), 0, false);
+                        }
+                        if (i != (int)expressionNode->children2.size() - 1) 
+                        {
+                                std::cout << ", ";
+                        }
                     }
                     
                     if (semicolon == true) {std::cout << ");";}

@@ -285,7 +285,15 @@ static void print_no_semicolon(Node* root, int indent=0)
                     std::cout << "len(";
                     if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
                     {
-                        std::cout << expressionNode->children2[0]->value.content;
+                        // std::cout << expressionNode->children2[0]->value.content;
+                        for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+                        {
+                            std::cout << expressionNode->children2[i]->value.content;
+                            if (i != (int)expressionNode->children2.size() - 1) 
+                            {
+                                std::cout << ", ";
+                            }
+                        }
                     }
                     else 
                     {
@@ -307,6 +315,30 @@ static void print_no_semicolon(Node* root, int indent=0)
                         print(expressionNode->children2[0].get(), 0, false);
                     }
             
+                    std::cout << ")";
+                }
+                // push()
+                else if (expressionNode->value.content == "push")
+                {
+                    std::cout << "push(";
+
+                    for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+                    {
+                        if (expressionNode->children2[i]->value.type == TokenType::VARIABLE) 
+                        {
+                            std::cout << expressionNode->children2[i]->value.content;
+                        }
+                        else 
+                        {
+                            print(expressionNode->children2[0].get(), 0, false);
+                        }
+                        if (i != (int)expressionNode->children2.size() - 1) 
+                        {
+                                std::cout << ", ";
+                        }
+                    }
+                    
+                
                     std::cout << ")";
                 }
 
