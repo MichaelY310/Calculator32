@@ -1308,18 +1308,18 @@ std::string ParserB::calculate(Node* root, Result& result)
             else if (expressionNode->children2.size() != 0 && expressionNode->ArrayLookUp == false)
             {
                 // len()
-                if (expressionNode->value.content == "len") 
+                if (expressionNode->value.content == "len")
                 {
                     result.type = DataType::DOUBLE;
                     if (expressionNode->children2[0]->value.type == TokenType::LEFT_BRACKET)
                     {
-                        result.doubleValue = expressionNode->children2[0]->ArrayContent.size();   
+                        result.doubleValue = expressionNode->children2[0]->ArrayContent.size();
                     }
                     else if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
                     {
-                        if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array.";}
+                        if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array."; }
                         Result result1;
-                        getVariable (expressionNode->children2[0]->value.content, result1);
+                        getVariable(expressionNode->children2[0]->value.content, result1);
                         result.doubleValue = result1.arrayValue->ArrayContent.size();
                     }
                 }
@@ -1330,20 +1330,19 @@ std::string ParserB::calculate(Node* root, Result& result)
                     if (expressionNode->children2[0]->value.type == TokenType::LEFT_BRACKET)
                     {
                         if (expressionNode->children2[0]->ArrayContent.size() == 0) { return "Runtime error: underflow."; }
-                        result.doubleValue = expressionNode->children2[0]->ArrayContent[expressionNode->children2[0]->ArrayContent.size()-1]->value.value;
+                        result.doubleValue = expressionNode->children2[0]->ArrayContent[expressionNode->children2[0]->ArrayContent.size() - 1]->value.value;
                     }
                     else if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
                     {
-                        if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array.";}
+                        if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array."; }
                         Result result1;
-                        getVariable (expressionNode->children2[0]->value.content, result1);
+                        getVariable(expressionNode->children2[0]->value.content, result1);
                         if (result1.arrayValue->ArrayContent.size() == 0) { return "Runtime error: underflow."; }
-                        result.doubleValue = result1.arrayValue->ArrayContent[result1.arrayValue->ArrayContent.size()-1]->value.value;
+                        result.doubleValue = result1.arrayValue->ArrayContent[result1.arrayValue->ArrayContent.size() - 1]->value.value;
                         variableArrayMap[expressionNode->children2[0]->value.content]->ArrayContent.pop_back();
-                    }   
+                    }
                 }
-
-                
+                return "";
             }
             // uninitialized
             if (variableTypeMap.find(expressionNode->value.content) == variableTypeMap.end() && expressionNode->value.content == "true"){
