@@ -14,83 +14,35 @@ int main() {
     input = input.substr(0, input.size()-1);
 #endif
 #if DEBUG == 1
-//     std::string input = R"(x     = 42
-// steps = 0
-
-// while x > 1 {
-//   steps = steps + 1
-//   if x % 2 == 0 {
-//     x = x / 2
-//   }
-//   else {
-//     x = 3 * x + 1
-//   }
-// }
-
-// print steps)";  
-
-//     std::string input = R"(
-// val  = 105
-// fizz = val % 3 == 0
-// buzz = false
-// if val % 5 == 0 {
-//     buzz = true
-// }
-
-// if fizz & buzz {
-//     if buzz {
-//         print 333555
-//     }
-//     else {
-//         print 333
-//     }
-// }
-// else if buzz {
-//     print 555
-// }
-// else {
-//     print val
-// })";
-
-//     std::string input = R"(
-// a = 0
-// if (a == 0) {
-//     print 0
-// } else if (a == 1) {
-//     print 11
-// } else {
-//     print 222
-// }
-// print a
-// )";
-
     std::string input = R"(
-z = 42
-
+(z = 42);
 def foo(x, y) {
-  def square(value) {
-    return value * value
-  }
-
-  print square(x + y + z)
+    def square(value) {
+        return (value * value);
+    }
+    print square(((x + y) + z));
+}
+(z = 108);
+(f = foo);
+(result = f(1, 2));
+if (result != null) {
+    print result;
 }
 
-z = 108
-f = foo
-print 1
+def p() { 
+    print a; 
+    return;
+}
+p();
+def p() {
+    return null;
+}
     )";
 
-//     std::string input = R"(
-// x=1
-// y=2
-
-// def add(a, b) {
-//     return a+b
-// }
-//     )";
-
 #endif
-
+    // std::cout << "===================" << std::endl;
+    // std::cout << input << std::endl;
+    // std::cout << "===================" << std::endl;
     std::vector<Token> TokenVector;
     std::pair<int, int> errorPair = Token::GenTokenVector(input, TokenVector);
 
@@ -100,7 +52,6 @@ print 1
         exit(1);
     }
     // Token::printLexer(TokenVector);
-
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
     if (errorResult.first.first != -1) 
@@ -108,11 +59,23 @@ print 1
         std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
         exit(2);
     }
-
+    
     for (int i=0; i < (int)flows.size(); i++)
     {
         ParserB::print(flows[i].get());
+        // if (flows[i].get()->value.type == TokenType::ARRAY) {
+        //     ArrayNode* Array = dynamic_cast<ArrayNode*>(flows[i].get());
+        //     if (Array->ArrayContent[2]->value.type == TokenType::NUMBER) {
+        //         std::cout << "yes" << std::endl;
+        //     }
+        //     std::cout << Array->ArrayContent[2]->value << std::endl;
+        // }
+        // if (flows[i].get()->value.type == TokenType::VARIABLE) {
+        //     std::cout << flows[i].get()->value.content << std::endl;
+        // }
+
+
         std::cout << std::endl;
     }
-    return 0;
+    return 0; 
 }

@@ -154,7 +154,7 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             {
                 if ( i + 1 < len && input.at(i+1) == '='){
                     res.emplace_back(TokenType::EQUALITY,"==", line, index, -1);
-                    i++;
+                    i++; 
                     index++;
                 }
                 else{
@@ -231,6 +231,14 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             {
                 res.emplace_back(TokenType::RIGHT_PARENTHESIS, ")", line, index, -1);
             }
+            else if (input.at(i) == '[')
+            {
+                res.emplace_back(TokenType::LEFT_BRACKET, "[", line, index, -1);
+            }
+            else if (input.at(i) == ']')
+            {
+                res.emplace_back(TokenType::RIGHT_BRACKET, "]", line, index, -1);
+            }
             else if (input.at(i) == '{')
             {
                 res.emplace_back(TokenType::LEFT_BRACE, "{", line, index, -1);
@@ -238,6 +246,14 @@ std::pair<int, int> Token::GenTokenVector(const std::string& input, std::vector<
             else if (input.at(i) == '}')
             {
                 res.emplace_back(TokenType::RIGHT_BRACE, "}", line, index, -1);
+            }
+            else if (input.at(i) == '[')
+            {
+                res.emplace_back(TokenType::LEFT_BRACKET, "[", line, index, -1);
+            }
+            else if (input.at(i) == ']')
+            {
+                res.emplace_back(TokenType::RIGHT_BRACKET, "]", line, index, -1);
             }
             else if (input.at(i) == ',')
             {

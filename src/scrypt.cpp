@@ -32,25 +32,42 @@ int main() {
 // print steps)";  
 
 
+//     std::string input = R"(
+// def foo(x, y) {
+// })"
+// ;
+
 
     std::string input = R"(
-z = 42
-
+(z = 42);
 def foo(x, y) {
-  def square(value) {
-    return value * value
-  }
-
-  print square(x + y + z)
+    def square(value) {
+        return (value * value);
+    }
+    print square(((x + y) + z));
+}
+(z = 108);
+(f = foo);
+(result = f(1, 2));
+if (result != null) {
+    print result;
 }
 
-z = 108
-f = foo
-
-result = f(1, 2)
-if result != null {
-  print result
+def p() { 
+    print 114514; 
+    return;
 }
+print p();
+
+
+def add(a) {
+    if (a <= 1) { 
+        return a;
+    }
+    return a * add(a-1);
+}
+
+print add(5);
     )";
 
 
@@ -70,7 +87,8 @@ if result != null {
 
     // Parser
     // Add the global Scope
-    ParserB::ScopeStack.push(Scope());
+    Scope* globalScope = new Scope();
+    ParserB::ScopeStack.push(globalScope);
     ParserB::setupExpression(TokenVector);
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
@@ -79,6 +97,12 @@ if result != null {
         std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
         exit(2);
     }
+
+    // for (int i=0; i < (int)flows.size(); i++)
+    // {
+    //     ParserB::print(flows[i].get());
+    //     std::cout << std::endl;
+    // }
 
     // Calculate
     // std::cout << "start calculating" << std::endl;
@@ -93,5 +117,9 @@ if result != null {
             exit(3);
         }
     }
+
+    // std::cout << ParserB::functionStorage.size() << std::endl;
+    ParserB::clean();
+    delete globalScope;
     return 0;
 }

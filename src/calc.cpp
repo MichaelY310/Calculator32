@@ -26,7 +26,7 @@ int main() {
     //std::string input = "x = y = 0 + 1 + 2 * 3 - 4 / (5 + 6)\nb=13\n(7 - (b = (b + 5)))\n1 % 114514\n\n1=a\n1+1\n";
     // std::string input = "1==false";
     // std::string input = "(1 == 2)";
-    std::string input = "x = 42\nx % 2 != 0";
+    std::string input = "((6 + (4 / ((1 + 2) - 3))) + 8)\n(z = ((32 * awol) >= 5))\n(((88 + 7) < (4 * true)) & (5 >= 2))";
 #endif
 
 
@@ -41,7 +41,11 @@ int main() {
         expressions.push_back(s);
     }
 
+
+    Scope* globalScope = new Scope();
+    ParserB::ScopeStack.push(globalScope);
     int lineCount = 0;
+    lineCount = lineCount + 1 -1;
     for (std::string expression : expressions)
     {
 
@@ -63,36 +67,51 @@ int main() {
 
         // ParserB
         ParserB::setupExpression(TokenVector);
-        std::unique_ptr<ExpressionNode> root;
-        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
+        // std::unique_ptr<ExpressionNode> root;
+        // std::pair<std::pair<int, int>, std::string> errorResult = ParserB::MakeExpressionTree(TokenVector, 0, TokenVector.size() - 2, root);
 
+        std::vector<std::unique_ptr<Node>> flows;
+        // std::cout << TokenVector.at(TokenVector.size()-2).content << std::endl;
+        TokenVector.pop_back();
+        TokenVector.push_back(Token(TokenType::SEMICOLON, ";", 0, 0 ));
+        TokenVector.push_back(Token(TokenType::END, "", 0, 0 ));
+        
+        std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
+
+        
         if (errorResult.first.first != -1) 
         {
             std::cout << "Unexpected token at line " << errorResult.first.first << " column " << errorResult.first.second << ": " << errorResult.second << std::endl;
             continue;
         }
-        ParserB::print(root.get());
+        ParserB::print_no_semicolon(flows[0].get());
+        // ParserB::print(flows[0].get(), 0, false);
         std::cout << std::endl;
 
         // Calculate
         Result result;
-        std::map<std::string, DataType> originalVariableTypeMap(ParserB::variableTypeMap);
-        std::map<std::string, double> originalVariableDoubleMap(ParserB::variableDoubleMap);
-        std::map<std::string, bool> originalVariableBoolMap(ParserB::variableBoolMap);
+        Scope* originalScope = new Scope(*(ParserB::ScopeStack.top()));
 
-        std::string errorMessage = ParserB::calculate(root.get(), result);
-
+        std::string errorMessage = ParserB::calculate(flows[0].get(), result);
         if (errorMessage.length() != 0)
         {
+            // Error
             std::cout << errorMessage << std::endl;
-            ParserB::variableTypeMap.swap(originalVariableTypeMap);
-            ParserB::variableDoubleMap.swap(originalVariableDoubleMap);
-            ParserB::variableBoolMap.swap(originalVariableBoolMap);
 
-            continue;
+            delete ParserB::ScopeStack.top();
+            ParserB::ScopeStack.pop();
+            ParserB::ScopeStack.push(originalScope);
         }
-        ParserB::printValue(result);
-        std::cout << std::endl;
+        else
+        {
+            // No Error
+            ParserB::printValue(result);
+            std::cout << std::endl;
+            delete originalScope;
+        }
     }
+
+    ParserB::clean();
+    delete ParserB::ScopeStack.top();
     return 0;
 }
