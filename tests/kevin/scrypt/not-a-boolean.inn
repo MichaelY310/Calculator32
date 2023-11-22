@@ -1,0 +1,17 @@
+x = 57.5;
+
+if x > 90 {
+  print 4.0;
+}
+else if x > 80 {
+  print 3.0;
+}
+else if x > 70 {
+  print 2.0;
+}
+else if x {
+  print 1.0;
+}
+else {
+  print 0.0;
+}

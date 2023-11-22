@@ -1,0 +1,10 @@
+(x = [1, 2, 3])
+[1, 2, 3]
+(x = x[2])
+3
+x[0]
+Runtime error: not an array.
+(x[0] = 7)
+Runtime error: not an array.
+(true[3] = 33)
+Runtime error: not an array.

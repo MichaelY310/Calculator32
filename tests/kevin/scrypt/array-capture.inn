@@ -1,0 +1,12 @@
+values = [null, null, null, null, null];
+
+def set_index(index, value) {
+  values[index] = value;
+  values = [];
+}
+
+set_index(3, 1.3);
+set_index(1, true);
+set_index(2, [1, [2], 3]);
+
+print values;
