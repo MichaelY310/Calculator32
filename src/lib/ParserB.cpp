@@ -656,6 +656,11 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         if (expression[i].type == TokenType::LEFT_PARENTHESIS || expression[i].type == TokenType::LEFT_BRACKET)
         {
             int rightIndex = findRightParenthesisNoError(expression, i+1, rightBound);
+            if (expression[i+1].type == TokenType::COMMA)
+            {
+                return { { expression[i+1].line, expression[i+1].index }, expression[i+1].content };  
+            }
+            
             if (rightIndex > rightBound)
             {
                 return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  
@@ -666,6 +671,10 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         else if (i+1 <= rightBound && expression[i].type == TokenType::VARIABLE && expression[i+1].type == TokenType::LEFT_PARENTHESIS)
         {
             int rightIndex = findRightParenthesisNoError(expression, i+2, rightBound);
+            if (expression[i+2].type == TokenType::COMMA)
+            {
+                return { { expression[i+2].line, expression[i+2].index }, expression[i+2].content };  
+            }
             if (rightIndex > rightBound)
             {
                 return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  
@@ -676,6 +685,10 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
         else if (i+1 <= rightBound && expression[i].type == TokenType::VARIABLE && expression[i+1].type == TokenType::LEFT_BRACKET)
         {
             int rightIndex = findRightBracketNoError(expression, i+2, rightBound);
+            if (expression[i+2].type == TokenType::COMMA)
+            {
+                return { { expression[i+2].line, expression[i+2].index }, expression[i+2].content };  
+            }
             if (rightIndex > rightBound)
             {
                 return { { expression[rightIndex].line, expression[rightIndex].index }, expression[rightIndex].content };  

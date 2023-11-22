@@ -1,15 +1,29 @@
-zero = true
-zero = [17.8, 18.9, 19.0]
-zero = 0
-x = [1]
-len(x, x)
-len(zero)
-len()
-push(x, 7, 8)
-push(zero, 4)
-push()
-pop(zero)
-pop(x, 42)
-pop(x)
-pop()
-pop(x)
+S = [];
+K = [9, 3, 1, 1, 7];
+N = 14;
+
+def swap(i, j) {
+    temp = S[i];
+    S[i] = S[j];
+    S[j] = temp;
+}
+
+def init() {
+    i = 0;
+    while i < N {
+        push(S, i);
+        i = i + 1;
+    }
+}
+
+init();
+
+i = 0;
+j = 0;
+while i < N {
+    j = (j + S[i] + K[i % len(K)]) % N;
+    swap(i, j);
+    i = i + 1;
+}
+
+print(S);
