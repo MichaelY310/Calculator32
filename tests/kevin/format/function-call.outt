@@ -1,4 +1,0 @@
-doit();
-(twelve = (3 * four()));
-(forty1 = forty(1));
-print max(1, 2, 3, four());

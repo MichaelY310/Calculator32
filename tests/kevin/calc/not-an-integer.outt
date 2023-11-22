@@ -1,8 +1,0 @@
-(array = [1, 2, 3])
-[1, 2, 3]
-(x = array[2e-08])
-Runtime error: index is not an integer.
-(i = ((1 / 1000) / 1000))
-1e-06
-(array[i] = i)
-Runtime error: index is not an integer.

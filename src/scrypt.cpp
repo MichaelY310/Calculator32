@@ -1,6 +1,5 @@
 #include "lib/ParserB.h"
 
-
 int main() {
 #if DEBUG == 0
     std::string input = "";
@@ -15,7 +14,6 @@ int main() {
     input = input.substr(0, input.size()-1);
 #endif
 #if DEBUG == 1
-
 //     std::string input = R"(x     = 42
 // steps = 0
 
@@ -31,48 +29,12 @@ int main() {
 
 // print steps)";  
 
+    std::string input = R"(print (12 < 12.1))"; 
 
-//     std::string input = R"(
-// def foo(x, y) {
-// })"
-// ;
-
-
-    std::string input = R"(
-(z = 42);
-def foo(x, y) {
-    def square(value) {
-        return (value * value);
-    }
-    print square(((x + y) + z));
-}
-(z = 108);
-(f = foo);
-(result = f(1, 2));
-if (result != null) {
-    print result;
-}
-
-def p() { 
-    print 114514; 
-    return;
-}
-print p();
-
-
-def add(a) {
-    if (a <= 1) { 
-        return a;
-    }
-    return a * add(a-1);
-}
-
-print add(5);
-    )";
-
-
-
- 
+    // std::string input = R"(print 114514)";  
+//     std::string input = R"(1 + 1
+// 2 + 2
+// 3 + 3 * (4 + 4))";  
 #endif
 
     // Lexer
@@ -86,9 +48,6 @@ print add(5);
     // Token::printLexer(TokenVector);
 
     // Parser
-    // Add the global Scope
-    Scope* globalScope = new Scope();
-    ParserB::ScopeStack.push(globalScope);
     ParserB::setupExpression(TokenVector);
     std::vector<std::unique_ptr<Node>> flows;
     std::pair<std::pair<int, int>, std::string> errorResult = ParserB::HandleTokenVector(TokenVector, 0, TokenVector.size()-2, flows);
@@ -98,18 +57,12 @@ print add(5);
         exit(2);
     }
 
-    // for (int i=0; i < (int)flows.size(); i++)
-    // {
-    //     ParserB::print(flows[i].get());
-    //     std::cout << std::endl;
-    // }
-
     // Calculate
-    // std::cout << "start calculating" << std::endl;
     for (int i=0; i < (int)flows.size(); i++)
     {
-        Result result;
-        std::string errorMessage = ParserB::calculate(flows[i].get(), result);
+        double result;
+        DataType resultType;
+        std::string errorMessage = ParserB::calculate(flows[i].get(), result, resultType);
 
         if (errorMessage.length() != 0)
         {
@@ -117,9 +70,5 @@ print add(5);
             exit(3);
         }
     }
-
-    // std::cout << ParserB::functionStorage.size() << std::endl;
-    ParserB::clean();
-    delete globalScope;
     return 0;
 }

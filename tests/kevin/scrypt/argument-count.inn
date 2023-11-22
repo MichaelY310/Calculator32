@@ -1,5 +1,0 @@
-def bar(x, y, z) {
-  print x*y + z;
-}
-
-bar(10, 11);

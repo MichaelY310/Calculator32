@@ -1,8 +1,0 @@
-((6 + (4 / ((1 + 2) - 3))) + 8)
-Runtime error: division by zero.
-Syntax error on line 1 column 10.
-(z = ((32 * awol) >= 5))
-Runtime error: unknown identifier awol
-(((88 + 7) < (4 * true)) & (5 >= 2))
-Runtime error: invalid operand type.
-Unexpected token at line 1 column 17: -
