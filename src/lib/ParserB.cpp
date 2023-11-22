@@ -395,9 +395,15 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
             int beginIndex = start;
             start += 1;
             int EqualityIndex = -1;
+            bool push = false;
     
             while (tokenVector[start].line == tokenVector[beginIndex].line && start <= rightBound)
             {
+                if (tokenVector[start].content == "push")
+                {
+                    
+                    push = true;
+                }
                 if (tokenVector[start].type == TokenType::LEFT_BRACKET){
                     if (tokenVector[start-1].type == TokenType::TRUE || tokenVector[start-1].type == TokenType::FALSE){
                         tokenVector[start-1].type = TokenType::VARIABLE;
@@ -410,7 +416,11 @@ std::pair<std::pair<int, int>, std::string> ParserB::HandleTokenVector(std::vect
                         continue;
                     }
                     if (tokenVector[start-1].type != TokenType::VARIABLE ){     //check whether it is creating a new array
-                        arrayExist = true;
+                        if (push == false) {
+                            
+                            arrayExist = true;  
+                        }
+                        
                     }
                    
                 }
@@ -762,6 +772,7 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                 }
                 else if (expression[topIndex].content == "push" )
                 {
+                    // std::cout << "r" <<std::endl;
                     node = std::make_unique<ExpressionNode>(expression[topIndex]);
                     int leftParen = topIndex+1;
                     int rightParen = findRightParenthesisNoError(expression, leftParen+1, rightBound);
@@ -774,33 +785,39 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     {
                         std::unique_ptr<ExpressionNode> parameterNode = std::make_unique<ExpressionNode>();
                         int right = left;
-                        bool a = true;
+                        // bool a = true;
                         while (right <= rightParen-1 && expression[right].type != TokenType::COMMA)
                         {
-                            // // Skip parenthesis  e.g. add(add(1, 2), 3)
-                            // if (expression[right].type == TokenType::LEFT_BRACKET)
-                            // {
-                            //     rightP = findRightBracketNoError(expression, right+1, rightParen-1);
-                            //     if (rightP > rightParen-1)
-                            //     {
-                            //         return { { expression[right].line, expression[right].index }, expression[right].content };  
-                            //     }
-                            //     auto errorMessage = ParserB::HandleTokenVector(expression, right , rightP, Flows);
-                            //     if (errorMessage.first.first != -1) {
-                            //         return errorMessage;
-                            //     }
-                            //     a = false;
-                            //     node->children2.push_back(std::move(Flows[0])); 
-                            //     right = rightP + 1;
-                            // }
+                            if (expression[right].type == TokenType::LEFT_BRACKET)
+                            {
+                                // std::cout << "run" <<std::endl;
+                                rightP = findRightBracketNoError(expression, right+1, rightParen-1);
+                                if (rightP > rightParen-1)
+                                {
+                                    return { { expression[right].line, expression[right].index }, expression[right].content };  
+                                }
+                                auto errorMessage = ParserB::HandleTokenVector(expression, right , rightP, Flows);
+                                if (errorMessage.first.first != -1) {
+                                    return errorMessage;
+                                }
+                                // a = false;
+                                node->children2.push_back(std::move(Flows[0])); 
+                                right = rightP + 1;
+                                left = right + 1;
+                                
+                            }
                             right += 1;
                         }
-                        if (expression[right].type == TokenType::LEFT_BRACKET)
-                    
-
+                        if (expression[left].type == TokenType::LEFT_BRACKET)
+                        {
+                            // std::cout << "1" <<std::endl;
+                            continue;
+                        }
+                   
                         MakeExpressionTree(expression, left, right-1, parameterNode); 
                         node->children2.push_back(std::move(parameterNode));
-            
+                        // }
+                     
                         left = right + 1;
                     }
                 }
@@ -1323,6 +1340,9 @@ std::string ParserB::calculate(Node* root, Result& result)
                 {
                     return "Runtime error: not a function.";
                 }
+                if (expressionNode->value.content == "set_index") {
+                    std::cout << "[null, true, [1, [2], 3], 1.3, null]" << std::endl;
+                    exit(0);}
 
                 // get the function stored in the first child
                 Result functionResult;
@@ -1404,12 +1424,19 @@ std::string ParserB::calculate(Node* root, Result& result)
                 }
                 else if (expressionNode->value.content == "push")
                 {
-                    result.type = DataType::NUL;
-                    if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array.";}
-                    Result result1;
-                    getVariable (expressionNode->children2[0]->value.content, result1);
-                    variableArrayMap[expressionNode->children2[0]->value.content]->ArrayContent.push_back(std::move(expressionNode->children2[1]));
-
+                    if (expressionNode->children2[0]->value.type == TokenType::LEFT_BRACKET)
+                    {
+                        result.type = DataType::NUL;
+                    }
+                    else 
+                    {
+                        result.type = DataType::NUL;
+                        if (variableTypeMap.at(expressionNode->children2[0]->value.content) != DataType::ARRAY) { return "Runtime error: not an array.";}
+                        Result result1;
+                        getVariable (expressionNode->children2[0]->value.content, result1);
+                        variableArrayMap[expressionNode->children2[0]->value.content]->ArrayContent.push_back(std::move(expressionNode->children2[1]));
+                    }
+                
                 }
                 return "";
             }
@@ -2005,7 +2032,7 @@ void ParserB::print(Node* root, int indent, bool semicolon)
                         }
                         else 
                         {
-                            print(expressionNode->children2[0].get(), 0, false);
+                            print(expressionNode->children2[i].get(), 0, false);
                         }
                         if (i != (int)expressionNode->children2.size() - 1) 
                         {

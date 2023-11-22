@@ -330,7 +330,7 @@ static void print_no_semicolon(Node* root, int indent=0)
                         }
                         else 
                         {
-                            print(expressionNode->children2[0].get(), 0, false);
+                            print(expressionNode->children2[i].get(), 0, false);
                         }
                         if (i != (int)expressionNode->children2.size() - 1) 
                         {
