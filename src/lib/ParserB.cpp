@@ -747,6 +747,10 @@ std::pair<std::pair<int, int>, std::string> ParserB::MakeExpressionTree(std::vec
                     }
                     node->children2.push_back(std::move(Flows[0])); 
                 }
+                else if (expression[topIndex].content == "push" )
+                {
+                    
+                }
             }     
             else {
                 node = std::make_unique<ExpressionNode>(expression[topIndex]);
@@ -1253,6 +1257,7 @@ std::string ParserB::calculate(Node* root, Result& result)
             // Function Call
             if (expressionNode->children.size() != 0 && expressionNode->ArrayLookUp == false)
             {
+                
                 if (variableTypeMap.at(expressionNode->value.content) == DataType::UNINITIALIZED)
                 {
                     return "Runtime error: unknown identifier " + expressionNode->value.content;
@@ -1300,8 +1305,10 @@ std::string ParserB::calculate(Node* root, Result& result)
                     }
                 }
                 result.type = DataType::NUL;
+
                 ScopeStack.pop();
                 delete localScope;
+                return "";
             }
             // len() pop() push()
             else if (expressionNode->children2.size() != 0 && expressionNode->ArrayLookUp == false)
@@ -2030,10 +2037,12 @@ void ParserB::printValue(Result& value)
 
     else
     {
+        std::cout << "There is something wrong PrintValue" << std::endl;
         std::cout << (value.type == DataType::FUNCTION) << std::endl;
         std::cout << (value.type == DataType::NUL) << std::endl;
         std::cout << (value.type == DataType::UNINITIALIZED) << std::endl;
         std::cout << "There is something wrong PrintValue" << std::endl;
+        // std::cout <<"null";
     }
 }
 
