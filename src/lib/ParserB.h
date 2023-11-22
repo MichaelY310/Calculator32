@@ -18,9 +18,6 @@
 
 class Result {
 public:
-    // Result(std::shared_ptr<ArrayNode> Array){
-
-    // }
     DataType type;
     bool isreturn = false;
     std::shared_ptr<Function> function;
@@ -277,36 +274,80 @@ static void print_no_semicolon(Node* root, int indent=0)
                 std::cout << ")";
             }
             // len() pop() push()
-            else if (expressionNode->children2.size() != 0 && expressionNode->ArrayLookUp == false)
+            else if (expressionNode->IsFunction == true && expressionNode->ArrayLookUp == false)
             {
                 // len()
                 if (expressionNode->value.content == "len") 
                 {
                     std::cout << "len(";
-                    if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
+                    if (expressionNode->children2.size()!=0)
                     {
-                        std::cout << expressionNode->children2[0]->value.content;
+                        if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
+                        {
+                            // std::cout << expressionNode->children2[0]->value.content;
+                            for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+                            {
+                                std::cout << expressionNode->children2[i]->value.content;
+                                if (i != (int)expressionNode->children2.size() - 1) 
+                                {
+                                    std::cout << ", ";
+                                }
+                            }
+                        }
+                        else 
+                        {
+                            print_no_semicolon(expressionNode->children2[0].get(), 0);
+                        }
                     }
-                    else 
-                    {
-                        print_no_semicolon(expressionNode->children2[0].get(), 0);
-                    }
-                    
                     std::cout << ")";
                 }
                 // pop()
                 else if (expressionNode->value.content == "pop") 
                 {
                     std::cout << "pop(";
-                    if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
+                    if (expressionNode->children2.size()!=0)
                     {
-                        std::cout << expressionNode->children2[0]->value.content;
+                        if (expressionNode->children2[0]->value.type == TokenType::VARIABLE)
+                        {
+                            // std::cout << expressionNode->children2[0]->value.content;
+                            for (int i = 0; i < (int)expressionNode->children2.size(); i++)
+                            {
+                                std::cout << expressionNode->children2[i]->value.content;
+                                if (i != (int)expressionNode->children2.size() - 1) 
+                                {
+                                    std::cout << ", ";
+                                }
+                            }
+                        }
+                        else 
+                        {
+                            print_no_semicolon(expressionNode->children2[0].get(), 0);
+                        }
                     }
-                    else 
+                    std::cout << ")";
+                }
+                // push()
+                else if (expressionNode->value.content == "push")
+                {
+                    std::cout << "push(";
+
+                    for (int i = 0; i < (int)expressionNode->children2.size(); i++)
                     {
-                        print(expressionNode->children2[0].get(), 0, false);
+                        if (expressionNode->children2[i]->value.type == TokenType::VARIABLE) 
+                        {
+                            std::cout << expressionNode->children2[i]->value.content;
+                        }
+                        else 
+                        {
+                            print(expressionNode->children2[i].get(), 0, false);
+                        }
+                        if (i != (int)expressionNode->children2.size() - 1) 
+                        {
+                                std::cout << ", ";
+                        }
                     }
-            
+                    
+                
                     std::cout << ")";
                 }
 

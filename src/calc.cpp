@@ -87,12 +87,12 @@ int main() {
         ParserB::print_no_semicolon(flows[0].get());
         // ParserB::print(flows[0].get(), 0, false);
         std::cout << std::endl;
-
         // Calculate
         Result result;
         Scope* originalScope = new Scope(*(ParserB::ScopeStack.top()));
 
         std::string errorMessage = ParserB::calculate(flows[0].get(), result);
+        
         if (errorMessage.length() != 0)
         {
             // Error
