@@ -1,7 +1,7 @@
 # Calculator32
 ## Overview
 
-Calculator32 is an ongoing project with the temporary goal of functioning as a calculator, with the ultimate aim of evolving into a lightweight script coding language. The project is structured into several main functions, each residing in the /src/ folder, with additional helper classes located in the /src/lib/ folder.
+Calculator32 is an ongoing project with the temporary goal of functioning as a calculator, with the ultimate aim of evolving into a lightweight script coding language. The project is structured into several main functions, each residing in the /src/ folder, with additional helper classes located in the /src/lib/ folder. Use 'Crtl+D' to end input to run the code you write.
 
 ## Lexing (lex.cpp)
 
